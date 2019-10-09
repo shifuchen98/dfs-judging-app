@@ -1,0 +1,68 @@
+{
+  "name": "dfs",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://dfs.avosapps.us",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.21",
+    "@fortawesome/free-solid-svg-icons": "^5.10.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "eslint-config-airbnb": "^18.0.1",
+    "leancloud-storage": "^3.15.0",
+    "leanengine": "^3.4.0",
+    "papaparse": "^5.0.2",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-router-dom": "^5.0.1",
+    "react-scripts": "3.1.1"
+  },
+  "scripts": {
+    "serve": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "prepublish": "npm run build"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true
+    },
+    "extends": "airbnb",
+    "rules": {
+      "react/jsx-filename-extension": [
+        1,
+        {
+          "extensions": [
+            ".js",
+            ".jsx"
+          ]
+        }
+      ],
+      "react/prop-types": 0,
+      "react/sort-comp": 0,
+      "react/no-danger": 0,
+      "react/no-array-index-key": 0,
+      "react/no-did-update-set-state": 0,
+      "max-classes-per-file": 0,
+      "no-plusplus": 0,
+      "class-methods-use-this": 0,
+      "no-param-reassign": 0,
+      "no-nested-ternary": 0
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": "^12.11.0"
+  }
+}
