@@ -104,7 +104,6 @@ label > select {
 }
 option {
   font-weight: 300;
-  transition: none;
 }
 button {
   border: 1px solid #d2d5da;
