@@ -3,8 +3,6 @@ import {
   NavLink as RouteLink,
 } from 'react-router-dom';
 
-import AV from 'leancloud-storage';
-
 import '../style.css';
 
 export default class SideNav extends React.Component {
@@ -17,9 +15,7 @@ export default class SideNav extends React.Component {
 
   logOut() {
     const { history } = this.props;
-    AV.User.logOut().then(() => {
-      history.push('/');
-    });
+    history.push('/'); // Implement auth
   }
 
   render() {

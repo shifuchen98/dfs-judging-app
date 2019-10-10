@@ -1,7 +1,5 @@
 import React from 'react';
 
-import AV from 'leancloud-storage';
-
 import './style.css';
 
 export default class AuthPage extends React.Component {
@@ -28,24 +26,7 @@ export default class AuthPage extends React.Component {
   go(event) {
     const { email, password } = this.state;
     const { history } = this.props;
-    AV.User
-      .logIn(email, password)
-      .then(() => {
-        history.push('/events');
-      })
-      .catch(error => {
-        if (error.code === 210) {
-          alert(
-            'The password you provided is incorrect. Please try again.'
-          );
-        } else if (error.code === 211) {
-          alert(
-            'We could not find a user with the username or email provided.'
-          );
-        } else {
-          alert(error);
-        }
-      });
+    history.push('/events'); // Implement auth
     event.preventDefault();
   }
 

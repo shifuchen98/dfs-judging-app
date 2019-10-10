@@ -1,7 +1,5 @@
 import React from 'react';
 
-import AV from 'leancloud-storage';
-
 import './style.css';
 
 export default class EventsPage extends React.Component {
@@ -14,9 +12,7 @@ export default class EventsPage extends React.Component {
 
   logOut() {
     const { history } = this.props;
-    AV.User.logOut().then(() => {
-      history.push('/');
-    });
+    history.push('/'); // Implement auth
   }
 
   render() {

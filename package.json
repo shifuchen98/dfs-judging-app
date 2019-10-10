@@ -2,14 +2,11 @@
   "name": "dfs",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dfs.avosapps.us",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.21",
     "@fortawesome/free-solid-svg-icons": "^5.10.1",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "eslint-config-airbnb": "^18.0.1",
-    "leancloud-storage": "^3.15.0",
-    "leanengine": "^3.4.0",
     "papaparse": "^5.0.2",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
@@ -17,11 +14,10 @@
     "react-scripts": "3.1.1"
   },
   "scripts": {
-    "serve": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prepublish": "npm run build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "env": {
@@ -51,8 +47,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "engines": {
-    "node": "^12.11.1"
   }
 }

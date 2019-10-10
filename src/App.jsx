@@ -15,14 +15,7 @@ import ExportPage from './ExportPage';
 import WinnerPage from './WinnerPage';
 import PresentationPage from './PresentationPage';
 
-import AV from 'leancloud-storage';
-
 import './style.css';
-
-AV.init({
-  appId: 'RlDEvApsCMvM9OmRpka0Xleb-MdYXbMMI',
-  appKey: 'kPj3e0KVgWClG1jmqCeI2oMw'
-});
 
 export default class App extends React.Component {
   constructor(props) {
