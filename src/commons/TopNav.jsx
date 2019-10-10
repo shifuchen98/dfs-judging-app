@@ -28,9 +28,9 @@ export default class SideNav extends React.Component {
       <nav className="top-nav">
         <ul id="top-nav__left">
           <li id="top-nav__menu">
-            <a onClick={sideNavOn ? closeSideNav : openSideNav}>
+            <button onClick={sideNavOn ? closeSideNav : openSideNav}>
               <span>Menu</span>
-            </a>
+            </button>
           </li>
           <li>
             <RouteLink to="/events">
@@ -40,9 +40,9 @@ export default class SideNav extends React.Component {
         </ul>
         <ul id="top-nav__right">
           <li>
-            <a onClick={this.logOut}>
+            <button onClick={this.logOut}>
               <span>Log out</span>
-            </a>
+            </button>
           </li>
         </ul>
       </nav>

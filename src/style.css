@@ -106,28 +106,33 @@ option {
   font-weight: 300;
 }
 button {
-  border: 1px solid #d2d5da;
-  padding: 8px;
-  background-color: #fff;
+  border: unset;
+  padding: unset;
+  background-color: unset;
   font-family: sans-serif;
   font-weight: 300;
   font-size: 12pt;
-  color: #202e47;
-  border-radius: 2px;
   cursor: pointer;
 }
-button:focus,
-button:hover {
+.field > button {
+  border: 1px solid #d2d5da;
+  padding: 8px;
+  background-color: #fff;
+  color: #202e47;
+  border-radius: 2px;
+}
+.field > button:focus,
+.field > button:hover {
   background-color: #202e4711;
 }
-button.primary {
+.field > button.primary {
   border: 1px solid #0099ff;
   background-color: #0099ff;
   font-weight: 400;
   color: #fff;
 }
-button.primary:focus,
-button.primary:hover {
+.field > button.primary:focus,
+.field > button.primary:hover {
   border: 1px solid #7fc9ff;
   background-color: #7fc9ff;
 }
@@ -180,7 +185,9 @@ button.primary:hover {
   margin: 8px 0 8px 8px;
 }
 #top-nav__left > li > a > span,
-#top-nav__right > li > a > span {
+#top-nav__left > li > button > span,
+#top-nav__right > li > a > span,
+#top-nav__right > li > button > span {
   display: inline-block;
   padding: 8px;
   line-height: 16px;
@@ -189,8 +196,12 @@ button.primary:hover {
 }
 #top-nav__left > li > a:focus > span,
 #top-nav__left > li > a:hover > span,
+#top-nav__left > li > button:focus > span,
+#top-nav__left > li > button:hover > span,
 #top-nav__right > li > a:focus > span,
-#top-nav__right > li > a:hover > span {
+#top-nav__right > li > a:hover > span,
+#top-nav__right > li > button:focus > span,
+#top-nav__right > li > button:hover > span {
   background-color: #ffffff11;
 }
 .side-nav {
