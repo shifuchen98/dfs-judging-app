@@ -9,6 +9,14 @@ export default class EventsPage extends React.Component {
     super(props);
     this.state = {
     };
+    this.logOut = this.logOut.bind(this);
+  }
+
+  logOut() {
+    const { history } = this.props;
+    AV.User.logOut().then(() => {
+      history.push('/');
+    });
   }
 
   render() {
@@ -86,7 +94,7 @@ export default class EventsPage extends React.Component {
               </section>
               <section className="fields">
                 <div className="field">
-                  <button onClick={() => { history.push('/') }}>Log out</button>
+                  <button onClick={this.logOut}>Log out</button>
                 </div>
               </section>
             </div>

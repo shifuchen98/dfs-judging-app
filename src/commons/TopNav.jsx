@@ -3,6 +3,8 @@ import {
   NavLink as RouteLink,
 } from 'react-router-dom';
 
+import AV from 'leancloud-storage';
+
 import '../style.css';
 
 export default class SideNav extends React.Component {
@@ -10,6 +12,14 @@ export default class SideNav extends React.Component {
     super(props);
     this.state = {
     };
+    this.logOut = this.logOut.bind(this);
+  }
+
+  logOut() {
+    const { history } = this.props;
+    AV.User.logOut().then(() => {
+      history.push('/');
+    });
   }
 
   render() {
@@ -30,7 +40,7 @@ export default class SideNav extends React.Component {
         </ul>
         <ul id="top-nav__right">
           <li>
-            <a href="/">
+            <a onClick={this.logOut}>
               <span>Log out</span>
             </a>
           </li>

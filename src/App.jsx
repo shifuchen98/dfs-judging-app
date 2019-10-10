@@ -46,24 +46,20 @@ export default class App extends React.Component {
     const { sideNavOn } = this.state;
     return (
       <Router>
+        <Route path="/event/:id" render={(props) => <TopNav {...props} sideNavOn={sideNavOn} openSideNav={this.openSideNav} closeSideNav={this.closeSideNav} />} />
+        <Route path="/event/:id" render={(props) => <SideNav {...props} sideNavOn={sideNavOn} closeSideNav={this.closeSideNav} />} />
         <Switch>
           <Route exact path="/">
             <div className="auth-wrapper">
-              <Switch>
-                <Route exact path="/" component={AuthPage} />
-              </Switch>
+              <Route exact path="/" component={AuthPage} />
             </div>
           </Route>
           <Route exact path="/events">
             <div className="auth-wrapper">
-              <Switch>
-                <Route exact path="/events" component={EventsPage} />
-              </Switch>
+              <Route exact path="/events" component={EventsPage} />
             </div>
           </Route>
           <Route path="/event/:id">
-            <TopNav sideNavOn={sideNavOn} openSideNav={this.openSideNav} closeSideNav={this.closeSideNav} />
-            <SideNav sideNavOn={sideNavOn} closeSideNav={this.closeSideNav} />
             <div className="basic-wrapper">
               <Switch>
                 <Route exact path="/event/:id/judges" component={JudgesPage} />
