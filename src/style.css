@@ -114,7 +114,8 @@ button {
   font-size: 12pt;
   cursor: pointer;
 }
-.field > button {
+.field > button,
+td > button {
   border: 1px solid #d2d5da;
   padding: 8px;
   background-color: #fff;
@@ -122,17 +123,22 @@ button {
   border-radius: 2px;
 }
 .field > button:focus,
-.field > button:hover {
+.field > button:hover,
+td > button:focus,
+td > button:hover {
   background-color: #202e4711;
 }
-.field > button.primary {
+.field > button.primary,
+td > button.primary {
   border: 1px solid #0099ff;
   background-color: #0099ff;
   font-weight: 400;
   color: #fff;
 }
 .field > button.primary:focus,
-.field > button.primary:hover {
+.field > button.primary:hover,
+td > button.primary:focus,
+td > button.primary:hover {
   border: 1px solid #7fc9ff;
   background-color: #7fc9ff;
 }
