@@ -1,16 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import './style.css';
+import "./style.css";
 
 export default class JudgesPage extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   render() {
-    const { } = this.state;
+    const {} = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -31,7 +30,9 @@ export default class JudgesPage extends React.Component {
                   </label>
                 </div>
                 <div className="field">
-                  <button type="submit" className="primary">Create</button>
+                  <button type="submit" className="primary">
+                    Create
+                  </button>
                 </div>
               </section>
             </div>
@@ -59,19 +60,25 @@ export default class JudgesPage extends React.Component {
                         <td>1</td>
                         <td>Alice</td>
                         <td>a@test.com</td>
-                        <td><button>Delete</button></td>
+                        <td>
+                          <button>Delete</button>
+                        </td>
                       </tr>
                       <tr>
                         <td>2</td>
                         <td>Bob</td>
                         <td>b@test.com</td>
-                        <td><button>Delete</button></td>
+                        <td>
+                          <button>Delete</button>
+                        </td>
                       </tr>
                       <tr>
                         <td>3</td>
                         <td>Charlie</td>
                         <td>c@test.com</td>
-                        <td><button>Delete</button></td>
+                        <td>
+                          <button>Delete</button>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
