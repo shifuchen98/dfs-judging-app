@@ -1,21 +1,29 @@
-import React from 'react';
-import {
-  NavLink as RouteLink,
-} from 'react-router-dom';
+import React from "react";
+import firebase from "../Auth.js";
+import { NavLink as RouteLink } from "react-router-dom";
 
-import '../style.css';
+import "../style.css";
 
 export default class SideNav extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
     this.logOut = this.logOut.bind(this);
   }
 
   logOut() {
     const { history } = this.props;
-    history.push('/'); // Implement auth
+    firebase
+      .auth()
+      .signOut()
+      .then(function() {
+        // Sign-out successful.
+        history.push("/");
+      })
+      .catch(function(error) {
+        // An error happened.
+        alert(error);
+      });
   }
 
   render() {

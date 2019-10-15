@@ -1,16 +1,31 @@
-import React from 'react';
-
-import './style.css';
+import React from "react";
+import firebase from "./Auth.js";
+import "./style.css";
 
 export default class JudgesPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      judges: []
     };
+    this.db = firebase.firestore();
+  }
+
+  componentDidMount() {
+    const judges = [];
+    this.db
+      .collection("judges")
+      .get()
+      .then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          judges.push(doc.data());
+        });
+        this.setState({ judges });
+      });
   }
 
   render() {
-    const { } = this.state;
+    const { judges } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -31,7 +46,9 @@ export default class JudgesPage extends React.Component {
                   </label>
                 </div>
                 <div className="field">
-                  <button type="submit" className="primary">Create</button>
+                  <button type="submit" className="primary">
+                    Create
+                  </button>
                 </div>
               </section>
             </div>
@@ -55,24 +72,16 @@ export default class JudgesPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Alice</td>
-                        <td>a@test.com</td>
-                        <td><button>Delete</button></td>
-                      </tr>
-                      <tr>
-                        <td>2</td>
-                        <td>Bob</td>
-                        <td>b@test.com</td>
-                        <td><button>Delete</button></td>
-                      </tr>
-                      <tr>
-                        <td>3</td>
-                        <td>Charlie</td>
-                        <td>c@test.com</td>
-                        <td><button>Delete</button></td>
-                      </tr>
+                      {judges.map((judge, index) => (
+                        <tr key={judge.email}>
+                          <td>{index + 1}</td>
+                          <td>{judge.name}</td>
+                          <td>{judge.email}</td>
+                          <td>
+                            <button>Delete</button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
