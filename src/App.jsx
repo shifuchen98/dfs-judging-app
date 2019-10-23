@@ -20,8 +20,8 @@ import AV from 'leancloud-storage';
 import './style.css';
 
 AV.init({
-  appId: 'RlDEvApsCMvM9OmRpka0Xleb-MdYXbMMI',
-  appKey: 'kPj3e0KVgWClG1jmqCeI2oMw'
+  appId: 'DYL9yvHhYIFt50o5MGIeGwKh-MdYXbMMI',
+  appKey: '1Np84YHTVsUEs2hmCWspVxMK'
 });
 
 export default class App extends React.Component {

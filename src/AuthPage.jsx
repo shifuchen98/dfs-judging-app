@@ -25,7 +25,7 @@ export default class AuthPage extends React.Component {
     this.setState({ password: event.target.value });
   }
 
-  go(event) {
+  go(e) {
     const { email, password } = this.state;
     const { history } = this.props;
     AV.User
@@ -46,7 +46,7 @@ export default class AuthPage extends React.Component {
           alert(error);
         }
       });
-    event.preventDefault();
+    e.preventDefault();
   }
 
   requestPasswordReset() {
