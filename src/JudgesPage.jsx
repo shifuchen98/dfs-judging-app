@@ -20,7 +20,12 @@ export default class JudgesPage extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchJudges();
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+      this.fetchJudges();
+    }
   }
 
   fetchJudges() {

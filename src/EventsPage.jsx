@@ -23,7 +23,12 @@ export default class EventsPage extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchEvents();
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+      this.fetchEvents();
+    }
   }
 
   fetchEvents() {

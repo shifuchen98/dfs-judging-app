@@ -26,7 +26,12 @@ export default class TeamsPage extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchTeams();
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+      this.fetchTeams();
+    }
   }
 
   fetchTeams() {

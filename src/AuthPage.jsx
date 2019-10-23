@@ -17,6 +17,13 @@ export default class AuthPage extends React.Component {
     this.requestPasswordReset = this.requestPasswordReset.bind(this);
   }
 
+  componentDidMount() {
+    const { history } = this.props;
+    if (AV.User.current()) {
+      history.push('/events');
+    }
+  }
+
   handleEmailChange(event) {
     this.setState({ email: event.target.value });
   }
