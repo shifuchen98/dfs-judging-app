@@ -136,7 +136,7 @@ export default class JudgesPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {judges.filter(judge => judgesSearch ? judge.get('user').get('name').toLowerCase().includes(judgesSearch) || judge.get('user').get('email').toLowerCase().includes(judgesSearch) : true).map((judge, index) =>
+                      {judges.filter(judge => judgesSearch ? judge.get('user').get('name').toLowerCase().includes(judgesSearch.toLowerCase()) || judge.get('user').get('email').toLowerCase().includes(judgesSearch.toLowerCase()) : true).map((judge, index) =>
                         <tr key={judge.id}>
                           <td>{index + 1}</td>
                           <td>{judge.get('user').get('name')}</td>

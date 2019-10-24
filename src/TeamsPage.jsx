@@ -158,7 +158,7 @@ export default class TeamsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {teams.filter(team => teamsSearch ? team.get('name').toLowerCase().includes(teamsSearch) || team.get('appName').toLowerCase().includes(teamsSearch) : true).map((team, index) =>
+                      {teams.filter(team => teamsSearch ? team.get('name').toLowerCase().includes(teamsSearch.toLowerCase()) || team.get('appName').toLowerCase().includes(teamsSearch.toLowerCase()) : true).map((team, index) =>
                         <tr key={team.id}>
                           <td>{index + 1}</td>
                           <td>{team.get('name')}</td>

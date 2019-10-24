@@ -121,7 +121,7 @@ export default class EventsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.filter(event => eventsFilter ? event.get('name').toLowerCase().includes(eventsFilter) : true).map(event =>
+                      {events.filter(event => eventsFilter ? event.get('name').toLowerCase().includes(eventsFilter.toLowerCase()) : true).map(event =>
                         <tr key={event.id}>
                           <td>{event.get('name')}</td>
                           <td>{event.get('date')}</td>
