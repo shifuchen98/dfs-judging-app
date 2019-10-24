@@ -107,6 +107,7 @@ option {
 }
 button {
   border: unset;
+  margin: unset;
   padding: unset;
   background-color: unset;
   font-family: sans-serif;

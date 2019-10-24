@@ -1,5 +1,7 @@
 import React from 'react';
 
+import AV from 'leancloud-storage';
+
 import './style.css';
 
 export default class AssignPage extends React.Component {
@@ -7,6 +9,15 @@ export default class AssignPage extends React.Component {
     super(props);
     this.state = {
     };
+  }
+
+  componentDidMount() {
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+
+    }
   }
 
   render() {
