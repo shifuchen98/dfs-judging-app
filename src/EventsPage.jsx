@@ -9,12 +9,12 @@ export default class EventsPage extends React.Component {
     super(props);
     this.state = {
       events: [],
-      eventsFilter: '',
+      eventsSearch: '',
       eventName: '',
       eventDate: new Date().toLocaleDateString('en-US')
     };
     this.fetchEvents = this.fetchEvents.bind(this);
-    this.handleEventsFilterChange = this.handleEventsFilterChange.bind(this);
+    this.handleEventsSearchChange = this.handleEventsSearchChange.bind(this);
     this.handleEventNameChange = this.handleEventNameChange.bind(this);
     this.handleEventDateChange = this.handleEventDateChange.bind(this);
     this.createEvent = this.createEvent.bind(this);
@@ -43,8 +43,8 @@ export default class EventsPage extends React.Component {
       });
   }
 
-  handleEventsFilterChange(event) {
-    this.setState({ eventsFilter: event.target.value });
+  handleEventsSearchChange(event) {
+    this.setState({ eventsSearch: event.target.value });
   }
 
   handleEventNameChange(event) {
@@ -89,7 +89,7 @@ export default class EventsPage extends React.Component {
 
   render() {
     const { history } = this.props;
-    const { events, eventsFilter, eventName, eventDate } = this.state;
+    const { events, eventsSearch, eventName, eventDate } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -107,7 +107,7 @@ export default class EventsPage extends React.Component {
                 <div className="field field--half">
                   <label>
                     <span>Search</span>
-                    <input type="text" value={eventsFilter} onChange={this.handleEventsFilterChange} />
+                    <input type="text" value={eventsSearch} onChange={this.handleEventsSearchChange} />
                   </label>
                 </div>
                 <div className="field">
@@ -121,7 +121,7 @@ export default class EventsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.filter(event => eventsFilter ? event.get('name').toLowerCase().includes(eventsFilter.toLowerCase()) : true).map(event =>
+                      {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).map(event =>
                         <tr key={event.id}>
                           <td>{event.get('name')}</td>
                           <td>{event.get('date')}</td>

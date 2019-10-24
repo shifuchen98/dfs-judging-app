@@ -8,21 +8,21 @@ export default class TeamsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      teams: [],
+      eventTeams: [],
       teamName: '',
       school: '',
       appName: '',
       appDescription: '',
       teamsSearch: ''
     };
-    this.fetchTeams = this.fetchTeams.bind(this);
+    this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
     this.handleAppNameChange = this.handleAppNameChange.bind(this);
     this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(this);
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
-    this.createTeam = this.createTeam.bind(this);
-    this.deleteTeam = this.deleteTeam.bind(this);
+    this.createEventTeam = this.createEventTeam.bind(this);
+    this.deleteEventTeam = this.deleteEventTeam.bind(this);
   }
 
   componentDidMount() {
@@ -30,18 +30,18 @@ export default class TeamsPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-      this.fetchTeams();
+      this.fetchEventTeams();
     }
   }
 
-  fetchTeams() {
+  fetchEventTeams() {
     const { match } = this.props;
-    const teamsQuery = new AV.Query('Team');
-    teamsQuery
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
       .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
       .find()
-      .then(teams => {
-        this.setState({ teams });
+      .then(eventTeams => {
+        this.setState({ eventTeams });
       })
       .catch(error => {
         alert(error);
@@ -68,11 +68,11 @@ export default class TeamsPage extends React.Component {
     this.setState({ teamsSearch: event.target.value });
   }
 
-  createTeam(e) {
+  createEventTeam(e) {
     const { match } = this.props;
     const { teamName, school, appName, appDescription } = this.state;
-    const team = new AV.Object('Team');
-    team
+    const eventTeam = new AV.Object('EventTeam');
+    eventTeam
       .set('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
       .set('name', teamName)
       .set('school', school)
@@ -80,7 +80,7 @@ export default class TeamsPage extends React.Component {
       .set('appDescription', appDescription)
       .save()
       .then(() => {
-        this.setState({ teamName: '', school: '', appName: '', appDescription: '' }, this.fetchTeams);
+        this.setState({ teamName: '', school: '', appName: '', appDescription: '' }, this.fetchEventTeams);
       })
       .catch(error => {
         alert(error);
@@ -88,17 +88,17 @@ export default class TeamsPage extends React.Component {
     e.preventDefault();
   }
 
-  deleteTeam(team) {
-    team
+  deleteEventTeam(eventTeam) {
+    eventTeam
       .destroy()
-      .then(this.fetchTeams)
+      .then(this.fetchEventTeams)
       .catch(error => {
         alert(error);
       });
   }
 
   render() {
-    const { teams, teamName, school, appName, appDescription, teamsSearch } = this.state;
+    const { eventTeams, teamName, school, appName, appDescription, teamsSearch } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -106,7 +106,7 @@ export default class TeamsPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>New Team</h1>
-                <form onSubmit={this.createTeam}>
+                <form onSubmit={this.createEventTeam}>
                   <div className="field field--half">
                     <label>
                       <span>Team Name</span>
@@ -158,13 +158,13 @@ export default class TeamsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {teams.filter(team => teamsSearch ? team.get('name').toLowerCase().includes(teamsSearch.toLowerCase()) || team.get('appName').toLowerCase().includes(teamsSearch.toLowerCase()) : true).map((team, index) =>
-                        <tr key={team.id}>
+                      {eventTeams.filter(eventTeam => teamsSearch ? eventTeam.get('name').toLowerCase().includes(teamsSearch.toLowerCase()) || eventTeam.get('appName').toLowerCase().includes(teamsSearch.toLowerCase()) : true).map((eventTeam, index) =>
+                        <tr key={eventTeam.id}>
                           <td>{index + 1}</td>
-                          <td>{team.get('name')}</td>
-                          <td>{team.get('appName')}</td>
-                          <td>{team.get('school')}</td>
-                          <td><button onClick={() => { this.deleteTeam(team) }}>Delete</button></td>
+                          <td>{eventTeam.get('name')}</td>
+                          <td>{eventTeam.get('appName')}</td>
+                          <td>{eventTeam.get('school')}</td>
+                          <td><button onClick={() => { this.deleteEventTeam(eventTeam) }}>Delete</button></td>
                         </tr>
                       )}
                     </tbody>

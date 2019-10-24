@@ -24,20 +24,20 @@ export default class TotalPage extends React.Component {
 
   fetchScores() {
     const { match } = this.props;
-    const teamsQuery = new AV.Query('Team');
-    teamsQuery
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
       .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
       .find()
-      .then(teams => {
-        teams.forEach(team => {
-          const assignmentsQuery = new AV.Query('Assignment');
-          assignmentsQuery
-            .equalTo('team', team)
-            .include('judge')
-            .include('judge.user')
+      .then(eventTeams => {
+        eventTeams.forEach(eventTeam => {
+          const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+          judgeTeamPairsQuery
+            .equalTo('eventTeam', eventTeam)
+            .include('eventJudge')
+            .include('eventJudge.user')
             .find()
-            .then(assignments => {
-              this.setState({ scores: [...this.state.scores, { team, assignments }] });
+            .then(judgeTeamPairs => {
+              this.setState({ scores: [...this.state.scores, { eventTeam, judgeTeamPairs }] });
             })
             .catch(error => {
               alert(error);
@@ -56,9 +56,9 @@ export default class TotalPage extends React.Component {
         <div className="columns">
           <div className="column">
             {scores.map(score =>
-              <div className="card" key={score.team.id}>
+              <div className="card" key={score.eventTeam.id}>
                 <section className="fields">
-                  <h1>{score.team.get('name')}</h1>
+                  <h1>{score.eventTeam.get('name')}</h1>
                   <div className="field">
                     <table>
                       <thead>
@@ -74,15 +74,16 @@ export default class TotalPage extends React.Component {
                         </tr>
                       </thead>
                       <tbody>
-                        {score.assignments.map(assignment =>
-                          <tr key={assignment.get('judge').id}>
-                            <td>{assignment.get('judge').get('user').get('name')}</td>
-                            <td>{assignment.get('scores').dscore1}</td>
-                            <td>{assignment.get('scores').dscore2}</td>
-                            <td>{assignment.get('scores').fscore1}</td>
-                            <td>{assignment.get('scores').fscore2}</td>
-                            <td>{assignment.get('scores').tscore1}</td>
-                            <td>{assignment.get('scores').tscore2}</td>
+                        {score.judgeTeamPairs.map(judgeTeamPair =>
+                          <tr key={judgeTeamPair.get('eventJudge').id}>
+                            <td>{judgeTeamPair.get('eventJudge').get('user').get('name')}</td>
+                            <td>{judgeTeamPair.get('scores').dscore1}</td>
+                            <td>{judgeTeamPair.get('scores').dscore2}</td>
+                            <td>{judgeTeamPair.get('scores').fscore1}</td>
+                            <td>{judgeTeamPair.get('scores').fscore2}</td>
+                            <td>{judgeTeamPair.get('scores').tscore1}</td>
+                            <td>{judgeTeamPair.get('scores').tscore2}</td>
+                            <td>{judgeTeamPair.get('scores').dscore1 + judgeTeamPair.get('scores').dscore2 + judgeTeamPair.get('scores').fscore1 + judgeTeamPair.get('scores').fscore2 + judgeTeamPair.get('scores').tscore1 + judgeTeamPair.get('scores').tscore2}</td>
                           </tr>
                         )}
                       </tbody>

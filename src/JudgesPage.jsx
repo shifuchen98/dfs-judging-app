@@ -8,15 +8,15 @@ export default class JudgesPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      judges: [],
+      eventJudges: [],
       judgesSearch: '',
       judgeEmail: ''
     };
-    this.fetchJudges = this.fetchJudges.bind(this);
+    this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
     this.handleJudgeEmailChange = this.handleJudgeEmailChange.bind(this);
-    this.addJudge = this.addJudge.bind(this);
-    this.deleteJudge = this.deleteJudge.bind(this);
+    this.addEventJudge = this.addEventJudge.bind(this);
+    this.deleteEventJudge = this.deleteEventJudge.bind(this);
   }
 
   componentDidMount() {
@@ -24,19 +24,19 @@ export default class JudgesPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-      this.fetchJudges();
+      this.fetchEventJudges();
     }
   }
 
-  fetchJudges() {
+  fetchEventJudges() {
     const { match } = this.props;
-    const judgesQuery = new AV.Query('Judge');
-    judgesQuery
+    const eventJudgesQuery = new AV.Query('EventJudge');
+    eventJudgesQuery
       .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
       .include('user')
       .find()
-      .then(judges => {
-        this.setState({ judges });
+      .then(eventJudges => {
+        this.setState({ eventJudges });
       })
       .catch(error => {
         alert(error);
@@ -51,7 +51,7 @@ export default class JudgesPage extends React.Component {
     this.setState({ judgeEmail: event.target.value });
   }
 
-  addJudge(e) {
+  addEventJudge(e) {
     const { match } = this.props;
     const { judgeEmail } = this.state;
     const usersQuery = new AV.Query('_User');
@@ -60,13 +60,13 @@ export default class JudgesPage extends React.Component {
       .first()
       .then(user => {
         if (user) {
-          const judge = new AV.Object('Judge');
-          judge
+          const eventJudge = new AV.Object('EventJudge');
+          eventJudge
             .set('user', user)
             .set('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
             .save()
             .then(() => {
-              this.setState({ judgeEmail: '' }, this.fetchJudges);
+              this.setState({ judgeEmail: '' }, this.fetchEventJudges);
             })
             .catch(error => {
               if (error.code === 137) {
@@ -85,17 +85,17 @@ export default class JudgesPage extends React.Component {
     e.preventDefault();
   }
 
-  deleteJudge(judge) {
-    judge
+  deleteEventJudge(eventJudge) {
+    eventJudge
       .destroy()
-      .then(this.fetchJudges)
+      .then(this.fetchEventJudges)
       .catch(error => {
         alert(error);
       });
   }
 
   render() {
-    const { judges, judgesSearch, judgeEmail } = this.state;
+    const { eventJudges, judgesSearch, judgeEmail } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -103,7 +103,7 @@ export default class JudgesPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Add Judge</h1>
-                <form onSubmit={this.addJudge}>
+                <form onSubmit={this.addEventJudge}>
                   <div className="field field--half">
                     <label>
                       <span>Judge Email</span>
@@ -136,12 +136,12 @@ export default class JudgesPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {judges.filter(judge => judgesSearch ? judge.get('user').get('name').toLowerCase().includes(judgesSearch.toLowerCase()) || judge.get('user').get('email').toLowerCase().includes(judgesSearch.toLowerCase()) : true).map((judge, index) =>
-                        <tr key={judge.id}>
+                      {eventJudges.filter(eventJudge => judgesSearch ? eventJudge.get('user').get('name').toLowerCase().includes(judgesSearch.toLowerCase()) || eventJudge.get('user').get('email').toLowerCase().includes(judgesSearch.toLowerCase()) : true).map((eventJudge, index) =>
+                        <tr key={eventJudge.id}>
                           <td>{index + 1}</td>
-                          <td>{judge.get('user').get('name')}</td>
-                          <td>{judge.get('user').get('email')}</td>
-                          <td><button onClick={() => { this.deleteJudge(judge) }}>Delete</button></td>
+                          <td>{eventJudge.get('user').get('name')}</td>
+                          <td>{eventJudge.get('user').get('email')}</td>
+                          <td><button onClick={() => { this.deleteEventJudge(eventJudge) }}>Delete</button></td>
                         </tr>
                       )}
                     </tbody>
