@@ -11,12 +11,14 @@ export default class EventsPage extends React.Component {
       events: [],
       eventsSearch: '',
       eventName: '',
-      eventDate: new Date().toLocaleDateString('en-US')
+      eventDate: new Date().toLocaleDateString('en-US'),
+      eventLocation: ''
     };
     this.fetchEvents = this.fetchEvents.bind(this);
     this.handleEventsSearchChange = this.handleEventsSearchChange.bind(this);
     this.handleEventNameChange = this.handleEventNameChange.bind(this);
     this.handleEventDateChange = this.handleEventDateChange.bind(this);
+    this.handleEventLocationChange = this.handleEventLocationChange.bind(this);
     this.createEvent = this.createEvent.bind(this);
     this.deleteEvent = this.deleteEvent.bind(this);
     this.logOut = this.logOut.bind(this);
@@ -55,15 +57,20 @@ export default class EventsPage extends React.Component {
     this.setState({ eventDate: event.target.value });
   }
 
+  handleEventLocationChange(event) {
+    this.setState({ eventLocation: event.target.value });
+  }
+
   createEvent(e) {
-    const { eventName, eventDate } = this.state;
+    const { eventName, eventDate, eventLocation } = this.state;
     const event = new AV.Object('Event');
     event
       .set('name', eventName)
       .set('date', eventDate)
+      .set('location', eventLocation)
       .save()
       .then(() => {
-        this.setState({ eventName: '', eventDate: new Date().toLocaleDateString('en-US') }, this.fetchEvents);
+        this.setState({ eventName: '', eventDate: new Date().toLocaleDateString('en-US'), eventLocation: '' }, this.fetchEvents);
       })
       .catch(error => {
         alert(error);
@@ -89,7 +96,7 @@ export default class EventsPage extends React.Component {
 
   render() {
     const { history } = this.props;
-    const { events, eventsSearch, eventName, eventDate } = this.state;
+    const { events, eventsSearch, eventName, eventDate, eventLocation } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -116,6 +123,7 @@ export default class EventsPage extends React.Component {
                       <tr>
                         <th>Name</th>
                         <th>Date</th>
+                        <th>Location</th>
                         <th>Enter</th>
                         <th>Delete</th>
                       </tr>
@@ -125,6 +133,7 @@ export default class EventsPage extends React.Component {
                         <tr key={event.id}>
                           <td>{event.get('name')}</td>
                           <td>{event.get('date')}</td>
+                          <td>{event.get('location')}</td>
                           <td><button className="primary" onClick={() => { history.push(`/event/${event.id}/judges`) }}>Enter</button></td>
                           <td><button onClick={() => { this.deleteEvent(event) }}>Delete</button></td>
                         </tr>
@@ -146,6 +155,12 @@ export default class EventsPage extends React.Component {
                     <label>
                       <span>Date</span>
                       <input type="text" value={eventDate} onChange={this.handleEventDateChange} required />
+                    </label>
+                  </div>
+                  <div className="field field--half">
+                    <label>
+                      <span>Location</span>
+                      <input type="text" value={eventLocation} onChange={this.handleEventLocationChange} required />
                     </label>
                   </div>
                   <div className="field">
