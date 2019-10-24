@@ -211,6 +211,9 @@ td > button.primary:hover {
 #top-nav__right > li > button:hover > span {
   background-color: #ffffff11;
 }
+.top-nav__extra {
+  display: none;
+}
 .side-nav {
   position: fixed;
   top: 48px;
@@ -296,6 +299,9 @@ td > button.primary:hover {
   }
   .column {
     margin: 64px auto 0 auto;
+  }
+  .top-nav__extra {
+    display: inline;
   }
   .side-nav {
     padding: 0;

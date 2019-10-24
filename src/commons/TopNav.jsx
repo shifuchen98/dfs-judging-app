@@ -11,8 +11,27 @@ export default class SideNav extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      event: new AV.Object('Event'),
     };
+    this.fetchEvent = this.fetchEvent.bind(this);
     this.logOut = this.logOut.bind(this);
+  }
+
+  componentDidMount() {
+    this.fetchEvent();
+  }
+
+  fetchEvent() {
+    const { match } = this.props;
+    const eventsQuery = new AV.Query('Event');
+    eventsQuery
+      .get(match.params.id)
+      .then(event => {
+        this.setState({ event });
+      })
+      .catch(error => {
+        alert(error);
+      });
   }
 
   logOut() {
@@ -24,6 +43,7 @@ export default class SideNav extends React.Component {
 
   render() {
     const { sideNavOn, openSideNav, closeSideNav } = this.props;
+    const { event } = this.state;
     return (
       <nav className="top-nav">
         <ul id="top-nav__left">
@@ -34,14 +54,14 @@ export default class SideNav extends React.Component {
           </li>
           <li>
             <RouteLink to="/events">
-              <span>All Events</span>
+              <span>All Events<span className="top-nav__extra"> ({event.get('name')})</span></span>
             </RouteLink>
           </li>
         </ul>
         <ul id="top-nav__right">
           <li>
             <button onClick={this.logOut}>
-              <span>Log out</span>
+              <span>Log out<span className="top-nav__extra"> ({AV.User.current().get('name')})</span></span>
             </button>
           </li>
         </ul>

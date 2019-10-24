@@ -170,7 +170,7 @@ export default class EventsPage extends React.Component {
               </section>
               <section className="fields">
                 <div className="field">
-                  <button onClick={this.logOut}>Log out</button>
+                  <button onClick={this.logOut}>Log out ({AV.User.current().get('name')})</button>
                 </div>
               </section>
             </div>
