@@ -8,8 +8,10 @@ export default class TotalPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      event: new AV.Object('Event'),
       scores: []
     };
+    this.fetchEvent = this.fetchEvent.bind(this);
     this.fetchScores = this.fetchScores.bind(this);
   }
 
@@ -18,8 +20,21 @@ export default class TotalPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-      this.fetchScores();
+      this.fetchEvent();
     }
+  }
+
+  fetchEvent() {
+    const { match } = this.props;
+    const eventsQuery = new AV.Query('Event');
+    eventsQuery
+      .get(match.params.id)
+      .then(event => {
+        this.setState({ event }, this.fetchScores);
+      })
+      .catch(error => {
+        alert(error);
+      });
   }
 
   fetchScores() {
@@ -50,7 +65,7 @@ export default class TotalPage extends React.Component {
   }
 
   render() {
-    const { scores } = this.state;
+    const { event, scores } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -64,12 +79,9 @@ export default class TotalPage extends React.Component {
                       <thead>
                         <tr>
                           <th>Judge</th>
-                          <th>Design 1</th>
-                          <th>Design 2</th>
-                          <th>Functionality 1</th>
-                          <th>Functionality 2</th>
-                          <th>Theme 1</th>
-                          <th>Theme 2</th>
+                          {event.get('criteria').map((criterion, index) =>
+                            <th key={index}>{criterion.name} ({criterion.max})</th>
+                          )}
                           <th>Total</th>
                         </tr>
                       </thead>
@@ -77,13 +89,24 @@ export default class TotalPage extends React.Component {
                         {score.judgeTeamPairs.map(judgeTeamPair =>
                           <tr key={judgeTeamPair.get('eventJudge').id}>
                             <td>{judgeTeamPair.get('eventJudge').get('user').get('name')}</td>
-                            <td>{judgeTeamPair.get('scores').dscore1}</td>
-                            <td>{judgeTeamPair.get('scores').dscore2}</td>
-                            <td>{judgeTeamPair.get('scores').fscore1}</td>
-                            <td>{judgeTeamPair.get('scores').fscore2}</td>
-                            <td>{judgeTeamPair.get('scores').tscore1}</td>
-                            <td>{judgeTeamPair.get('scores').tscore2}</td>
-                            <td>{judgeTeamPair.get('scores').dscore1 + judgeTeamPair.get('scores').dscore2 + judgeTeamPair.get('scores').fscore1 + judgeTeamPair.get('scores').fscore2 + judgeTeamPair.get('scores').tscore1 + judgeTeamPair.get('scores').tscore2}</td>
+                            {event.get('criteria').map((criterion, index) =>
+                              <td key={index}>{judgeTeamPair.get('scores').reduce((accumulator, currentValue) => {
+                                let result = accumulator;
+                                if (currentValue.name === criterion.name) {
+                                  result += currentValue.value;
+                                }
+                                return result;
+                              }, null)}</td>
+                            )}
+                            <td>{judgeTeamPair.get('scores').reduce((accumulator, currentValue) => {
+                              let result = accumulator;
+                              event.get('criteria').forEach(criterion => {
+                                if (currentValue.name === criterion.name) {
+                                  result += currentValue.value;
+                                }
+                              });
+                              return result;
+                            }, null)}</td>
                           </tr>
                         )}
                       </tbody>

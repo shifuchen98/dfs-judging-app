@@ -10,6 +10,7 @@ import EventsPage from './EventsPage';
 import JudgesPage from './JudgesPage';
 import TeamsPage from './TeamsPage';
 import AssignPage from './AssignPage';
+import CriteriaPage from './CriteriaPage';
 import TotalPage from './TotalPage';
 import ExportPage from './ExportPage';
 import WinnerPage from './WinnerPage';
@@ -65,6 +66,7 @@ export default class App extends React.Component {
                 <Route exact path="/event/:id/judges" component={JudgesPage} />
                 <Route exact path="/event/:id/teams" component={TeamsPage} />
                 <Route exact path="/event/:id/assign" component={AssignPage} />
+                <Route exact path="/event/:id/criteria" component={CriteriaPage} />
                 <Route exact path="/event/:id/total" component={TotalPage} />
                 <Route exact path="/event/:id/export" component={ExportPage} />
                 <Route exact path="/event/:id/winner" component={WinnerPage} />
