@@ -43,12 +43,12 @@ export default class JudgesPage extends React.Component {
       });
   }
 
-  handleJudgesSearchChange(event) {
-    this.setState({ judgesSearch: event.target.value });
+  handleJudgesSearchChange(e) {
+    this.setState({ judgesSearch: e.target.value });
   }
 
-  handleJudgeEmailChange(event) {
-    this.setState({ judgeEmail: event.target.value });
+  handleJudgeEmailChange(e) {
+    this.setState({ judgeEmail: e.target.value });
   }
 
   addEventJudge(e) {

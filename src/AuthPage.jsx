@@ -24,12 +24,12 @@ export default class AuthPage extends React.Component {
     }
   }
 
-  handleEmailChange(event) {
-    this.setState({ email: event.target.value });
+  handleEmailChange(e) {
+    this.setState({ email: e.target.value });
   }
 
-  handlePasswordChange(event) {
-    this.setState({ password: event.target.value });
+  handlePasswordChange(e) {
+    this.setState({ password: e.target.value });
   }
 
   go(e) {

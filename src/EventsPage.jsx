@@ -45,20 +45,20 @@ export default class EventsPage extends React.Component {
       });
   }
 
-  handleEventsSearchChange(event) {
-    this.setState({ eventsSearch: event.target.value });
+  handleEventsSearchChange(e) {
+    this.setState({ eventsSearch: e.target.value });
   }
 
-  handleEventNameChange(event) {
-    this.setState({ eventName: event.target.value });
+  handleEventNameChange(e) {
+    this.setState({ eventName: e.target.value });
   }
 
-  handleEventDateChange(event) {
-    this.setState({ eventDate: event.target.value });
+  handleEventDateChange(e) {
+    this.setState({ eventDate: e.target.value });
   }
 
-  handleEventLocationChange(event) {
-    this.setState({ eventLocation: event.target.value });
+  handleEventLocationChange(e) {
+    this.setState({ eventLocation: e.target.value });
   }
 
   createEvent(e) {

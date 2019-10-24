@@ -48,24 +48,24 @@ export default class TeamsPage extends React.Component {
       });
   }
 
-  handleTeamNameChange(event) {
-    this.setState({ teamName: event.target.value });
+  handleTeamNameChange(e) {
+    this.setState({ teamName: e.target.value });
   }
 
-  handleSchoolChange(event) {
-    this.setState({ school: event.target.value });
+  handleSchoolChange(e) {
+    this.setState({ school: e.target.value });
   }
 
-  handleAppNameChange(event) {
-    this.setState({ appName: event.target.value });
+  handleAppNameChange(e) {
+    this.setState({ appName: e.target.value });
   }
 
-  handleAppDescriptionChange(event) {
-    this.setState({ appDescription: event.target.value });
+  handleAppDescriptionChange(e) {
+    this.setState({ appDescription: e.target.value });
   }
 
-  handleTeamsSearchChange(event) {
-    this.setState({ teamsSearch: event.target.value });
+  handleTeamsSearchChange(e) {
+    this.setState({ teamsSearch: e.target.value });
   }
 
   createEventTeam(e) {
