@@ -29,7 +29,7 @@ export default class JudgesPage extends React.Component {
   }
 
   fetchJudges() {
-    const { match } = this.props
+    const { match } = this.props;
     const judgesQuery = new AV.Query('Judge');
     judgesQuery
       .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
@@ -52,7 +52,7 @@ export default class JudgesPage extends React.Component {
   }
 
   addJudge(e) {
-    const { match } = this.props
+    const { match } = this.props;
     const { judgeEmail } = this.state;
     const usersQuery = new AV.Query('_User');
     usersQuery

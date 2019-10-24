@@ -35,7 +35,7 @@ export default class TeamsPage extends React.Component {
   }
 
   fetchTeams() {
-    const { match } = this.props
+    const { match } = this.props;
     const teamsQuery = new AV.Query('Team');
     teamsQuery
       .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
@@ -69,7 +69,7 @@ export default class TeamsPage extends React.Component {
   }
 
   createTeam(e) {
-    const { match } = this.props
+    const { match } = this.props;
     const { teamName, school, appName, appDescription } = this.state;
     const team = new AV.Object('Team');
     team
