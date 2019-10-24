@@ -57,7 +57,21 @@ export default class AuthPage extends React.Component {
   }
 
   requestPasswordReset() {
-
+    const { email } = this.state;
+    const username = email || prompt('Please enter your email:');
+    if (username) {
+      AV.User.requestPasswordReset(username)
+        .then(() => {
+          alert('You will receive an email with instructions to reset your password.');
+        })
+        .catch(error => {
+          if (error.code === 205) {
+            alert('We could not find a user with the username or email provided.');
+          } else {
+            alert(error);
+          }
+        });
+    }
   }
 
   render() {
