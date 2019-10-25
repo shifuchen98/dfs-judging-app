@@ -22,6 +22,7 @@ export default class TeamsPage extends React.Component {
     this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(this);
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
     this.createEventTeam = this.createEventTeam.bind(this);
+    this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
   }
 
@@ -86,6 +87,11 @@ export default class TeamsPage extends React.Component {
         alert(error);
       })
     e.preventDefault();
+  }
+
+  editEventTeam(eventTeam) {
+    const { history, match } = this.props;
+    history.push(`/event/${match.params.id}/team/${eventTeam.id}`);
   }
 
   deleteEventTeam(eventTeam) {
@@ -155,6 +161,7 @@ export default class TeamsPage extends React.Component {
                         <th>School</th>
                         <th>App Name</th>
                         <th>App Description</th>
+                        <th>Edit</th>
                         <th>Delete</th>
                       </tr>
                     </thead>
@@ -166,6 +173,7 @@ export default class TeamsPage extends React.Component {
                           <td>{eventTeam.get('school')}</td>
                           <td>{eventTeam.get('appName')}</td>
                           <td>{eventTeam.get('appDescription')}</td>
+                          <td><button onClick={() => { this.editEventTeam(eventTeam) }}>Edit</button></td>
                           <td><button onClick={() => { this.deleteEventTeam(eventTeam) }}>Delete</button></td>
                         </tr>
                       )}

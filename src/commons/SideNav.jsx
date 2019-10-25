@@ -13,41 +13,41 @@ export default class SideNav extends React.Component {
     this.pages = [
       {
         name: "Judges",
-        path: "./judges",
+        path: "judges",
       },
       {
         name: "Teams",
-        path: "./teams",
+        path: "teams",
       },
       {
         name: "Assign Teams",
-        path: "./assign",
+        path: "assign",
       },
       {
         name: "Criteria",
-        path: "./criteria",
+        path: "criteria",
       },
       {
         name: "Total Score",
-        path: "./total",
+        path: "total",
       },
       {
         name: "Export",
-        path: "./export",
+        path: "export",
       },
       {
         name: "Winner",
-        path: "./winner",
+        path: "winner",
       },
       {
         name: "Presentation",
-        path: "./presentation",
+        path: "presentation",
       },
     ];
   }
 
   render() {
-    const { sideNavOn, closeSideNav } = this.props;
+    const { match, sideNavOn, closeSideNav } = this.props;
     return (
       <nav className={sideNavOn ? 'side-nav on' : 'side-nav'}>
         <div id="side-nav__logo">
@@ -56,7 +56,7 @@ export default class SideNav extends React.Component {
         <ul id="side-nav__pages">
           {this.pages.map(page =>
             <li key={page.path}>
-              <RouteLink to={page.path} onClick={closeSideNav}>
+              <RouteLink to={`/event/${match.params.id}/${page.path}`} onClick={closeSideNav}>
                 <span>{page.name}</span>
               </RouteLink>
             </li>
