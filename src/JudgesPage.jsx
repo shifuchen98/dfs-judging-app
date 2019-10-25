@@ -32,7 +32,7 @@ export default class JudgesPage extends React.Component {
     const { match } = this.props;
     const eventJudgesQuery = new AV.Query('EventJudge');
     eventJudgesQuery
-      .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
       .include('user')
       .find()
       .then(eventJudges => {
@@ -63,7 +63,7 @@ export default class JudgesPage extends React.Component {
           const eventJudge = new AV.Object('EventJudge');
           eventJudge
             .set('user', user)
-            .set('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
+            .set('event', AV.Object.createWithoutData('Event', match.params.id))
             .save()
             .then(() => {
               this.setState({ judgeEmail: '' }, this.fetchEventJudges);

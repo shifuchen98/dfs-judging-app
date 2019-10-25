@@ -39,7 +39,7 @@ export default class TeamsPage extends React.Component {
     const { match } = this.props;
     const eventTeamsQuery = new AV.Query('EventTeam');
     eventTeamsQuery
-      .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
       .find()
       .then(eventTeams => {
         this.setState({ eventTeams });
@@ -74,7 +74,7 @@ export default class TeamsPage extends React.Component {
     const { teamName, school, appName, appDescription } = this.state;
     const eventTeam = new AV.Object('EventTeam');
     eventTeam
-      .set('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
+      .set('event', AV.Object.createWithoutData('Event', match.params.id))
       .set('name', teamName)
       .set('school', school)
       .set('appName', appName)

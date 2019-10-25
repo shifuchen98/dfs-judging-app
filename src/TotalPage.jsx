@@ -7,8 +7,9 @@ import './style.css';
 export default class TotalPage extends React.Component {
   constructor(props) {
     super(props);
+    const { match } = this.props;
     this.state = {
-      event: new AV.Object('Event'),
+      event: AV.Object.createWithoutData('Event', match.params.id),
       scores: []
     };
     this.fetchEvent = this.fetchEvent.bind(this);
@@ -25,10 +26,9 @@ export default class TotalPage extends React.Component {
   }
 
   fetchEvent() {
-    const { match } = this.props;
-    const eventsQuery = new AV.Query('Event');
-    eventsQuery
-      .get(match.params.id)
+    const { event } = this.state;
+    event
+      .fetch()
       .then(event => {
         this.setState({ event }, this.fetchScores);
       })
@@ -38,10 +38,10 @@ export default class TotalPage extends React.Component {
   }
 
   fetchScores() {
-    const { match } = this.props;
+    const { event } = this.state;
     const eventTeamsQuery = new AV.Query('EventTeam');
     eventTeamsQuery
-      .equalTo('event', { __type: 'Pointer', className: 'Event', objectId: match.params.id })
+      .equalTo('event', event)
       .find()
       .then(eventTeams => {
         eventTeams.forEach(eventTeam => {

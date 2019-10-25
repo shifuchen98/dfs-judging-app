@@ -28,7 +28,42 @@ export default class AssignPage extends React.Component {
           <div className="column">
             <div className="card">
               <section className="fields">
-                <h1>Assign</h1>
+                <h1>Current Assignment</h1>
+                <div className="field">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Judge</th>
+                        <th>Team 1</th>
+                        <th>Team 2</th>
+                        <th>Team 3</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Alice</td>
+                        <td>x</td>
+                        <td>x</td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Bob</td>
+                        <td>x</td>
+                        <td></td>
+                        <td>x</td>
+                      </tr>
+                      <tr>
+                        <td>Charlie</td>
+                        <td></td>
+                        <td>x</td>
+                        <td>x</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="field">
+                  <button className="primary">Auto Assign</button>
+                </div>
               </section>
             </div>
           </div>

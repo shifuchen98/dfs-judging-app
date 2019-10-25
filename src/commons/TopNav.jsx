@@ -10,8 +10,9 @@ import '../style.css';
 export default class SideNav extends React.Component {
   constructor(props) {
     super(props);
+    const { match } = this.props;
     this.state = {
-      event: new AV.Object('Event'),
+      event: AV.Object.createWithoutData('Event', match.params.id),
     };
     this.fetchEvent = this.fetchEvent.bind(this);
     this.logOut = this.logOut.bind(this);
@@ -22,10 +23,9 @@ export default class SideNav extends React.Component {
   }
 
   fetchEvent() {
-    const { match } = this.props;
-    const eventsQuery = new AV.Query('Event');
-    eventsQuery
-      .get(match.params.id)
+    const { event } = this.state;
+    event
+      .fetch()
       .then(event => {
         this.setState({ event });
       })

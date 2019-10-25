@@ -7,8 +7,9 @@ import './style.css';
 export default class TeamPage extends React.Component {
   constructor(props) {
     super(props);
+    const { match } = this.props;
     this.state = {
-      eventTeam: new AV.Object('EventTeam'),
+      eventTeam: AV.Object.createWithoutData('EventTeam', match.params.tid),
       teamName: '',
       school: '',
       appName: '',
@@ -32,10 +33,9 @@ export default class TeamPage extends React.Component {
   }
 
   fetchEventTeam() {
-    const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery
-      .get(match.params.tid)
+    const { eventTeam } = this.state;
+    eventTeam
+      .fetch()
       .then(eventTeam => {
         this.setState({ eventTeam, teamName: eventTeam.get('name'), school: eventTeam.get('school'), appName: eventTeam.get('appName'), appDescription: eventTeam.get('appDescription') });
       })
