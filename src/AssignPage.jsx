@@ -42,21 +42,21 @@ export default class AssignPage extends React.Component {
                     <tbody>
                       <tr>
                         <td>Alice</td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
-                        <td><button style={{ width: '42px' }}>⬜</button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
                       </tr>
                       <tr>
                         <td>Bob</td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
-                        <td><button style={{ width: '42px' }}>⬜</button></td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
                       </tr>
                       <tr>
                         <td>Charlie</td>
-                        <td><button style={{ width: '42px' }}>⬜</button></td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
-                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
+                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
                       </tr>
                     </tbody>
                   </table>
