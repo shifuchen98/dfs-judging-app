@@ -42,27 +42,30 @@ export default class AssignPage extends React.Component {
                     <tbody>
                       <tr>
                         <td>Alice</td>
-                        <td>x</td>
-                        <td>x</td>
-                        <td></td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}>⬜</button></td>
                       </tr>
                       <tr>
                         <td>Bob</td>
-                        <td>x</td>
-                        <td></td>
-                        <td>x</td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}>⬜</button></td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
                       </tr>
                       <tr>
                         <td>Charlie</td>
-                        <td></td>
-                        <td>x</td>
-                        <td>x</td>
+                        <td><button style={{ width: '42px' }}>⬜</button></td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
+                        <td><button style={{ width: '42px' }}>✅</button></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <div className="field">
                   <button className="primary">Auto Assign</button>
+                </div>
+                <div class="field">
+                  <button>Clear Assignment</button>
                 </div>
               </section>
             </div>
