@@ -61,11 +61,38 @@ export default class AssignPage extends React.Component {
                     </tbody>
                   </table>
                 </div>
-                <div className="field">
-                  <button className="primary">Auto Assign</button>
-                </div>
                 <div class="field">
                   <button>Clear Assignment</button>
+                </div>
+              </section>
+              <section className="fields">
+                <h1>Auto Assign</h1>
+                <div className="field field--half">
+                  <label>
+                    <span>Each Team Gets Judged</span>
+                    <select required>
+                      <option>1 Time</option>
+                      <option>2 Times</option>
+                      <option>3 Times</option>
+                      <option>4 Times</option>
+                      <option>5 Times</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="field field--half">
+                  <label>
+                    <span>Each Judge Judges No More Than</span>
+                    <select required>
+                      <option>1 Team</option>
+                      <option>2 Teams</option>
+                      <option>3 Teams</option>
+                      <option>4 Teams</option>
+                      <option>5 Teams</option>
+                    </select>
+                  </label>
+                </div>
+                <div className="field">
+                  <button className="primary">Perform Assignment</button>
                 </div>
               </section>
             </div>
