@@ -152,8 +152,9 @@ export default class TeamsPage extends React.Component {
                       <tr>
                         <th>#</th>
                         <th>Team Name</th>
-                        <th>App Name</th>
                         <th>School</th>
+                        <th>App Name</th>
+                        <th>App Description</th>
                         <th>Delete</th>
                       </tr>
                     </thead>
@@ -162,8 +163,9 @@ export default class TeamsPage extends React.Component {
                         <tr key={eventTeam.id}>
                           <td>{index + 1}</td>
                           <td>{eventTeam.get('name')}</td>
-                          <td>{eventTeam.get('appName')}</td>
                           <td>{eventTeam.get('school')}</td>
+                          <td>{eventTeam.get('appName')}</td>
+                          <td>{eventTeam.get('appDescription')}</td>
                           <td><button onClick={() => { this.deleteEventTeam(eventTeam) }}>Delete</button></td>
                         </tr>
                       )}
