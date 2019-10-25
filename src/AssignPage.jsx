@@ -8,7 +8,16 @@ export default class AssignPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      eventJudges: [],
+      eventTeams: [],
+      judgeTeamPairs: []
     };
+    this.fetchEventJudges = this.fetchEventJudges.bind(this);
+    this.fetchEventTeams = this.fetchEventTeams.bind(this);
+    this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
+    this.assign = this.assign.bind(this);
+    this.unassign = this.unassign.bind(this);
+    this.clear = this.clear.bind(this);
   }
 
   componentDidMount() {
@@ -16,12 +25,88 @@ export default class AssignPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-
+      this.fetchEventJudges();
     }
   }
 
+  fetchEventJudges() {
+    const { match } = this.props;
+    const eventJudgesQuery = new AV.Query('EventJudge');
+    eventJudgesQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .include('user')
+      .find()
+      .then(eventJudges => {
+        this.setState({ eventJudges }, this.fetchEventTeams);
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  fetchEventTeams() {
+    const { match } = this.props;
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .find()
+      .then(eventTeams => {
+        this.setState({ eventTeams }, this.fetchJudgeTeamPairs);
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  fetchJudgeTeamPairs() {
+    const { match } = this.props;
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+    const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+    judgeTeamPairsQuery
+      .matchesQuery('eventTeam', eventTeamsQuery)
+      .find()
+      .then(judgeTeamPairs => {
+        this.setState({ judgeTeamPairs });
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  assign(eventJudge, eventTeam) {
+    const judgeTeamPair = new AV.Object('JudgeTeamPair');
+    judgeTeamPair.set('eventJudge', eventJudge)
+      .set('eventTeam', eventTeam)
+      .save()
+      .then(this.fetchJudgeTeamPairs)
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  unassign(judgeTeamPair) {
+    judgeTeamPair
+      .destroy()
+      .then(this.fetchJudgeTeamPairs)
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  clear() {
+    const { judgeTeamPairs } = this.state;
+    AV.Object
+      .destroyAll(judgeTeamPairs)
+      .then(this.fetchJudgeTeamPairs)
+      .catch(error => {
+        alert(error);
+      });
+  }
+
   render() {
-    const { } = this.state;
+    const { eventJudges, eventTeams, judgeTeamPairs } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -34,35 +119,19 @@ export default class AssignPage extends React.Component {
                     <thead>
                       <tr>
                         <th>Judge</th>
-                        <th>Team 1</th>
-                        <th>Team 2</th>
-                        <th>Team 3</th>
+                        {eventTeams.map(eventTeam => <th key={eventTeam.id}>{eventTeam.get('name')}</th>)}
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Alice</td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
-                      </tr>
-                      <tr>
-                        <td>Bob</td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                      </tr>
-                      <tr>
-                        <td>Charlie</td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Not assigned.">⬜</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                        <td><button style={{ width: '42px' }}><span role="img" aria-label="Assigned.">✅</span></button></td>
-                      </tr>
+                      {eventJudges.map(eventJudge => <tr key={eventJudge.id}>
+                        <td>{eventJudge.get('user').get('name')}</td>
+                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).length ? <button style={{ width: '42px' }} onClick={() => { this.unassign(judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id)[0]) }}><span role="img" aria-label="Assigned.">✅</span></button> : <button style={{ width: '42px' }} onClick={() => { this.assign(eventJudge, eventTeam) }}><span role="img" aria-label="Not assigned.">⬜</span></button>}</td>)}
+                      </tr>)}
                     </tbody>
                   </table>
                 </div>
                 <div className="field">
-                  <button>Clear Assignment</button>
+                  <button onClick={this.clear}>Clear Assignment</button>
                 </div>
               </section>
               <section className="fields">

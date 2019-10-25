@@ -107,7 +107,7 @@ export default class JudgesPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Judge Email</span>
-                      <input type="text" value={judgeEmail} onChange={this.handleJudgeEmailChange} required />
+                      <input type="email" value={judgeEmail} onChange={this.handleJudgeEmailChange} required />
                     </label>
                   </div>
                   <div className="field">
