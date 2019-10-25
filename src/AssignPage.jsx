@@ -61,7 +61,7 @@ export default class AssignPage extends React.Component {
                     </tbody>
                   </table>
                 </div>
-                <div class="field">
+                <div className="field">
                   <button>Clear Assignment</button>
                 </div>
               </section>
