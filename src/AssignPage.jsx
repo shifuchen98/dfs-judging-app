@@ -10,14 +10,17 @@ export default class AssignPage extends React.Component {
     this.state = {
       eventJudges: [],
       eventTeams: [],
-      judgeTeamPairs: []
+      judgeTeamPairs: [],
+      timesEachTeamGetsJudged: ''
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
+    this.handleTimesEachTeamGetsJudgedChange = this.handleTimesEachTeamGetsJudgedChange.bind(this);
     this.assign = this.assign.bind(this);
     this.unassign = this.unassign.bind(this);
     this.clear = this.clear.bind(this);
+    this.autoAssign = this.autoAssign.bind(this);
   }
 
   componentDidMount() {
@@ -75,6 +78,10 @@ export default class AssignPage extends React.Component {
       });
   }
 
+  handleTimesEachTeamGetsJudgedChange(e) {
+    this.setState({ timesEachTeamGetsJudged: e.target.value });
+  }
+
   assign(eventJudge, eventTeam) {
     const judgeTeamPairACL = new AV.ACL();
     judgeTeamPairACL.setReadAccess(eventJudge.get('user'), true);
@@ -111,8 +118,13 @@ export default class AssignPage extends React.Component {
       });
   }
 
+  autoAssign(e) {
+    const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
+    e.preventDefault();
+  }
+
   render() {
-    const { eventJudges, eventTeams, judgeTeamPairs } = this.state;
+    const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -142,33 +154,17 @@ export default class AssignPage extends React.Component {
               </section>
               <section className="fields">
                 <h1>Auto Assign</h1>
-                <div className="field field--half">
-                  <label>
-                    <span>Each Team Gets Judged</span>
-                    <select required>
-                      <option>1 Time</option>
-                      <option>2 Times</option>
-                      <option>3 Times</option>
-                      <option>4 Times</option>
-                      <option>5 Times</option>
-                    </select>
-                  </label>
-                </div>
-                <div className="field field--half">
-                  <label>
-                    <span>Each Judge Judges No More Than</span>
-                    <select required>
-                      <option>1 Team</option>
-                      <option>2 Teams</option>
-                      <option>3 Teams</option>
-                      <option>4 Teams</option>
-                      <option>5 Teams</option>
-                    </select>
-                  </label>
-                </div>
-                <div className="field">
-                  <button className="primary">Perform Assignment</button>
-                </div>
+                <form onSubmit={this.autoAssign}>
+                  <div className="field field--half">
+                    <label>
+                      <span>Times Each Team Gets Judged</span>
+                      <input type="number" value={timesEachTeamGetsJudged} min={0} max={eventJudges.length} step={1} onChange={this.handleTimesEachTeamGetsJudgedChange} required />
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">Perform Assignment</button>
+                  </div>
+                </form>
               </section>
             </div>
           </div>
