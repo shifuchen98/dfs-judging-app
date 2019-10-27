@@ -134,25 +134,24 @@ export default class AssignPage extends React.Component {
 
   autoAssign(e) {
     const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
-    let result = eventJudges.map(eventJudge => ({ eventJudge, eventTeams: [] }));
+    const result = eventJudges.map(eventJudge => ({ eventJudge, eventTeams: [] }));
     const pendingTeams = this.shuffle(eventTeams.map(eventTeam => Array(parseInt(timesEachTeamGetsJudged)).fill(eventTeam)).flat());
     pendingTeams.forEach(pendingTeam => {
-      result = this.shuffle(result);
-      result.sort((a, b) => a.eventTeams.length - b.eventTeams.length);
-      for (let i = 0; i < result.length; i++) {
-        let assigned = false;
-        result[i].eventTeams.forEach(eventTeam => {
-          if (eventTeam.id === pendingTeam.id) {
-            assigned = true;
+      const resultShadow = this.shuffle(result).filter(({ eventTeams }) => eventTeams.reduce((accumulator, eventTeam) => accumulator && eventTeam.id !== pendingTeam.id, true));
+      resultShadow.sort((a, b) => a.eventTeams.length - b.eventTeams.length);
+      for (let i = 0; i < resultShadow.length; i++) {
+        let hasSchoolConflict = false;
+        resultShadow[i].eventTeams.forEach(eventTeam => {
+          if (eventTeam.get('school') === pendingTeam.get('school')) {
+            hasSchoolConflict = true;
           }
         });
-        if (assigned) {
-          continue;
-        } else {
-          result[i].eventTeams.push(pendingTeam);
-          break;
+        if (!hasSchoolConflict) {
+          resultShadow[i].eventTeams.push(pendingTeam);
+          return;
         }
       }
+      resultShadow[0].eventTeams.push(pendingTeam);
     });
     AV.Object
       .destroyAll(judgeTeamPairs)
