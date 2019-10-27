@@ -20,6 +20,7 @@ export default class AssignPage extends React.Component {
     this.assign = this.assign.bind(this);
     this.unassign = this.unassign.bind(this);
     this.clear = this.clear.bind(this);
+    this.shuffle = this.shuffle.bind(this);
     this.autoAssign = this.autoAssign.bind(this);
   }
 
@@ -89,7 +90,8 @@ export default class AssignPage extends React.Component {
     judgeTeamPairACL.setRoleReadAccess(new AV.Role('Admin'), true);
     judgeTeamPairACL.setRoleWriteAccess(new AV.Role('Admin'), true);
     const judgeTeamPair = new AV.Object('JudgeTeamPair');
-    judgeTeamPair.set('eventJudge', eventJudge)
+    judgeTeamPair
+      .set('eventJudge', eventJudge)
       .set('eventTeam', eventTeam)
       .setACL(judgeTeamPairACL)
       .save()
@@ -118,8 +120,67 @@ export default class AssignPage extends React.Component {
       });
   }
 
+  shuffle(array) {
+    const result = array.map(array => array);
+    let m = result.length, t, i;
+    while (m) {
+      i = Math.floor(Math.random() * m--);
+      t = result[m];
+      result[m] = result[i];
+      result[i] = t;
+    }
+    return result;
+  }
+
   autoAssign(e) {
     const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
+    let result = eventJudges.map(eventJudge => ({ eventJudge, eventTeams: [] }));
+    const pendingTeams = this.shuffle(eventTeams.map(eventTeam => Array(parseInt(timesEachTeamGetsJudged)).fill(eventTeam)).flat());
+    pendingTeams.forEach(pendingTeam => {
+      result = this.shuffle(result);
+      result.sort((a, b) => a.eventTeams.length - b.eventTeams.length);
+      for (let i = 0; i < result.length; i++) {
+        let assigned = false;
+        result[i].eventTeams.forEach(eventTeam => {
+          if (eventTeam.id === pendingTeam.id) {
+            assigned = true;
+          }
+        });
+        if (assigned) {
+          continue;
+        } else {
+          result[i].eventTeams.push(pendingTeam);
+          break;
+        }
+      }
+    });
+    AV.Object
+      .destroyAll(judgeTeamPairs)
+      .then(() => {
+        AV.Object
+          .saveAll(result.reduce((accumulator, eventJudge) => {
+            const judgeTeamPairs = eventJudge.eventTeams.map(eventTeam => {
+              const judgeTeamPairACL = new AV.ACL();
+              judgeTeamPairACL.setReadAccess(eventJudge.eventJudge.get('user'), true);
+              judgeTeamPairACL.setWriteAccess(eventJudge.eventJudge.get('user'), true)
+              judgeTeamPairACL.setRoleReadAccess(new AV.Role('Admin'), true);
+              judgeTeamPairACL.setRoleWriteAccess(new AV.Role('Admin'), true);
+              const judgeTeamPair = new AV.Object('JudgeTeamPair');
+              return judgeTeamPair
+                .set('eventJudge', eventJudge.eventJudge)
+                .set('eventTeam', eventTeam)
+                .setACL(judgeTeamPairACL)
+            })
+            return accumulator.concat(judgeTeamPairs);
+          }, []))
+          .then(this.fetchJudgeTeamPairs)
+          .catch(error => {
+            alert(error);
+          });
+      })
+      .catch(error => {
+        alert(error);
+      });
     e.preventDefault();
   }
 
