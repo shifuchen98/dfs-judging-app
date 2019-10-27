@@ -158,16 +158,16 @@ export default class AssignPage extends React.Component {
       .destroyAll(judgeTeamPairs)
       .then(() => {
         AV.Object
-          .saveAll(result.reduce((accumulator, eventJudge) => {
-            const judgeTeamPairs = eventJudge.eventTeams.map(eventTeam => {
+          .saveAll(result.reduce((accumulator, { eventJudge, eventTeams }) => {
+            const judgeTeamPairs = eventTeams.map(eventTeam => {
               const judgeTeamPairACL = new AV.ACL();
-              judgeTeamPairACL.setReadAccess(eventJudge.eventJudge.get('user'), true);
-              judgeTeamPairACL.setWriteAccess(eventJudge.eventJudge.get('user'), true)
+              judgeTeamPairACL.setReadAccess(eventJudge.get('user'), true);
+              judgeTeamPairACL.setWriteAccess(eventJudge.get('user'), true)
               judgeTeamPairACL.setRoleReadAccess(new AV.Role('Admin'), true);
               judgeTeamPairACL.setRoleWriteAccess(new AV.Role('Admin'), true);
               const judgeTeamPair = new AV.Object('JudgeTeamPair');
               return judgeTeamPair
-                .set('eventJudge', eventJudge.eventJudge)
+                .set('eventJudge', eventJudge)
                 .set('eventTeam', eventTeam)
                 .setACL(judgeTeamPairACL)
             })
