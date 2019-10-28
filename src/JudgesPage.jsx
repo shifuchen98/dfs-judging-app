@@ -34,6 +34,7 @@ export default class JudgesPage extends React.Component {
     eventJudgesQuery
       .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
       .include('user')
+      .include('user.judgePassword')
       .find()
       .then(eventJudges => {
         this.setState({ eventJudges });
@@ -66,6 +67,7 @@ export default class JudgesPage extends React.Component {
             .set('event', AV.Object.createWithoutData('Event', match.params.id))
             .save()
             .then(() => {
+              alert('Judge successfully added');
               this.setState({ judgeEmail: '' }, this.fetchEventJudges);
             })
             .catch(error => {
@@ -76,7 +78,33 @@ export default class JudgesPage extends React.Component {
               }
             });
         } else {
-          alert('No user with the given email found.');
+          const judgeName = prompt('This is the first time this judge attends DFS. Please provide the name of the judge.');
+          if (judgeName !== null) {
+            const password = `${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}`
+            const judgePassword = new AV.Object('JudgePassword')
+            judgePassword
+              .set('password', password);
+            const user = new AV.Object('_User');
+            user
+              .set('email', judgeEmail)
+              .set('username', judgeEmail)
+              .set('name', judgeName)
+              .set('password', password)
+              .set('judgePassword', judgePassword);
+            const eventJudge = new AV.Object('EventJudge');
+            eventJudge
+              .set('user', user)
+              .set('event', AV.Object.createWithoutData('Event', match.params.id));
+            AV.Object
+              .saveAll([user, eventJudge])
+              .then(() => {
+                alert('Judge successfully added');
+                this.setState({ judgeEmail: '' }, this.fetchEventJudges);
+              })
+              .catch(error => {
+                alert(error);
+              });
+          }
         }
       })
       .catch(error => {
@@ -132,6 +160,7 @@ export default class JudgesPage extends React.Component {
                         <th>#</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Password</th>
                         <th>Delete</th>
                       </tr>
                     </thead>
@@ -141,6 +170,7 @@ export default class JudgesPage extends React.Component {
                           <td>{index + 1}</td>
                           <td>{eventJudge.get('user').get('name')}</td>
                           <td>{eventJudge.get('user').get('email')}</td>
+                          <td>{eventJudge.get('user').get('judgePassword') ? eventJudge.get('user').get('judgePassword').get('password') : null}</td>
                           <td><button onClick={() => { this.deleteEventJudge(eventJudge) }}>Delete</button></td>
                         </tr>
                       )}
