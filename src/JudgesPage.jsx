@@ -113,6 +113,11 @@ export default class JudgesPage extends React.Component {
     e.preventDefault();
   }
 
+  editEventJudge(eventJudge) {
+    const { history, match } = this.props;
+    history.push(`/event/${match.params.id}/judge/${eventJudge.get('user').id}`);
+  }
+
   deleteEventJudge(eventJudge) {
     eventJudge
       .destroy()
@@ -161,6 +166,7 @@ export default class JudgesPage extends React.Component {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Password</th>
+                        <th>Edit</th>
                         <th>Delete</th>
                       </tr>
                     </thead>
@@ -171,6 +177,7 @@ export default class JudgesPage extends React.Component {
                           <td>{eventJudge.get('user').get('name')}</td>
                           <td>{eventJudge.get('user').get('email')}</td>
                           <td>{eventJudge.get('user').get('judgePassword') ? eventJudge.get('user').get('judgePassword').get('password') : null}</td>
+                          <td><button onClick={() => { this.editEventJudge(eventJudge) }}>Edit</button></td>
                           <td><button onClick={() => { this.deleteEventJudge(eventJudge) }}>Delete</button></td>
                         </tr>
                       )}

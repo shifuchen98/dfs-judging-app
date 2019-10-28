@@ -9,6 +9,7 @@ import AuthPage from './AuthPage';
 import EventsPage from './EventsPage';
 import InfoPage from './InfoPage';
 import JudgesPage from './JudgesPage';
+import JudgePage from './JudgePage';
 import TeamsPage from './TeamsPage';
 import TeamPage from './TeamPage';
 import AssignPage from './AssignPage';
@@ -67,6 +68,7 @@ export default class App extends React.Component {
               <Switch>
                 <Route exact path="/event/:id/info" component={InfoPage} />
                 <Route exact path="/event/:id/judges" component={JudgesPage} />
+                <Route exact path="/event/:id/judge/:uid" component={JudgePage} />
                 <Route exact path="/event/:id/teams" component={TeamsPage} />
                 <Route exact path="/event/:id/team/:tid" component={TeamPage} />
                 <Route exact path="/event/:id/assign" component={AssignPage} />
