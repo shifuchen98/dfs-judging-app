@@ -7,6 +7,7 @@ import SideNav from './commons/SideNav';
 
 import AuthPage from './AuthPage';
 import EventsPage from './EventsPage';
+import InfoPage from './InfoPage';
 import JudgesPage from './JudgesPage';
 import TeamsPage from './TeamsPage';
 import TeamPage from './TeamPage';
@@ -64,6 +65,7 @@ export default class App extends React.Component {
           <Route path="/event/:id">
             <div className="basic-wrapper">
               <Switch>
+                <Route exact path="/event/:id/info" component={InfoPage} />
                 <Route exact path="/event/:id/judges" component={JudgesPage} />
                 <Route exact path="/event/:id/teams" component={TeamsPage} />
                 <Route exact path="/event/:id/team/:tid" component={TeamPage} />
@@ -73,7 +75,7 @@ export default class App extends React.Component {
                 <Route exact path="/event/:id/export" component={ExportPage} />
                 <Route exact path="/event/:id/winner" component={WinnerPage} />
                 <Route exact path="/event/:id/presentation" component={PresentationPage} />
-                <Redirect to="/event/:id/judges" />
+                <Redirect to="/event/:id/info" />
               </Switch>
             </div>
           </Route>

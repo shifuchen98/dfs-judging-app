@@ -134,7 +134,7 @@ export default class EventsPage extends React.Component {
                           <td>{event.get('name')}</td>
                           <td>{event.get('date')}</td>
                           <td>{event.get('location')}</td>
-                          <td><button className="primary" onClick={() => { history.push(`/event/${event.id}/judges`) }}>Enter</button></td>
+                          <td><button className="primary" onClick={() => { history.push(`/event/${event.id}/info`) }}>Enter</button></td>
                           <td><button onClick={() => { this.deleteEvent(event) }}>Delete</button></td>
                         </tr>
                       )}

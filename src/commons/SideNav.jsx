@@ -12,6 +12,10 @@ export default class SideNav extends React.Component {
     };
     this.pages = [
       {
+        name: "Event Info",
+        path: "info",
+      },
+      {
         name: "Judges",
         path: "judges",
       },
