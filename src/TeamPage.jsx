@@ -61,6 +61,7 @@ export default class TeamPage extends React.Component {
   }
 
   updateEventTeam(e) {
+    const { history, match } = this.props;
     const { eventTeam, teamName, school, appName, appDescription } = this.state;
     eventTeam
       .set('name', teamName)
@@ -70,11 +71,15 @@ export default class TeamPage extends React.Component {
       .save()
       .then(() => {
         alert('Team information updated.');
-        this.fetchEventTeam();
+        history.push(`/event/${match.params.id}/teams`);
       })
       .catch(error => {
-        alert(error);
-      })
+        if (error.code === 137) {
+          alert('Team already exists.');
+        } else {
+          alert(error);
+        }
+      });
     e.preventDefault();
   }
 

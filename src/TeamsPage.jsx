@@ -90,7 +90,7 @@ export default class TeamsPage extends React.Component {
         } else {
           alert(error);
         }
-      })
+      });
     e.preventDefault();
   }
 
