@@ -14,7 +14,6 @@ export default class AuthPage extends React.Component {
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.go = this.go.bind(this);
-    this.requestPasswordReset = this.requestPasswordReset.bind(this);
   }
 
   componentDidMount() {
@@ -54,24 +53,6 @@ export default class AuthPage extends React.Component {
         }
       });
     e.preventDefault();
-  }
-
-  requestPasswordReset() {
-    const { email } = this.state;
-    const username = email || prompt('Please enter your email:');
-    if (username) {
-      AV.User.requestPasswordReset(username)
-        .then(() => {
-          alert('You will receive an email with instructions to reset your password.');
-        })
-        .catch(error => {
-          if (error.code === 205) {
-            alert('We could not find a user with the username or email provided.');
-          } else {
-            alert(error);
-          }
-        });
-    }
   }
 
   render() {
@@ -119,11 +100,6 @@ export default class AuthPage extends React.Component {
                     <button type="submit" className="primary">Continue</button>
                   </div>
                 </form>
-              </section>
-              <section className="fields">
-                <div className="field">
-                  <button onClick={this.requestPasswordReset}>Reset Password</button>
-                </div>
               </section>
             </div>
           </div>
