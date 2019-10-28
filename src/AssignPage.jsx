@@ -193,11 +193,11 @@ export default class AssignPage extends React.Component {
               <section className="fields">
                 <h1>Current Assignment</h1>
                 <div className="field">
-                  <table>
+                  <table className="condensed">
                     <thead>
                       <tr>
-                        <th>Judge</th>
-                        {eventTeams.map(eventTeam => <th key={eventTeam.id}>{eventTeam.get('name')}</th>)}
+                        <th><span>Judge</span></th>
+                        {eventTeams.map(eventTeam => <th key={eventTeam.id}><span>{eventTeam.get('name')}</span></th>)}
                       </tr>
                     </thead>
                     <tbody>

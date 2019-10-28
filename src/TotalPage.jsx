@@ -83,14 +83,14 @@ export default class TotalPage extends React.Component {
                 <section className="fields">
                   <h1>{eventTeam.get('name')} ({judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventTeam').id === eventTeam.id).reduce((accumulator, judgeTeamPair) => accumulator + event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0), 0)})</h1>
                   <div className="field">
-                    <table>
+                    <table className="condensed">
                       <thead>
                         <tr>
-                          <th>Judge</th>
+                          <th><span>Judge</span></th>
                           {event.get('criteria').map(criterion =>
-                            <th key={criterion.name}>{criterion.name} ({criterion.max})</th>
+                            <th key={criterion.name}><span>{criterion.name} ({criterion.max})</span></th>
                           )}
-                          <th>Total</th>
+                          <th><span>Total</span></th>
                         </tr>
                       </thead>
                       <tbody>

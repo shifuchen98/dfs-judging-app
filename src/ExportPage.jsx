@@ -30,13 +30,13 @@ export default class ExportPage extends React.Component {
               <section className="fields">
                 <h1>Raw Data</h1>
                 <div className="field">
-                  <table>
+                  <table className="condensed">
                     <thead>
                       <tr>
-                        <th>Judge</th>
-                        <th>Team 1</th>
-                        <th>Team 2</th>
-                        <th>Team 3</th>
+                        <th><span>Judge</span></th>
+                        <th><span>Team 1</span></th>
+                        <th><span>Team 2</span></th>
+                        <th><span>Team 3</span></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -70,13 +70,13 @@ export default class ExportPage extends React.Component {
               <section className="fields">
                 <h1>Normalized Data</h1>
                 <div className="field">
-                  <table>
+                  <table className="condensed">
                     <thead>
                       <tr>
-                        <th>Judge</th>
-                        <th>Team 1</th>
-                        <th>Team 2</th>
-                        <th>Team 3</th>
+                        <th><span>Judge</span></th>
+                        <th><span>Team 1</span></th>
+                        <th><span>Team 2</span></th>
+                        <th><span>Team 3</span></th>
                       </tr>
                     </thead>
                     <tbody>

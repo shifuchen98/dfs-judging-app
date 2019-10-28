@@ -25,6 +25,18 @@ table {
   text-align: left;
   border-spacing: 0 2px;
 }
+table.condensed {
+  table-layout: fixed;
+}
+table.condensed > thead > tr > th {
+  height: 256px;
+  vertical-align: bottom;
+}
+table.condensed > thead > tr > th > span {
+  display: inline-block;
+  transform: rotate(-90deg) translateX(-12pt);
+  transform-origin: 0 0;
+}
 thead {
   background-color: #202e4709;
 }
