@@ -81,10 +81,15 @@ export default class TeamsPage extends React.Component {
       .set('appDescription', appDescription)
       .save()
       .then(() => {
+        alert('Team successfully added.')
         this.setState({ teamName: '', school: '', appName: '', appDescription: '' }, this.fetchEventTeams);
       })
       .catch(error => {
-        alert(error);
+        if (error.code === 137) {
+          alert('Team already exists.');
+        } else {
+          alert(error);
+        }
       })
     e.preventDefault();
   }
