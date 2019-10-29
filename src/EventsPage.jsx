@@ -188,11 +188,13 @@ export default class EventsPage extends React.Component {
                   </form>
                 </section> : null
               }
-              <section className="fields">
-                <div className="field">
-                  <button onClick={this.logOut}>Log out ({AV.User.current().get('name')})</button>
-                </div>
-              </section>
+              {AV.User.current() ?
+                <section className="fields">
+                  <div className="field">
+                    <button onClick={this.logOut}>Log out ({AV.User.current().get('name')})</button>
+                  </div>
+                </section> : null
+              }
             </div>
           </div>
         </div>

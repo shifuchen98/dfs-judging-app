@@ -19,7 +19,12 @@ export default class SideNav extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchEvent();
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+      this.fetchEvent();
+    }
   }
 
   fetchEvent() {
@@ -59,11 +64,13 @@ export default class SideNav extends React.Component {
           </li>
         </ul>
         <ul id="top-nav__right">
-          <li>
-            <button onClick={this.logOut}>
-              <span>Log out<span className="top-nav__extra"> ({AV.User.current().get('name')})</span></span>
-            </button>
-          </li>
+          {AV.User.current() ?
+            <li>
+              <button onClick={this.logOut}>
+                <span>Log out<span className="top-nav__extra"> ({AV.User.current().get('name')})</span></span>
+              </button>
+            </li> : null
+          }
         </ul>
       </nav>
     );

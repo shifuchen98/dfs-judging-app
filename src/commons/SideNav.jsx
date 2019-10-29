@@ -23,9 +23,14 @@ export default class SideNav extends React.Component {
   }
 
   componentDidMount() {
-    AV.User.current().getRoles().then(roles => {
-      this.setState({ roles }, this.updatePages);
-    });
+    const { history } = this.props;
+    if (!AV.User.current()) {
+      history.push('/');
+    } else {
+      AV.User.current().getRoles().then(roles => {
+        this.setState({ roles }, this.updatePages);
+      });
+    }
   }
 
   updatePages() {
