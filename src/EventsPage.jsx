@@ -8,6 +8,7 @@ export default class EventsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      roles: [],
       events: [],
       eventsSearch: '',
       eventName: '',
@@ -29,20 +30,37 @@ export default class EventsPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-      this.fetchEvents();
+      AV.User.current().getRoles().then(roles => {
+        this.setState({ roles }, this.fetchEvents);
+      });
     }
   }
 
   fetchEvents() {
-    const eventsQuery = new AV.Query('Event');
-    eventsQuery
-      .find()
-      .then(events => {
-        this.setState({ events });
-      })
-      .catch(error => {
-        alert(error);
-      });
+    const { roles } = this.state;
+    if (roles.filter(role => role.get('name') === 'Admin').length) {
+      const eventsQuery = new AV.Query('Event');
+      eventsQuery
+        .find()
+        .then(events => {
+          this.setState({ events });
+        })
+        .catch(error => {
+          alert(error);
+        });
+    } else {
+      const eventJudgesQuery = new AV.Query('EventJudge');
+      eventJudgesQuery
+        .equalTo('user', AV.User.current())
+        .include('event')
+        .find()
+        .then(eventJudges => {
+          this.setState({ events: eventJudges.map(eventJudge => eventJudge.get('event')) });
+        })
+        .catch(error => {
+          alert(error);
+        });
+    }
   }
 
   handleEventsSearchChange(e) {
@@ -96,7 +114,7 @@ export default class EventsPage extends React.Component {
 
   render() {
     const { history } = this.props;
-    const { events, eventsSearch, eventName, eventDate, eventLocation } = this.state;
+    const { roles, events, eventsSearch, eventName, eventDate, eventLocation } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -125,7 +143,7 @@ export default class EventsPage extends React.Component {
                         <th>Date</th>
                         <th>Location</th>
                         <th>Enter</th>
-                        <th>Delete</th>
+                        {roles.filter(role => role.get('name') === 'Admin').length ? <th>Delete</th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -135,39 +153,41 @@ export default class EventsPage extends React.Component {
                           <td>{event.get('date')}</td>
                           <td>{event.get('location')}</td>
                           <td><button className="primary" onClick={() => { history.push(`/event/${event.id}/info`) }}>Enter</button></td>
-                          <td><button onClick={() => { this.deleteEvent(event) }}>Delete</button></td>
+                          {roles.filter(role => role.get('name') === 'Admin').length ? <td><button onClick={() => { this.deleteEvent(event) }}>Delete</button></td> : null}
                         </tr>
                       )}
                     </tbody>
                   </table>
                 </div>
               </section>
-              <section className="fields">
-                <h1>Create an Event</h1>
-                <form onSubmit={this.createEvent}>
-                  <div className="field field--half">
-                    <label>
-                      <span>Name</span>
-                      <input type="text" value={eventName} onChange={this.handleEventNameChange} required />
-                    </label>
-                  </div>
-                  <div className="field field--half">
-                    <label>
-                      <span>Date</span>
-                      <input type="text" value={eventDate} onChange={this.handleEventDateChange} required />
-                    </label>
-                  </div>
-                  <div className="field field--half">
-                    <label>
-                      <span>Location</span>
-                      <input type="text" value={eventLocation} onChange={this.handleEventLocationChange} required />
-                    </label>
-                  </div>
-                  <div className="field">
-                    <button type="submit" className="primary">Create</button>
-                  </div>
-                </form>
-              </section>
+              {roles.filter(role => role.get('name') === 'Admin').length ?
+                <section className="fields">
+                  <h1>Create an Event</h1>
+                  <form onSubmit={this.createEvent}>
+                    <div className="field field--half">
+                      <label>
+                        <span>Name</span>
+                        <input type="text" value={eventName} onChange={this.handleEventNameChange} required />
+                      </label>
+                    </div>
+                    <div className="field field--half">
+                      <label>
+                        <span>Date</span>
+                        <input type="text" value={eventDate} onChange={this.handleEventDateChange} required />
+                      </label>
+                    </div>
+                    <div className="field field--half">
+                      <label>
+                        <span>Location</span>
+                        <input type="text" value={eventLocation} onChange={this.handleEventLocationChange} required />
+                      </label>
+                    </div>
+                    <div className="field">
+                      <button type="submit" className="primary">Create</button>
+                    </div>
+                  </form>
+                </section> : null
+              }
               <section className="fields">
                 <div className="field">
                   <button onClick={this.logOut}>Log out ({AV.User.current().get('name')})</button>

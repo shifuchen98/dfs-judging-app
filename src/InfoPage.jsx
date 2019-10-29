@@ -9,6 +9,7 @@ export default class InfoPage extends React.Component {
     super(props);
     const { match } = this.props;
     this.state = {
+      roles: [],
       event: AV.Object.createWithoutData('Event', match.params.id),
       name: '',
       date: '',
@@ -26,7 +27,9 @@ export default class InfoPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-      this.fetchEvent();
+      AV.User.current().getRoles().then(roles => {
+        this.setState({ roles }, this.fetchEvent);
+      });
     }
   }
 
@@ -71,36 +74,39 @@ export default class InfoPage extends React.Component {
   }
 
   render() {
-    const { name, date, location } = this.state;
+    const { roles, name, date, location } = this.state;
     return (
       <div id="page">
         <div className="columns">
           <div className="column">
             <div className="card">
               <section className="fields">
-                <h1>Edit Event</h1>
+                <h1>The Current Event</h1>
                 <form onSubmit={this.updateEvent}>
                   <div className="field field--half">
                     <label>
                       <span>Name</span>
-                      <input type="text" value={name} onChange={this.handleNameChange} required />
+                      <input type="text" value={name} onChange={this.handleNameChange} required disabled={!roles.filter(role => role.get('name') === 'Admin').length} />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>Date</span>
-                      <input type="text" value={date} onChange={this.handleDateChange} required />
+                      <input type="text" value={date} onChange={this.handleDateChange} required disabled={!roles.filter(role => role.get('name') === 'Admin').length} />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>Location</span>
-                      <input type="text" value={location} onChange={this.handleLocationChange} required />
+                      <input type="text" value={location} onChange={this.handleLocationChange} required disabled={!roles.filter(role => role.get('name') === 'Admin').length} />
                     </label>
                   </div>
-                  <div className="field">
-                    <button type="submit" className="primary">Save</button>
-                  </div>
+                  {roles.filter(role => role.get('name') === 'Admin').length ?
+                    <div className="field">
+                      <button type="submit" className="primary">Save</button>
+                    </div>
+                    : null
+                  }
                 </form>
               </section>
             </div>
