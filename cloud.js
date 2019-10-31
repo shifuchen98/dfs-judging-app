@@ -14,3 +14,40 @@ AV.Cloud.define('updateUser', async request => {
     throw new AV.Cloud.Error('You are not logged in.');
   }
 });
+AV.Cloud.beforeDelete('Event', request => {
+  const eventJudgesQuery = new AV.Query('EventJudge');
+  eventJudgesQuery
+    .equalTo('event', request.object)
+    .find()
+    .then(eventJudges => {
+      AV.Object
+        .destroyAll(eventJudges)
+        .then(() => {
+          const eventTeamsQuery = new AV.Query('EventTeam');
+          eventTeamsQuery
+            .equalTo('event', request.object)
+            .find()
+            .then(eventTeams => {
+              AV.Object.destroyAll(eventTeams);
+            });
+        });
+    });
+});
+AV.Cloud.beforeDelete('EventJudge', request => {
+  const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+  judgeTeamPairsQuery
+    .equalTo('eventJudge', request.object)
+    .find()
+    .then(judgeTeamPairs => {
+      AV.Object.destroyAll(judgeTeamPairs);
+    });
+});
+AV.Cloud.beforeDelete('EventTeam', request => {
+  const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+  judgeTeamPairsQuery
+    .equalTo('eventTeam', request.object)
+    .find()
+    .then(judgeTeamPairs => {
+      AV.Object.destroyAll(judgeTeamPairs);
+    });
+});
