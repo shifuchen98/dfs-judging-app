@@ -91,6 +91,9 @@ section:last-of-type {
   margin: 0 0 12px 0;
   width: 100%;
 }
+.field--with--dropdown {
+  position: relative;
+}
 label > span {
   color: #5b7082;
 }
@@ -124,6 +127,24 @@ label > select {
 }
 option {
   font-weight: 300;
+}
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 56px;
+  border: solid #0099ff;
+  border-width: 0 1px 1px 1px;
+  width: 100%;
+  padding: 4px 8px;
+  background-color: #fff;
+  border-radius: 0 0 2px 2px;
+}
+input:focus + .dropdown {
+  display: block;
+}
+.dropdown > span {
+  font-size: 9pt;
+  color: #0099ff;
 }
 button {
   border: unset;

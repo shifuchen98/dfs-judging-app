@@ -10,11 +10,13 @@ export default class JudgesPage extends React.Component {
     this.state = {
       eventJudges: [],
       judgesSearch: '',
-      judgeEmail: ''
+      judgeEmail: '',
+      judgeEmailPrediction: ''
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
     this.handleJudgeEmailChange = this.handleJudgeEmailChange.bind(this);
+    this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
   }
@@ -49,7 +51,27 @@ export default class JudgesPage extends React.Component {
   }
 
   handleJudgeEmailChange(e) {
-    this.setState({ judgeEmail: e.target.value });
+    this.setState({ judgeEmail: e.target.value }, () => {
+      const { judgeEmail } = this.state;
+      if (judgeEmail) {
+        const usersQuery = new AV.Query('_User');
+        usersQuery
+          .startsWith('email', judgeEmail)
+          .first()
+          .then(user => {
+            this.setState({ judgeEmailPrediction: user ? user.get('email') : '' });
+          });
+      } else {
+        this.setState({ judgeEmailPrediction: '' });
+      }
+    });
+  }
+
+  handleJudgeEmailCompletion(e) {
+    const { judgeEmailPrediction } = this.state;
+    if (e.keyCode === 40) {
+      this.setState({ judgeEmail: judgeEmailPrediction })
+    }
   }
 
   addEventJudge(e) {
@@ -128,7 +150,7 @@ export default class JudgesPage extends React.Component {
   }
 
   render() {
-    const { eventJudges, judgesSearch, judgeEmail } = this.state;
+    const { eventJudges, judgesSearch, judgeEmail, judgeEmailPrediction } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -137,10 +159,14 @@ export default class JudgesPage extends React.Component {
               <section className="fields">
                 <h1>Add Judge</h1>
                 <form onSubmit={this.addEventJudge}>
-                  <div className="field field--half">
+                  <div className="field field--half field--with--dropdown">
                     <label>
                       <span>Judge Email</span>
-                      <input type="email" value={judgeEmail} onChange={this.handleJudgeEmailChange} required />
+                      <input type="email" value={judgeEmail} onChange={this.handleJudgeEmailChange} onKeyDown={this.handleJudgeEmailCompletion} required />
+                      <div className="dropdown" style={{ display: judgeEmailPrediction && judgeEmail !== judgeEmailPrediction ? null : 'none' }}>
+                        <span style={{ float: 'left' }}>{judgeEmailPrediction}</span>
+                        <span style={{ float: 'right' }}><kbd>↓</kbd></span>
+                      </div>
                     </label>
                   </div>
                   <div className="field">

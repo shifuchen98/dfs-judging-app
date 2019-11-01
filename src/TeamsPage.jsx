@@ -11,6 +11,7 @@ export default class TeamsPage extends React.Component {
       eventTeams: [],
       teamName: '',
       school: '',
+      schoolPrediction: '',
       appName: '',
       appDescription: '',
       teamsSearch: ''
@@ -18,6 +19,7 @@ export default class TeamsPage extends React.Component {
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
+    this.handleSchoolCompletion = this.handleSchoolCompletion.bind(this);
     this.handleAppNameChange = this.handleAppNameChange.bind(this);
     this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(this);
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
@@ -54,7 +56,27 @@ export default class TeamsPage extends React.Component {
   }
 
   handleSchoolChange(e) {
-    this.setState({ school: e.target.value });
+    this.setState({ school: e.target.value }, () => {
+      const { school } = this.state;
+      if (school) {
+        const eventTeamsQuery = new AV.Query('EventTeam');
+        eventTeamsQuery
+          .startsWith('school', school)
+          .first()
+          .then(eventTeam => {
+            this.setState({ schoolPrediction: eventTeam ? eventTeam.get('school') : '' });
+          });
+      } else {
+        this.setState({ schoolPrediction: '' });
+      }
+    });
+  }
+
+  handleSchoolCompletion(e) {
+    const { schoolPrediction } = this.state;
+    if (e.keyCode === 40) {
+      this.setState({ school: schoolPrediction })
+    }
   }
 
   handleAppNameChange(e) {
@@ -109,7 +131,7 @@ export default class TeamsPage extends React.Component {
   }
 
   render() {
-    const { eventTeams, teamName, school, appName, appDescription, teamsSearch } = this.state;
+    const { eventTeams, teamName, school, schoolPrediction, appName, appDescription, teamsSearch } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -124,10 +146,14 @@ export default class TeamsPage extends React.Component {
                       <input type="text" value={teamName} onChange={this.handleTeamNameChange} required />
                     </label>
                   </div>
-                  <div className="field field--half">
+                  <div className="field field--half field--with--dropdown">
                     <label>
                       <span>School</span>
-                      <input type="text" value={school} onChange={this.handleSchoolChange} required />
+                      <input type="text" value={school} onChange={this.handleSchoolChange} onKeyDown={this.handleSchoolCompletion} required />
+                      <div className="dropdown" style={{ display: schoolPrediction && school !== schoolPrediction ? null : 'none' }}>
+                        <span style={{ float: 'left' }}>{schoolPrediction}</span>
+                        <span style={{ float: 'right' }}><kbd>↓</kbd></span>
+                      </div>
                     </label>
                   </div>
                   <div className="field field--half">
