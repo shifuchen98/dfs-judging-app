@@ -38,7 +38,7 @@ export default class InfoPage extends React.Component {
     event
       .fetch()
       .then(event => {
-        this.setState({ event, name: event.get('name'), date: event.get('date'), location: event.get('location') });
+        this.setState({ event, name: event.get('name'), date: `${event.get('date').getFullYear()}-${`0${event.get('date').getMonth() + 1}`.slice(-2)}-${`0${event.get('date').getDate()}`.slice(-2)}`, location: event.get('location') });
       })
       .catch(error => {
         alert(error);
@@ -61,7 +61,7 @@ export default class InfoPage extends React.Component {
     const { event, name, date, location } = this.state;
     event
       .set('name', name)
-      .set('date', date)
+      .set('date', new Date(date.slice(0, 4), date.slice(5, 7) - 1, date.slice(8, 10)))
       .set('location', location)
       .save()
       .then(() => {
@@ -92,7 +92,7 @@ export default class InfoPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Date</span>
-                      <input type="text" value={date} onChange={this.handleDateChange} required disabled={!roles.filter(role => role.get('name') === 'Admin').length} />
+                      <input type="date" max="2099-12-31" value={date} onChange={this.handleDateChange} required disabled={!roles.filter(role => role.get('name') === 'Admin').length} />
                     </label>
                   </div>
                   <div className="field field--half">

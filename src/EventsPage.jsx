@@ -12,7 +12,7 @@ export default class EventsPage extends React.Component {
       events: [],
       eventsSearch: '',
       eventName: '',
-      eventDate: new Date().toLocaleDateString('en-US'),
+      eventDate: '',
       eventLocation: ''
     };
     this.fetchEvents = this.fetchEvents.bind(this);
@@ -84,11 +84,11 @@ export default class EventsPage extends React.Component {
     const event = new AV.Object('Event');
     event
       .set('name', eventName)
-      .set('date', eventDate)
+      .set('date', new Date(eventDate.slice(0, 4), eventDate.slice(5, 7) - 1, eventDate.slice(8, 10)))
       .set('location', eventLocation)
       .save()
       .then(() => {
-        this.setState({ eventName: '', eventDate: new Date().toLocaleDateString('en-US'), eventLocation: '' }, this.fetchEvents);
+        this.setState({ eventName: '', eventDate: '', eventLocation: '' }, this.fetchEvents);
       })
       .catch(error => {
         alert(error);
@@ -150,7 +150,7 @@ export default class EventsPage extends React.Component {
                       {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).map(event =>
                         <tr key={event.id}>
                           <td>{event.get('name')}</td>
-                          <td>{event.get('date')}</td>
+                          <td>{event.get('date').toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}</td>
                           <td>{event.get('location')}</td>
                           <td><button className="primary" onClick={() => { history.push(`/event/${event.id}/info`) }}>Enter</button></td>
                           {roles.filter(role => role.get('name') === 'Admin').length ? <td><button onClick={() => { this.deleteEvent(event) }}>Delete</button></td> : null}
@@ -173,7 +173,7 @@ export default class EventsPage extends React.Component {
                     <div className="field field--half">
                       <label>
                         <span>Date</span>
-                        <input type="text" value={eventDate} onChange={this.handleEventDateChange} required />
+                        <input type="date" max="2099-12-31" value={eventDate} onChange={this.handleEventDateChange} required />
                       </label>
                     </div>
                     <div className="field field--half">
