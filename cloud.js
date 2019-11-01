@@ -51,3 +51,10 @@ AV.Cloud.beforeDelete('EventTeam', request => {
       AV.Object.destroyAll(judgeTeamPairs);
     });
 });
+AV.Cloud.beforeUpdate('JudgeTeamPair', async request => {
+  const originalJudgeTeamPair = AV.Object.createWithoutData('JudgeTeamPair', request.object.id);
+  const judgeTeamPair = await originalJudgeTeamPair.fetch();
+  if (judgeTeamPair.get('scores').length) {
+    throw new AV.Cloud.Error('Team already judged by the current judge.');
+  }
+});
