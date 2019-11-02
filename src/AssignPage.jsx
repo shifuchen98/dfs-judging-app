@@ -218,7 +218,7 @@ export default class AssignPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Times Each Team Gets Judged</span>
-                      <input type="number" value={timesEachTeamGetsJudged} min={0} max={eventJudges.length} step={1} onChange={this.handleTimesEachTeamGetsJudgedChange} required />
+                      <input type="number" value={timesEachTeamGetsJudged} min="0" max={eventJudges.length} step="1" onChange={this.handleTimesEachTeamGetsJudgedChange} required />
                     </label>
                   </div>
                   <div className="field">

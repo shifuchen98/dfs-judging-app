@@ -105,7 +105,7 @@ export default class CriteriaPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Max Score</span>
-                      <input type="number" value={max} min={1} step={1} onChange={this.handleMaxChange} required />
+                      <input type="number" value={max} min="1" step="1" onChange={this.handleMaxChange} required />
                     </label>
                   </div>
                   <div className="field">
