@@ -71,6 +71,30 @@ export default class SideNav extends React.Component {
         }]
       });
     }
+    else {
+      const judgeTeamPairQuery = new AV.Query('JudgeTeamPair');
+      judgeTeamPairQuery
+      .include("eventTeam")
+        .find()
+        .then(pairs => {
+          this.setState({
+            pages: [...pages, 
+          // this.setState({ pairs });
+              ...pairs.map(pair => 
+                ({name: pair.get("eventTeam").get("name"),
+                path: "scores/" + pair.id})
+              )
+            ]
+          } )
+        })
+        .catch(error => {
+          alert(error);
+        });
+        
+      
+
+        
+    }
   }
 
   render() {
