@@ -1,4 +1,7 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckSquare } from '@fortawesome/free-solid-svg-icons';
+import { faSquare } from '@fortawesome/free-regular-svg-icons';
 
 import AV from 'leancloud-storage/live-query';
 
@@ -203,7 +206,7 @@ export default class AssignPage extends React.Component {
                     <tbody>
                       {eventJudges.map(eventJudge => <tr key={eventJudge.id}>
                         <td>{eventJudge.get('user').get('name')}</td>
-                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).length ? <button style={{ width: '42px' }} onClick={() => { this.unassign(judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id)[0]) }}><span role="img" aria-label={`${eventJudge.get('user').get('name')} is assigned to ${eventTeam.get('name')}. Click to unassign.`}>✅</span></button> : <button style={{ width: '42px' }} onClick={() => { this.assign(eventJudge, eventTeam) }}><span role="img" aria-label={`${eventJudge.get('user').get('name')} is not assigned to ${eventTeam.get('name')}. Click to assign.`}>⬜</span></button>}</td>)}
+                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).length ? <button style={{ width: '36px' }} aria-label={`${eventJudge.get('user').get('name')} is assigned to ${eventTeam.get('name')}. Click to unassign.`} onClick={() => { this.unassign(judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id)[0]) }}><FontAwesomeIcon icon={faCheckSquare} /></button> : <button style={{ width: '36px' }} aria-label={`${eventJudge.get('user').get('name')} is not assigned to ${eventTeam.get('name')}. Click to assign.`} onClick={() => { this.assign(eventJudge, eventTeam) }}><FontAwesomeIcon icon={faSquare} /></button>}</td>)}
                       </tr>)}
                     </tbody>
                   </table>

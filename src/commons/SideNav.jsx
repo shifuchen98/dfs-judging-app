@@ -123,7 +123,7 @@ export default class SideNav extends React.Component {
               <RouteLink to={`/event/${match.params.id}/${page.path}`} onClick={closeSideNav}>
                 <span>
                   <span>{page.name}</span>
-                  {page.judgeTeamPair ? <span style={{ float: 'right' }} aria-label={page.judgeTeamPair.get('scores').length ? 'Scored.' : 'Not scored.'} >{page.judgeTeamPair.get('scores').length ? <FontAwesomeIcon icon={faCheckCircle} /> : <FontAwesomeIcon icon={faCircle} />}</span> : null}
+                  {page.judgeTeamPair ? <span style={{ float: 'right' }} aria-label={page.judgeTeamPair.get('scores').length ? 'Scored.' : 'Not scored.'}>{page.judgeTeamPair.get('scores').length ? <FontAwesomeIcon icon={faCheckCircle} /> : <FontAwesomeIcon icon={faCircle} />}</span> : null}
                 </span>
               </RouteLink>
             </li>
