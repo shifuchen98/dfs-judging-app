@@ -2,8 +2,10 @@ import React from 'react';
 import {
   NavLink as RouteLink,
 } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheckCircle, faCircle } from '@fortawesome/free-regular-svg-icons';
 
-import AV from 'leancloud-storage';
+import AV from 'leancloud-storage/live-query';
 
 import '../style.css';
 
@@ -79,8 +81,26 @@ export default class SideNav extends React.Component {
           this.setState({
             pages: [...pages, ...judgeTeamPairs.map(judgeTeamPair => ({
               name: judgeTeamPair.get("eventTeam").get("name"),
-              path: `scores/${judgeTeamPair.id}`
+              path: `scores/${judgeTeamPair.id}`,
+              judgeTeamPair
             }))]
+          });
+        })
+        .catch(error => {
+          alert(error);
+        });
+      judgeTeamPairsQuery
+        .subscribe()
+        .then(liveQuery => {
+          liveQuery.on('update', judgeTeamPair => {
+            const { pages } = this.state;
+            this.setState({
+              pages: pages.map(page => page.judgeTeamPair ? {
+                name: page.name,
+                path: page.path,
+                judgeTeamPair: judgeTeamPair.id === page.judgeTeamPair.id ? judgeTeamPair : page.judgeTeamPair
+              } : page)
+            });
           });
         })
         .catch(error => {
@@ -101,7 +121,10 @@ export default class SideNav extends React.Component {
           {pages.map(page =>
             <li key={page.path}>
               <RouteLink to={`/event/${match.params.id}/${page.path}`} onClick={closeSideNav}>
-                <span>{page.name}</span>
+                <span>
+                  <span>{page.name}</span>
+                  {page.judgeTeamPair ? <span style={{ float: 'right' }} aria-label={page.judgeTeamPair.get('scores').length ? 'Scored.' : 'Not scored.'} >{page.judgeTeamPair.get('scores').length ? <FontAwesomeIcon icon={faCheckCircle} /> : <FontAwesomeIcon icon={faCircle} />}</span> : null}
+                </span>
               </RouteLink>
             </li>
           )}

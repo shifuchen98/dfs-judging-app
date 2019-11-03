@@ -1,6 +1,8 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
-import AV from 'leancloud-storage';
+import AV from 'leancloud-storage/live-query';
 
 import './style.css';
 
@@ -165,7 +167,7 @@ export default class JudgesPage extends React.Component {
                       <input type="email" value={judgeEmail} onChange={this.handleJudgeEmailChange} onKeyDown={this.handleJudgeEmailCompletion} required />
                       <div className="dropdown" style={{ display: judgeEmailPrediction && judgeEmail !== judgeEmailPrediction ? null : 'none' }}>
                         <span style={{ float: 'left' }}>{judgeEmailPrediction}</span>
-                        <span style={{ float: 'right' }}><kbd>↓</kbd></span>
+                        <span style={{ float: 'right' }}><kbd style={{ fontSize: '6pt' }}><FontAwesomeIcon icon={faArrowDown} /></kbd></span>
                       </div>
                     </label>
                   </div>

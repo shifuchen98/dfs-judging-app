@@ -1,6 +1,6 @@
 import React from 'react';
 
-import AV from 'leancloud-storage';
+import AV from 'leancloud-storage/live-query';
 
 import './style.css';
 

@@ -20,7 +20,7 @@ import WinnerPage from './WinnerPage';
 import PresentationPage from './PresentationPage';
 import ScoringPage from './ScoringPage';
 
-import AV from 'leancloud-storage';
+import AV from 'leancloud-storage/live-query';
 
 import './style.css';
 
