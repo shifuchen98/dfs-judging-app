@@ -59,6 +59,7 @@ export default class JudgesPage extends React.Component {
         const usersQuery = new AV.Query('_User');
         usersQuery
           .startsWith('email', judgeEmail)
+          .exists('judgePassword')
           .first()
           .then(user => {
             this.setState({ judgeEmailPrediction: user ? user.get('email') : '' });
@@ -85,22 +86,28 @@ export default class JudgesPage extends React.Component {
       .first()
       .then(user => {
         if (user) {
-          const eventJudge = new AV.Object('EventJudge');
-          eventJudge
-            .set('user', user)
-            .set('event', AV.Object.createWithoutData('Event', match.params.id))
-            .save()
-            .then(() => {
-              alert('Judge successfully added');
-              this.setState({ judgeEmail: '' }, this.fetchEventJudges);
-            })
-            .catch(error => {
-              if (error.code === 137) {
-                alert('This judge is already added to the current event.');
-              } else {
-                alert(error);
-              }
-            });
+          user.getRoles().then(roles => {
+            if (roles.filter(role => role.get('name') === 'Admin').length) {
+              alert('An admin cannot be added as a judge.');
+            } else {
+              const eventJudge = new AV.Object('EventJudge');
+              eventJudge
+                .set('user', user)
+                .set('event', AV.Object.createWithoutData('Event', match.params.id))
+                .save()
+                .then(() => {
+                  alert('Judge successfully added');
+                  this.setState({ judgeEmail: '' }, this.fetchEventJudges);
+                })
+                .catch(error => {
+                  if (error.code === 137) {
+                    alert('This judge is already added to the current event.');
+                  } else {
+                    alert(error);
+                  }
+                });
+            }
+          });
         } else {
           const judgeName = prompt('This is the first time this judge attends DFS. Please provide the name of the judge.');
           if (judgeName !== null) {
@@ -204,7 +211,7 @@ export default class JudgesPage extends React.Component {
                           <td>{index + 1}</td>
                           <td>{eventJudge.get('user').get('name')}</td>
                           <td>{eventJudge.get('user').get('email')}</td>
-                          <td>{eventJudge.get('user').get('judgePassword') ? eventJudge.get('user').get('judgePassword').get('password') : null}</td>
+                          <td>{eventJudge.get('user').get('judgePassword').get('password')}</td>
                           <td><button onClick={() => { this.editEventJudge(eventJudge) }}>Edit</button></td>
                           <td><button onClick={() => { this.deleteEventJudge(eventJudge) }}>Delete</button></td>
                         </tr>
