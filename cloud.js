@@ -33,13 +33,52 @@ AV.Cloud.beforeDelete('Event', request => {
         });
     });
 });
+AV.Cloud.afterSave('EventJudge', request => {
+  const presentationScoreACL = new AV.ACL();
+  presentationScoreACL.setReadAccess(request.object.get('user'), true);
+  presentationScoreACL.setWriteAccess(request.object.get('user'), true)
+  presentationScoreACL.setRoleReadAccess(new AV.Role('Admin'), true);
+  presentationScoreACL.setRoleWriteAccess(new AV.Role('Admin'), true);
+  const eventTeamsQuery = new AV.Query('EventTeam');
+  eventTeamsQuery
+    .equalTo('event', request.object.get('event'))
+    .find()
+    .then(eventTeams => {
+      AV.Object.saveAll(eventTeams.map(eventTeam => new AV.Object('PresentationScore').set('eventTeam', eventTeam).set('eventJudge', request.object).setACL(presentationScoreACL)));
+    });
+});
 AV.Cloud.beforeDelete('EventJudge', request => {
   const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
   judgeTeamPairsQuery
     .equalTo('eventJudge', request.object)
     .find()
     .then(judgeTeamPairs => {
-      AV.Object.destroyAll(judgeTeamPairs);
+      const presentationScoresQuery = new AV.Query('PresentationScore');
+      presentationScoresQuery
+        .equalTo('eventJudge', request.object)
+        .find()
+        .then(presentationScores => {
+          AV.Object.destroyAll([...judgeTeamPairs, ...presentationScores]);
+        });
+    });
+});
+AV.Cloud.afterSave('EventTeam', request => {
+  const eventJudgesQuery = new AV.Query('EventJudge');
+  eventJudgesQuery
+    .equalTo('event', request.object.get('event'))
+    .find()
+    .then(eventJudges => {
+      AV.Object.saveAll(eventJudges.map(eventJudge => {
+        const presentationScoreACL = new AV.ACL();
+        presentationScoreACL.setReadAccess(eventJudge.get('user'), true);
+        presentationScoreACL.setWriteAccess(eventJudge.get('user'), true)
+        presentationScoreACL.setRoleReadAccess(new AV.Role('Admin'), true);
+        presentationScoreACL.setRoleWriteAccess(new AV.Role('Admin'), true);
+        return new AV.Object('PresentationScore')
+          .set('eventJudge', eventJudge)
+          .set('eventTeam', request.object)
+          .setACL(presentationScoreACL);
+      }));
     });
 });
 AV.Cloud.beforeDelete('EventTeam', request => {
@@ -48,7 +87,13 @@ AV.Cloud.beforeDelete('EventTeam', request => {
     .equalTo('eventTeam', request.object)
     .find()
     .then(judgeTeamPairs => {
-      AV.Object.destroyAll(judgeTeamPairs);
+      const presentationScoresQuery = new AV.Query('PresentationScore');
+      presentationScoresQuery
+        .equalTo('eventTeam', request.object)
+        .find()
+        .then(presentationScores => {
+          AV.Object.destroyAll([...judgeTeamPairs, ...presentationScores]);
+        });
     });
 });
 AV.Cloud.beforeUpdate('JudgeTeamPair', async request => {
@@ -56,5 +101,12 @@ AV.Cloud.beforeUpdate('JudgeTeamPair', async request => {
   const judgeTeamPair = await originalJudgeTeamPair.fetch();
   if (judgeTeamPair.get('scores').length) {
     throw new AV.Cloud.Error('Team already judged by the current judge.');
+  }
+});
+AV.Cloud.beforeUpdate('PresentationScore', async request => {
+  const originalPresentationScore = AV.Object.createWithoutData('PresentationScore', request.object.id);
+  const presentationScore = await originalPresentationScore.fetch();
+  if (presentationScore.get('score')) {
+    throw new AV.Cloud.Error('Team already has a presentation score given by the current judge.');
   }
 });

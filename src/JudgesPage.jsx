@@ -125,9 +125,8 @@ export default class JudgesPage extends React.Component {
             const eventJudge = new AV.Object('EventJudge');
             eventJudge
               .set('user', user)
-              .set('event', AV.Object.createWithoutData('Event', match.params.id));
-            AV.Object
-              .saveAll([user, eventJudge])
+              .set('event', AV.Object.createWithoutData('Event', match.params.id))
+              .save()
               .then(() => {
                 alert('Judge successfully added');
                 this.setState({ judgeEmail: '' }, this.fetchEventJudges);

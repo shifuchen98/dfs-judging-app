@@ -79,11 +79,18 @@ export default class SideNav extends React.Component {
         .find()
         .then(judgeTeamPairs => {
           this.setState({
-            pages: [...pages, ...judgeTeamPairs.map(judgeTeamPair => ({
-              name: judgeTeamPair.get("eventTeam").get("name"),
-              path: `scores/${judgeTeamPair.id}`,
-              judgeTeamPair
-            }))]
+            pages: [
+              ...pages,
+              ...judgeTeamPairs.map(judgeTeamPair => ({
+                name: judgeTeamPair.get("eventTeam").get("name"),
+                path: `scoring/${judgeTeamPair.id}`,
+                judgeTeamPair
+              })),
+              {
+                name: 'Presentation Scores',
+                path: 'pscoring'
+              }
+            ]
           });
         })
         .catch(error => {

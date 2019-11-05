@@ -173,7 +173,7 @@ export default class AssignPage extends React.Component {
                 .set('eventTeam', eventTeam)
                 .setACL(judgeTeamPairACL)
             })
-            return accumulator.concat(judgeTeamPairs);
+            return [...accumulator, ...judgeTeamPairs];
           }, []))
           .then(this.fetchJudgeTeamPairs)
           .catch(error => {

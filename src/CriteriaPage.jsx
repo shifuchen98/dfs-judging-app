@@ -76,7 +76,7 @@ export default class CriteriaPage extends React.Component {
   deleteCriterion(index) {
     const { event } = this.state;
     event
-      .set('criteria', event.get('criteria').slice(0, index).concat(event.get('criteria').slice(index + 1)))
+      .set('criteria', [...event.get('criteria').slice(0, index), ...event.get('criteria').slice(index + 1)])
       .save()
       .then(event => {
         this.setState({ event });

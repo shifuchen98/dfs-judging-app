@@ -19,6 +19,7 @@ import ExportPage from './ExportPage';
 import WinnerPage from './WinnerPage';
 import PresentationPage from './PresentationPage';
 import ScoringPage from './ScoringPage';
+import PscoringPage from './PscoringPage';
 
 import AV from 'leancloud-storage/live-query';
 
@@ -78,7 +79,8 @@ export default class App extends React.Component {
                 <Route exact path="/event/:id/export" component={ExportPage} />
                 <Route exact path="/event/:id/winner" component={WinnerPage} />
                 <Route exact path="/event/:id/presentation" component={PresentationPage} />
-                <Route exact path="/event/:id/scores/:tid" component={ScoringPage} />
+                <Route exact path="/event/:id/scoring/:tid" component={ScoringPage} />
+                <Route exact path="/event/:id/pscoring" component={PscoringPage} />
                 <Redirect to="/event/:id/info" />
               </Switch>
             </div>
