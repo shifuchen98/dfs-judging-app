@@ -11,6 +11,7 @@ export default class EventsPage extends React.Component {
       roles: [],
       events: [],
       eventsSearch: '',
+      showingPastEvents: false,
       eventName: '',
       eventDate: '',
       eventLocation: ''
@@ -20,6 +21,7 @@ export default class EventsPage extends React.Component {
     this.handleEventNameChange = this.handleEventNameChange.bind(this);
     this.handleEventDateChange = this.handleEventDateChange.bind(this);
     this.handleEventLocationChange = this.handleEventLocationChange.bind(this);
+    this.showPastEvents = this.showPastEvents.bind(this);
     this.createEvent = this.createEvent.bind(this);
     this.deleteEvent = this.deleteEvent.bind(this);
     this.logOut = this.logOut.bind(this);
@@ -43,7 +45,7 @@ export default class EventsPage extends React.Component {
       eventsQuery
         .find()
         .then(events => {
-          this.setState({ events });
+          this.setState({ events: events.sort((a, b) => b.get('date') - a.get('date')) });
         })
         .catch(error => {
           alert(error);
@@ -55,7 +57,7 @@ export default class EventsPage extends React.Component {
         .include('event')
         .find()
         .then(eventJudges => {
-          this.setState({ events: eventJudges.map(eventJudge => eventJudge.get('event')) });
+          this.setState({ events: eventJudges.map(eventJudge => eventJudge.get('event')).sort((a, b) => b.get('date') - a.get('date')) });
         })
         .catch(error => {
           alert(error);
@@ -77,6 +79,10 @@ export default class EventsPage extends React.Component {
 
   handleEventLocationChange(e) {
     this.setState({ eventLocation: e.target.value });
+  }
+
+  showPastEvents() {
+    this.setState({ showingPastEvents: true });
   }
 
   createEvent(e) {
@@ -114,7 +120,7 @@ export default class EventsPage extends React.Component {
 
   render() {
     const { history } = this.props;
-    const { roles, events, eventsSearch, eventName, eventDate, eventLocation } = this.state;
+    const { roles, events, eventsSearch, showingPastEvents, eventName, eventDate, eventLocation } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -147,7 +153,7 @@ export default class EventsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).map(event =>
+                      {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).filter(event => event.get('date') >= new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) || showingPastEvents).map(event =>
                         <tr key={event.id}>
                           <td>{event.get('name')}</td>
                           <td>{event.get('date').toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' })}</td>
@@ -159,6 +165,10 @@ export default class EventsPage extends React.Component {
                     </tbody>
                   </table>
                 </div>
+                {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).filter(event => event.get('date') < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) && !showingPastEvents).length ?
+                  <div className="field">
+                    <button onClick={this.showPastEvents}>Show {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).filter(event => event.get('date') < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) && !showingPastEvents).length} Past {events.filter(event => eventsSearch ? event.get('name').toLowerCase().includes(eventsSearch.toLowerCase()) : true).filter(event => event.get('date') < new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()) && !showingPastEvents).length === 1 ? 'Event' : 'Events'}</button>
+                  </div> : null}
               </section>
               {roles.filter(role => role.get('name') === 'Admin').length ?
                 <section className="fields">
