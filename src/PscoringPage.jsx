@@ -61,8 +61,9 @@ export default class PscoringPage extends React.Component {
       .set('score', parseInt(score.value))
       .save()
       .then(() => {
+        const { scores } = this.state;
         alert('Score submitted.');
-        this.fetchPresentationScores();
+        this.setState({ scores });
       })
       .catch(error => {
         alert(error);
