@@ -114,8 +114,8 @@ export default class ExportPage extends React.Component {
                     <thead>
                       <tr>
                         <th>Place</th>
-                        <th>Score</th>
                         <th>Team</th>
+                        <th>Score</th>
                       </tr>
                     </thead>
                     <tbody>

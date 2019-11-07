@@ -71,10 +71,10 @@ export default class PresentationPage extends React.Component {
           <div className="column">
             <div className="card">
               <section className="fields">
-                <h1>Select Rank or Team</h1>
+                <h1>Presentation Scores</h1>
                 <div className="field field--half">
                   <select value={currentEventTeam} onChange={this.handleCurrentEventTeamChange}>
-                    <option value="">Rank</option>
+                    <option value="">All Teams</option>
                     {eventTeams.map(eventTeam => <option key={eventTeam.id} value={eventTeam.id}>{eventTeam.get("name")}</option>)}
                   </select>
                 </div>
@@ -100,7 +100,7 @@ export default class PresentationPage extends React.Component {
                     <table>
                       <thead>
                         <tr>
-                          <th>Rank</th>
+                          <th>Place</th>
                           <th>Team Name</th>
                           <th>Total Score</th>
                         </tr>
@@ -114,11 +114,11 @@ export default class PresentationPage extends React.Component {
                               .reduce((accumulator, presentationScore) => accumulator + presentationScore.get('score') || 0, 0)
                           }))
                           .sort((a, b) => b.score - a.score)
-                          .map((rank, index) =>
-                            <tr key={rank.eventTeam.id}>
+                          .map((place, index) =>
+                            <tr key={place.eventTeam.id}>
                               <td>{index + 1}</td>
-                              <td>{rank.eventTeam.get('name')}</td>
-                              <td>{rank.score}</td>
+                              <td>{place.eventTeam.get('name')}</td>
+                              <td>{place.score}</td>
                             </tr>
                           )}
                       </tbody>
