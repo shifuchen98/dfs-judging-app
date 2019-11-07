@@ -8,7 +8,13 @@ export default class ExportPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      eventJudges: [],
+      eventTeams: [],
+      judgeTeamPairs: []
     };
+    this.fetchEventJudges = this.fetchEventJudges.bind(this);
+    this.fetchEventTeams = this.fetchEventTeams.bind(this);
+    this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
   }
 
   componentDidMount() {
@@ -16,12 +22,61 @@ export default class ExportPage extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
-
+      this.fetchEventJudges();
     }
   }
 
+  fetchEventJudges() {
+    const { match } = this.props;
+    const eventJudgesQuery = new AV.Query('EventJudge');
+    eventJudgesQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .include('user')
+      .limit(1000)
+      .find()
+      .then(eventJudges => {
+        this.setState({ eventJudges }, this.fetchEventTeams);
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  fetchEventTeams() {
+    const { match } = this.props;
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .limit(1000)
+      .find()
+      .then(eventTeams => {
+        this.setState({ eventTeams }, this.fetchJudgeTeamPairs);
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
+  fetchJudgeTeamPairs() {
+    const { match } = this.props;
+    const eventTeamsQuery = new AV.Query('EventTeam');
+    eventTeamsQuery
+      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+    const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+    judgeTeamPairsQuery
+      .matchesQuery('eventTeam', eventTeamsQuery)
+      .limit(1000)
+      .find()
+      .then(judgeTeamPairs => {
+        this.setState({ judgeTeamPairs });
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
   render() {
-    const { } = this.state;
+    const { eventJudges, eventTeams, judgeTeamPairs } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -34,30 +89,14 @@ export default class ExportPage extends React.Component {
                     <thead>
                       <tr>
                         <th><span>Judge</span></th>
-                        <th><span>Team 1</span></th>
-                        <th><span>Team 2</span></th>
-                        <th><span>Team 3</span></th>
+                        {eventTeams.map(eventTeam => <th key={eventTeam.id}><span>{eventTeam.get('name')}</span></th>)}
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Alice</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Bob</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Charlie</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
+                      {eventJudges.map(eventJudge => <tr key={eventJudge.id}>
+                        <td>{eventJudge.get('user').get('name')}</td>
+                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).reduce((accumulator, judgeTeamPair) => [...accumulator, ...judgeTeamPair.get('scores')], []).reduce((accumulator, score) => accumulator + score.value, null)}</td>)}
+                      </tr>)}
                     </tbody>
                   </table>
                 </div>
@@ -74,30 +113,14 @@ export default class ExportPage extends React.Component {
                     <thead>
                       <tr>
                         <th><span>Judge</span></th>
-                        <th><span>Team 1</span></th>
-                        <th><span>Team 2</span></th>
-                        <th><span>Team 3</span></th>
+                        {eventTeams.map(eventTeam => <th key={eventTeam.id}><span>{eventTeam.get('name')}</span></th>)}
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Alice</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Bob</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>Charlie</td>
-                        <td>0</td>
-                        <td>0</td>
-                        <td>0</td>
-                      </tr>
+                      {eventJudges.map(eventJudge => <tr key={eventJudge.id}>
+                        <td>{eventJudge.get('user').get('name')}</td>
+                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>?</td>)}
+                      </tr>)}
                     </tbody>
                   </table>
                 </div>
