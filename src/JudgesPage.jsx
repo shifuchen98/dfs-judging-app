@@ -13,12 +13,14 @@ export default class JudgesPage extends React.Component {
       eventJudges: [],
       judgesSearch: '',
       judgeEmail: '',
-      judgeEmailPrediction: ''
+      judgeEmailPrediction: '',
+      csvToBeImported: ''
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
     this.handleJudgeEmailChange = this.handleJudgeEmailChange.bind(this);
     this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(this);
+    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
   }
@@ -75,6 +77,10 @@ export default class JudgesPage extends React.Component {
     if (e.keyCode === 40) {
       this.setState({ judgeEmail: judgeEmailPrediction })
     }
+  }
+
+  handleCsvToBeImportedChange(e) {
+    this.setState({ csvToBeImported: e.target.value });
   }
 
   addEventJudge(e) {
@@ -158,7 +164,7 @@ export default class JudgesPage extends React.Component {
   }
 
   render() {
-    const { eventJudges, judgesSearch, judgeEmail, judgeEmailPrediction } = this.state;
+    const { eventJudges, judgesSearch, judgeEmail, judgeEmailPrediction, csvToBeImported } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -220,13 +226,17 @@ export default class JudgesPage extends React.Component {
                 </div>
               </section>
             </div>
-            <div className = "card">
-              <section className = "fields">
-                <h1>Import Judge Information</h1>
-                <textarea rows = "20" cols = "90">
-                </textarea> 
-                <div className = "field">
-                <button type = "submit" className = "primary">Import</button> 
+            <div className="card">
+              <section className="fields">
+                <h1>Import Judges</h1>
+                <div className="field">
+                  <label>
+                    <span>Paste CSV Here</span>
+                    <textarea rows="20" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
+                  </label>
+                </div>
+                <div className="field">
+                  <button type="submit" className="primary">Import</button>
                 </div>
               </section>
             </div>

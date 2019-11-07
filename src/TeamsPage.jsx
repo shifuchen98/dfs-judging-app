@@ -16,8 +16,8 @@ export default class TeamsPage extends React.Component {
       schoolPrediction: '',
       appName: '',
       appDescription: '',
-      teamsSearch: '', 
-      test: ''
+      teamsSearch: '',
+      csvToBeImported: ''
     };
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
@@ -26,10 +26,10 @@ export default class TeamsPage extends React.Component {
     this.handleAppNameChange = this.handleAppNameChange.bind(this);
     this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(this);
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
+    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(this);
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
-    this.handleTest = this.handleTest.bind(this); 
   }
 
   componentDidMount() {
@@ -95,8 +95,8 @@ export default class TeamsPage extends React.Component {
     this.setState({ teamsSearch: e.target.value });
   }
 
-  handleTest(e){
-    this.setState({test: e.target.value}); 
+  handleCsvToBeImportedChange(e) {
+    this.setState({ csvToBeImported: e.target.value });
   }
 
   createEventTeam(e) {
@@ -139,7 +139,7 @@ export default class TeamsPage extends React.Component {
   }
 
   render() {
-    const { eventTeams, teamName, school, schoolPrediction, appName, appDescription, teamsSearch, test} = this.state;
+    const { eventTeams, teamName, school, schoolPrediction, appName, appDescription, teamsSearch, csvToBeImported } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -221,14 +221,17 @@ export default class TeamsPage extends React.Component {
                 </div>
               </section>
             </div>
-            <div className = "card">
-              <section className = "fields">
-                <h1>Import Teams Information</h1>
-                <textarea rows = "20" cols = "90" id = "TextArea" value = {test} onChange = {this.handleTest}>
-                </textarea> 
-                <h2>{test}</h2>
-                <div className = "field">
-                <button type = "submit" className = "primary">Import</button> 
+            <div className="card">
+              <section className="fields">
+                <h1>Import Teams</h1>
+                <div className="field">
+                  <label>
+                    <span>Paste CSV Here</span>
+                    <textarea rows="20" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
+                  </label>
+                </div>
+                <div className="field">
+                  <button type="submit" className="primary">Import</button>
                 </div>
               </section>
             </div>

@@ -98,6 +98,7 @@ label > span {
   color: #5b7082;
 }
 input,
+textarea,
 select {
   border: 1px solid #d2d5da;
   width: 100%;
@@ -110,10 +111,12 @@ select {
   border-radius: 2px;
 }
 input:focus,
+textarea:focus,
 select:focus {
   border: 1px solid #0099ff;
 }
 input:disabled,
+textarea:disabled,
 select:disabled {
   border: 1px solid #00000009;
   background-color: transparent;
@@ -122,6 +125,7 @@ input[type="date"] {
   height: 36px;
 }
 label > input,
+label > textarea,
 label > select {
   margin: 6px 0 0 0;
 }
@@ -335,6 +339,7 @@ td > button.primary:hover {
     margin: 0 0 16px 0;
   }
   label > input,
+  label > textarea,
   label > select {
     margin: 8px 0 0 0;
   }
