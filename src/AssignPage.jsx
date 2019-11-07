@@ -42,6 +42,7 @@ export default class AssignPage extends React.Component {
     eventJudgesQuery
       .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
       .include('user')
+      .limit(1000)
       .find()
       .then(eventJudges => {
         this.setState({ eventJudges }, this.fetchEventTeams);
@@ -56,6 +57,7 @@ export default class AssignPage extends React.Component {
     const eventTeamsQuery = new AV.Query('EventTeam');
     eventTeamsQuery
       .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .limit(1000)
       .find()
       .then(eventTeams => {
         this.setState({ eventTeams }, this.fetchJudgeTeamPairs);
@@ -73,6 +75,7 @@ export default class AssignPage extends React.Component {
     const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
     judgeTeamPairsQuery
       .matchesQuery('eventTeam', eventTeamsQuery)
+      .limit(1000)
       .find()
       .then(judgeTeamPairs => {
         this.setState({ judgeTeamPairs });

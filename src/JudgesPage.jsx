@@ -43,6 +43,7 @@ export default class JudgesPage extends React.Component {
       .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
       .include('user')
       .include('user.judgePassword')
+      .limit(1000)
       .find()
       .then(eventJudges => {
         this.setState({ eventJudges });

@@ -76,6 +76,7 @@ export default class SideNav extends React.Component {
       const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
       judgeTeamPairsQuery
         .include("eventTeam")
+        .limit(1000)
         .find()
         .then(judgeTeamPairs => {
           this.setState({

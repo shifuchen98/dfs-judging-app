@@ -18,6 +18,7 @@ AV.Cloud.beforeDelete('Event', request => {
   const eventJudgesQuery = new AV.Query('EventJudge');
   eventJudgesQuery
     .equalTo('event', request.object)
+    .limit(1000)
     .find()
     .then(eventJudges => {
       AV.Object
@@ -26,6 +27,7 @@ AV.Cloud.beforeDelete('Event', request => {
           const eventTeamsQuery = new AV.Query('EventTeam');
           eventTeamsQuery
             .equalTo('event', request.object)
+            .limit(1000)
             .find()
             .then(eventTeams => {
               AV.Object.destroyAll(eventTeams);
@@ -42,6 +44,7 @@ AV.Cloud.afterSave('EventJudge', request => {
   const eventTeamsQuery = new AV.Query('EventTeam');
   eventTeamsQuery
     .equalTo('event', request.object.get('event'))
+    .limit(1000)
     .find()
     .then(eventTeams => {
       AV.Object.saveAll(eventTeams.map(eventTeam => new AV.Object('PresentationScore').set('eventTeam', eventTeam).set('eventJudge', request.object).setACL(presentationScoreACL)));
@@ -51,11 +54,13 @@ AV.Cloud.beforeDelete('EventJudge', request => {
   const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
   judgeTeamPairsQuery
     .equalTo('eventJudge', request.object)
+    .limit(1000)
     .find()
     .then(judgeTeamPairs => {
       const presentationScoresQuery = new AV.Query('PresentationScore');
       presentationScoresQuery
         .equalTo('eventJudge', request.object)
+        .limit(1000)
         .find()
         .then(presentationScores => {
           AV.Object.destroyAll([...judgeTeamPairs, ...presentationScores]);
@@ -66,6 +71,7 @@ AV.Cloud.afterSave('EventTeam', request => {
   const eventJudgesQuery = new AV.Query('EventJudge');
   eventJudgesQuery
     .equalTo('event', request.object.get('event'))
+    .limit(1000)
     .find()
     .then(eventJudges => {
       AV.Object.saveAll(eventJudges.map(eventJudge => {
@@ -85,11 +91,13 @@ AV.Cloud.beforeDelete('EventTeam', request => {
   const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
   judgeTeamPairsQuery
     .equalTo('eventTeam', request.object)
+    .limit(1000)
     .find()
     .then(judgeTeamPairs => {
       const presentationScoresQuery = new AV.Query('PresentationScore');
       presentationScoresQuery
         .equalTo('eventTeam', request.object)
+        .limit(1000)
         .find()
         .then(presentationScores => {
           AV.Object.destroyAll([...judgeTeamPairs, ...presentationScores]);

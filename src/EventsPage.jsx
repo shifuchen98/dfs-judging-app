@@ -43,6 +43,7 @@ export default class EventsPage extends React.Component {
     if (roles.filter(role => role.get('name') === 'Admin').length) {
       const eventsQuery = new AV.Query('Event');
       eventsQuery
+        .limit(1000)
         .find()
         .then(events => {
           this.setState({ events: events.sort((a, b) => b.get('date') - a.get('date')) });
@@ -55,6 +56,7 @@ export default class EventsPage extends React.Component {
       eventJudgesQuery
         .equalTo('user', AV.User.current())
         .include('event')
+        .limit(1000)
         .find()
         .then(eventJudges => {
           this.setState({ events: eventJudges.map(eventJudge => eventJudge.get('event')).sort((a, b) => b.get('date') - a.get('date')) });

@@ -44,6 +44,7 @@ export default class TotalPage extends React.Component {
     const eventTeamsQuery = new AV.Query('EventTeam');
     eventTeamsQuery
       .equalTo('event', event)
+      .limit(1000)
       .find()
       .then(eventTeams => {
         this.setState({ eventTeams }, this.fetchJudgeTeamPairs);
@@ -63,6 +64,7 @@ export default class TotalPage extends React.Component {
       .matchesQuery('eventTeam', eventTeamsQuery)
       .include('eventJudge')
       .include('eventJudge.user')
+      .limit(1000)
       .find()
       .then(judgeTeamPairs => {
         this.setState({ judgeTeamPairs });

@@ -32,6 +32,7 @@ export default class PscoringPage extends React.Component {
     presentationScoresQuery
       .matchesQuery('eventTeam', eventTeamsQuery)
       .include('eventTeam')
+      .limit(1000)
       .find()
       .then(presentationScores => {
         this.setState({

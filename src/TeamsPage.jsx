@@ -48,6 +48,7 @@ export default class TeamsPage extends React.Component {
     const eventTeamsQuery = new AV.Query('EventTeam');
     eventTeamsQuery
       .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .limit(1000)
       .find()
       .then(eventTeams => {
         this.setState({ eventTeams });
