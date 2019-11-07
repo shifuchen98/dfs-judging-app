@@ -10,12 +10,12 @@ export default class JudgePage extends React.Component {
     const { match } = this.props;
     this.state = {
       user: AV.Object.createWithoutData('_User', match.params.uid),
-      name: '',
-      email: ''
+      email: '',
+      name: ''
     };
     this.fetchUser = this.fetchUser.bind(this);
-    this.handleNameChange = this.handleNameChange.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
     this.updateUser = this.updateUser.bind(this);
   }
 
@@ -40,12 +40,12 @@ export default class JudgePage extends React.Component {
       });
   }
 
-  handleNameChange(e) {
-    this.setState({ name: e.target.value });
-  }
-
   handleEmailChange(e) {
     this.setState({ email: e.target.value });
+  }
+
+  handleNameChange(e) {
+    this.setState({ name: e.target.value });
   }
 
   updateUser(e) {
@@ -63,7 +63,7 @@ export default class JudgePage extends React.Component {
   }
 
   render() {
-    const { name, email } = this.state;
+    const { email, name } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -74,14 +74,14 @@ export default class JudgePage extends React.Component {
                 <form onSubmit={this.updateUser}>
                   <div className="field field--half">
                     <label>
-                      <span>Name</span>
-                      <input type="text" value={name} onChange={this.handleNameChange} required />
+                      <span>Email</span>
+                      <input type="text" value={email} onChange={this.handleEmailChange} required />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
-                      <span>Email</span>
-                      <input type="text" value={email} onChange={this.handleEmailChange} required />
+                      <span>Name</span>
+                      <input type="text" value={name} onChange={this.handleNameChange} required />
                     </label>
                   </div>
                   <div className="field">

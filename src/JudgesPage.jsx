@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 import AV from 'leancloud-storage/live-query';
+import Papa from 'papaparse';
 
 import './style.css';
 
@@ -23,6 +24,7 @@ export default class JudgesPage extends React.Component {
     this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
+    this.importFromCsv = this.importFromCsv.bind(this);
   }
 
   componentDidMount() {
@@ -163,6 +165,56 @@ export default class JudgesPage extends React.Component {
       });
   }
 
+  importFromCsv(e) { // To be fixed
+    const { match } = this.props;
+    const { csvToBeImported } = this.state;
+    AV.Object
+      .saveAll(Papa.parse(csvToBeImported).data.map(async row => {
+        const usersQuery = new AV.Query('_User');
+        usersQuery.equalTo('email', row[0]);
+        const user = await usersQuery.first();
+        if (user) {
+          const roles = await user.getRoles();
+          if (roles.filter(role => role.get('name') === 'Admin').length) {
+            alert('An admin is skipped since it cannot be added as a judge.');
+          } else {
+            const eventJudge = new AV.Object('EventJudge');
+            return eventJudge
+              .set('user', user)
+              .set('event', AV.Object.createWithoutData('Event', match.params.id));
+          }
+        } else {
+          const password = `${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}${parseInt(Math.random() * 10)}`
+          const judgePassword = new AV.Object('JudgePassword')
+          judgePassword
+            .set('password', password);
+          const user = new AV.Object('_User');
+          user
+            .set('email', row[0])
+            .set('username', row[0])
+            .set('name', row[1])
+            .set('password', password)
+            .set('judgePassword', judgePassword);
+          const eventJudge = new AV.Object('EventJudge');
+          return eventJudge
+            .set('user', user)
+            .set('event', AV.Object.createWithoutData('Event', match.params.id));
+        }
+      }))
+      .then(() => {
+        alert('Judges successfully imported.');
+        this.fetchEventJudges();
+      })
+      .catch(error => {
+        if (error.code === 137) {
+          alert('Judges successfully imported with existing judges skipped.');
+        } else {
+          alert(error);
+        }
+      });
+    e.preventDefault();
+  }
+
   render() {
     const { eventJudges, judgesSearch, judgeEmail, judgeEmailPrediction, csvToBeImported } = this.state;
     return (
@@ -203,8 +255,8 @@ export default class JudgesPage extends React.Component {
                     <thead>
                       <tr>
                         <th>#</th>
-                        <th>Name</th>
                         <th>Email</th>
+                        <th>Name</th>
                         <th>Password</th>
                         <th>Edit</th>
                         <th>Delete</th>
@@ -214,8 +266,8 @@ export default class JudgesPage extends React.Component {
                       {eventJudges.filter(eventJudge => judgesSearch ? eventJudge.get('user').get('name').toLowerCase().includes(judgesSearch.toLowerCase()) || eventJudge.get('user').get('email').toLowerCase().includes(judgesSearch.toLowerCase()) : true).map((eventJudge, index) =>
                         <tr key={eventJudge.id}>
                           <td>{index + 1}</td>
-                          <td>{eventJudge.get('user').get('name')}</td>
                           <td>{eventJudge.get('user').get('email')}</td>
+                          <td>{eventJudge.get('user').get('name')}</td>
                           <td>{eventJudge.get('user').get('judgePassword').get('password')}</td>
                           <td><button onClick={() => { this.editEventJudge(eventJudge) }}>Edit</button></td>
                           <td><button onClick={() => { this.deleteEventJudge(eventJudge) }}>Delete</button></td>
@@ -229,15 +281,17 @@ export default class JudgesPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Judges</h1>
-                <div className="field">
-                  <label>
-                    <span>Paste CSV Here</span>
-                    <textarea rows="20" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
-                  </label>
-                </div>
-                <div className="field">
-                  <button type="submit" className="primary">Import</button>
-                </div>
+                <form onSubmit={this.importFromCsv}>
+                  <div className="field">
+                    <label>
+                      <span>Paste CSV or TSV Here</span>
+                      <textarea rows="20" placeholder="thornton@uci.edu,Alex Thornton" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">Import</button>
+                  </div>
+                </form>
               </section>
             </div>
           </div>

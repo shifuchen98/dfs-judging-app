@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 import AV from 'leancloud-storage/live-query';
+import Papa from 'papaparse';
 
 import './style.css';
 
@@ -30,6 +31,7 @@ export default class TeamsPage extends React.Component {
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
+    this.importFromCsv = this.importFromCsv.bind(this);
   }
 
   componentDidMount() {
@@ -138,6 +140,25 @@ export default class TeamsPage extends React.Component {
       });
   }
 
+  importFromCsv(e) {
+    const { match } = this.props;
+    const { csvToBeImported } = this.state;
+    AV.Object
+      .saveAll(Papa.parse(csvToBeImported).data.map(row => new AV.Object('EventTeam').set('event', AV.Object.createWithoutData('Event', match.params.id)).set('name', row[0]).set('school', row[1]).set('appName', row[2]).set('appDescription', row[3])))
+      .then(() => {
+        alert('Teams successfully imported.');
+        this.fetchEventTeams();
+      })
+      .catch(error => {
+        if (error.code === 137) {
+          alert('Teams successfully imported with duplicate teams skipped.');
+        } else {
+          alert(error);
+        }
+      });
+    e.preventDefault();
+  }
+
   render() {
     const { eventTeams, teamName, school, schoolPrediction, appName, appDescription, teamsSearch, csvToBeImported } = this.state;
     return (
@@ -224,15 +245,17 @@ export default class TeamsPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Teams</h1>
-                <div className="field">
-                  <label>
-                    <span>Paste CSV Here</span>
-                    <textarea rows="20" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
-                  </label>
-                </div>
-                <div className="field">
-                  <button type="submit" className="primary">Import</button>
-                </div>
+                <form onSubmit={this.importFromCsv}>
+                  <div className="field">
+                    <label>
+                      <span>Paste CSV or TSV Here</span>
+                      <textarea rows="20" placeholder="The Dream Team,UCI,The Dream App,This is the coolest app in the world!" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">Import</button>
+                  </div>
+                </form>
               </section>
             </div>
           </div>
