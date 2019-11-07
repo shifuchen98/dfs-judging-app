@@ -220,6 +220,16 @@ export default class JudgesPage extends React.Component {
                 </div>
               </section>
             </div>
+            <div className = "card">
+              <section className = "fields">
+                <h1>Import Judge Information</h1>
+                <textarea rows = "20" cols = "90">
+                </textarea> 
+                <div className = "field">
+                <button type = "submit" className = "primary">Import</button> 
+                </div>
+              </section>
+            </div>
           </div>
         </div>
       </div>
