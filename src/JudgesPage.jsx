@@ -165,11 +165,11 @@ export default class JudgesPage extends React.Component {
       });
   }
 
-  importFromCsv(e) { // To be fixed
+  importFromCsv(e) {
     const { match } = this.props;
     const { csvToBeImported } = this.state;
-    AV.Object
-      .saveAll(Papa.parse(csvToBeImported.trim()).data.map(async row => {
+    Promise
+      .all(Papa.parse(csvToBeImported.trim()).data.map(async row => {
         const usersQuery = new AV.Query('_User');
         usersQuery.equalTo('email', row[0]);
         const user = await usersQuery.first();
@@ -201,17 +201,24 @@ export default class JudgesPage extends React.Component {
             .set('event', AV.Object.createWithoutData('Event', match.params.id));
         }
       }))
-      .then(() => {
-        alert('Judges successfully imported.');
-        this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+      .then(eventJudges => {
+        AV.Object
+          .saveAll(eventJudges)
+          .then(() => {
+            alert('Judges successfully imported.');
+            this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+          })
+          .catch(error => {
+            if (error.code === 137) {
+              alert('Judges successfully imported with existing judges skipped.');
+              this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+            } else {
+              alert(error);
+            }
+          });
       })
       .catch(error => {
-        if (error.code === 137) {
-          alert('Judges successfully imported with existing judges skipped.');
-          this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
-        } else {
-          alert(error);
-        }
+        alert(error);
       });
     e.preventDefault();
   }
