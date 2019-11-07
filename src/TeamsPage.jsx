@@ -144,14 +144,15 @@ export default class TeamsPage extends React.Component {
     const { match } = this.props;
     const { csvToBeImported } = this.state;
     AV.Object
-      .saveAll(Papa.parse(csvToBeImported).data.map(row => new AV.Object('EventTeam').set('event', AV.Object.createWithoutData('Event', match.params.id)).set('name', row[0]).set('school', row[1]).set('appName', row[2]).set('appDescription', row[3])))
+      .saveAll(Papa.parse(csvToBeImported.trim()).data.map(row => new AV.Object('EventTeam').set('event', AV.Object.createWithoutData('Event', match.params.id)).set('name', row[0]).set('school', row[1]).set('appName', row[2]).set('appDescription', row[3])))
       .then(() => {
         alert('Teams successfully imported.');
-        this.fetchEventTeams();
+        this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
       })
       .catch(error => {
         if (error.code === 137) {
           alert('Teams successfully imported with duplicate teams skipped.');
+          this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
         } else {
           alert(error);
         }
