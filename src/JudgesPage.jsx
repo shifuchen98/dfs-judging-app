@@ -207,12 +207,12 @@ export default class JudgesPage extends React.Component {
           .saveAll(eventJudges)
           .then(() => {
             alert('Judges successfully imported.');
-            this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+            this.setState({ csvToBeImported: '' }, this.fetchEventJudges);
           })
           .catch(error => {
             if (error.code === 137) {
               alert('Judges successfully imported with existing judges skipped.');
-              this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+              this.setState({ csvToBeImported: '' }, this.fetchEventJudges);
             } else {
               alert(error);
             }
