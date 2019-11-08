@@ -1,6 +1,7 @@
 import React from 'react';
 
 import AV from 'leancloud-storage/live-query';
+import Papa from 'papaparse';
 
 import './style.css';
 
@@ -20,6 +21,9 @@ export default class ExportPage extends React.Component {
     this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
     this.normalizedScores = this.normalizedScores.bind(this);
     this.totalScore = this.totalScore.bind(this);
+    this.rawData = this.rawData.bind(this);
+    this.normalizedData = this.normalizedData.bind(this);
+    this.winnerData = this.winnerData.bind(this);
   }
 
   componentDidMount() {
@@ -109,6 +113,50 @@ export default class ExportPage extends React.Component {
     return eventJudges.map(eventJudge => this.normalizedScores(eventJudge).filter(score => score.eventTeam.id === eventTeam.id).map(score => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === score.eventTeam.id).length ? score.value : 0).reduce((accumulator, value) => accumulator + value, 0)).reduce((accumulator, value) => accumulator + value, 0).toFixed(2);
   }
 
+  rawData() {
+    const { event, eventJudges, eventTeams, judgeTeamPairs } = this.state;
+    return Papa.unparse(
+      [
+        ['Judge', ...eventTeams.map(eventTeam => eventTeam.get('name'))],
+        ...eventJudges.map(eventJudge => [
+          eventJudge.get('user').get('name'),
+          ...eventTeams.map(eventTeam => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).reduce((accumulator, judgeTeamPair) => accumulator + event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0), null))
+        ])
+      ],
+      { delimiter: ',' }
+    );
+  }
+
+  normalizedData() {
+    const { eventJudges, eventTeams, judgeTeamPairs } = this.state;
+    return Papa.unparse(
+      [
+        ['Judge', ...eventTeams.map(eventTeam => eventTeam.get('name'))],
+        ...eventJudges.map(eventJudge => [
+          eventJudge.get('user').get('name'),
+          ...this.normalizedScores(eventJudge).map(score => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === score.eventTeam.id).length ? score.value.toFixed(2) : null)
+        ]),
+        ['Total', ...eventTeams.map(eventTeam => this.totalScore(eventTeam))]
+      ],
+      { delimiter: ',' }
+    );
+  }
+
+  winnerData() {
+    const { eventTeams } = this.state;
+    return Papa.unparse(
+      [
+        ['Place', 'Team', 'Score'],
+        ...eventTeams.map(eventTeam => ({ eventTeam, value: this.totalScore(eventTeam) })).sort((a, b) => b.value - a.value).map((score, index) => [
+          index + 1,
+          score.eventTeam.get('name'),
+          score.value
+        ])
+      ],
+      { delimiter: ',' }
+    );
+  }
+
   render() {
     const { event, eventJudges, eventTeams, judgeTeamPairs } = this.state;
     return (
@@ -135,7 +183,9 @@ export default class ExportPage extends React.Component {
                   </table>
                 </div>
                 <div className="field">
-                  <button className="primary">Export as CSV</button>
+                  <a href={`data:text/plain;charset=utf-8,${encodeURIComponent(this.rawData())}`} download={`${event.get('name')} (Raw Data).csv`} tabIndex="-1">
+                    <button className="primary">Export as CSV</button>
+                  </a>
                 </div>
               </section>
             </div>
@@ -163,7 +213,9 @@ export default class ExportPage extends React.Component {
                   </table>
                 </div>
                 <div className="field">
-                  <button className="primary">Export as CSV</button>
+                  <a href={`data:text/plain;charset=utf-8,${encodeURIComponent(this.normalizedData())}`} download={`${event.get('name')} (Normalized Data).csv`} tabIndex="-1">
+                    <button className="primary">Export as CSV</button>
+                  </a>
                 </div>
               </section>
             </div>
@@ -191,7 +243,9 @@ export default class ExportPage extends React.Component {
                   </table>
                 </div>
                 <div className="field">
-                  <button className="primary">Export as CSV</button>
+                  <a href={`data:text/plain;charset=utf-8,${encodeURIComponent(this.winnerData())}`} download={`${event.get('name')} (Winner Data).csv`} tabIndex="-1">
+                    <button className="primary">Export as CSV</button>
+                  </a>
                 </div>
               </section>
             </div>

@@ -161,6 +161,7 @@ button {
   cursor: pointer;
 }
 .field > button,
+.field > a > button,
 td > button {
   border: 1px solid #d2d5da;
   padding: 8px;
@@ -170,11 +171,14 @@ td > button {
 }
 .field > button:focus,
 .field > button:hover,
+.field > a > button:focus,
+.field > a > button:hover,
 td > button:focus,
 td > button:hover {
   background-color: #202e4711;
 }
 .field > button.primary,
+.field > a > button.primary,
 td > button.primary {
   border: 1px solid #0099ff;
   background-color: #0099ff;
@@ -183,6 +187,8 @@ td > button.primary {
 }
 .field > button.primary:focus,
 .field > button.primary:hover,
+.field > a > button.primary:focus,
+.field > a > button.primary:hover,
 td > button.primary:focus,
 td > button.primary:hover {
   border: 1px solid #7fc9ff;
