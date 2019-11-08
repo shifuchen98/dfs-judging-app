@@ -131,7 +131,7 @@ export default class WinnerPage extends React.Component {
                     </thead>
                     <tbody>
                       {eventTeams.map(eventTeam => ({ eventTeam, value: this.totalScore(eventTeam) })).sort((a, b) => b.value - a.value).map((score, index) =>
-                        <tr>
+                        <tr key={score.eventTeam.id}>
                           <td>{index + 1}</td>
                           <td>{score.eventTeam.get('name')}</td>
                           <td>{score.eventTeam.get('school')}</td>
