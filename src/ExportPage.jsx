@@ -19,6 +19,7 @@ export default class ExportPage extends React.Component {
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
     this.normalizedScores = this.normalizedScores.bind(this);
+    this.totalScore = this.totalScore.bind(this);
   }
 
   componentDidMount() {
@@ -103,6 +104,11 @@ export default class ExportPage extends React.Component {
     return eventTeams.map(eventTeam => ({ eventTeam, value: (judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).reduce((accumulator, judgeTeamPair) => accumulator + event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0), 0) - min) / (max - min) * event.get('criteria').reduce((accumulator, criterion) => accumulator + criterion.max, 0) || 0 }));
   }
 
+  totalScore(eventTeam) {
+    const { eventJudges, judgeTeamPairs } = this.state;
+    return eventJudges.map(eventJudge => this.normalizedScores(eventJudge).filter(score => score.eventTeam.id === eventTeam.id).map(score => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === score.eventTeam.id).length ? score.value : 0).reduce((accumulator, value) => accumulator + value, 0)).reduce((accumulator, value) => accumulator + value, 0).toFixed(2);
+  }
+
   render() {
     const { event, eventJudges, eventTeams, judgeTeamPairs } = this.state;
     return (
@@ -151,7 +157,7 @@ export default class ExportPage extends React.Component {
                       </tr>)}
                       <tr>
                         <td>Total</td>
-                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{eventJudges.map(eventJudge => this.normalizedScores(eventJudge).filter(score => score.eventTeam.id === eventTeam.id).map(score => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === score.eventTeam.id).length ? score.value : 0).reduce((accumulator, value) => accumulator + value, 0)).reduce((accumulator, value) => accumulator + value, 0).toFixed(2)}</td>)}
+                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{this.totalScore(eventTeam)}</td>)}
                       </tr>
                     </tbody>
                   </table>
@@ -174,21 +180,13 @@ export default class ExportPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Team 1</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>2</td>
-                        <td>Team 2</td>
-                        <td>0</td>
-                      </tr>
-                      <tr>
-                        <td>3</td>
-                        <td>Team 3</td>
-                        <td>0</td>
-                      </tr>
+                      {eventTeams.map(eventTeam => ({ eventTeam, value: this.totalScore(eventTeam) })).sort((a, b) => b.value - a.value).map((score, index) =>
+                        <tr>
+                          <td>{index + 1}</td>
+                          <td>{score.eventTeam.get('name')}</td>
+                          <td>{score.value}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
