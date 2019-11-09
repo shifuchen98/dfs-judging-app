@@ -1,33 +1,37 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
-import AV from 'leancloud-storage/live-query';
-import Papa from 'papaparse';
+import AV from "leancloud-storage/live-query";
+import Papa from "papaparse";
 
-import './style.css';
+import "./style.css";
 
 export default class TeamsPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       eventTeams: [],
-      teamName: '',
-      school: '',
-      schoolPrediction: '',
-      appName: '',
-      appDescription: '',
-      teamsSearch: '',
-      csvToBeImported: ''
+      teamName: "",
+      school: "",
+      schoolPrediction: "",
+      appName: "",
+      appDescription: "",
+      teamsSearch: "",
+      csvToBeImported: ""
     };
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
     this.handleSchoolChange = this.handleSchoolChange.bind(this);
     this.handleSchoolCompletion = this.handleSchoolCompletion.bind(this);
     this.handleAppNameChange = this.handleAppNameChange.bind(this);
-    this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(this);
+    this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(
+      this
+    );
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
-    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(this);
+    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(
+      this
+    );
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
@@ -37,7 +41,7 @@ export default class TeamsPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEventTeams();
     }
@@ -45,9 +49,9 @@ export default class TeamsPage extends React.Component {
 
   fetchEventTeams() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
+    const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -66,15 +70,17 @@ export default class TeamsPage extends React.Component {
     this.setState({ school: e.target.value }, () => {
       const { school } = this.state;
       if (school) {
-        const eventTeamsQuery = new AV.Query('EventTeam');
+        const eventTeamsQuery = new AV.Query("EventTeam");
         eventTeamsQuery
-          .startsWith('school', school)
+          .startsWith("school", school)
           .first()
           .then(eventTeam => {
-            this.setState({ schoolPrediction: eventTeam ? eventTeam.get('school') : '' });
+            this.setState({
+              schoolPrediction: eventTeam ? eventTeam.get("school") : ""
+            });
           });
       } else {
-        this.setState({ schoolPrediction: '' });
+        this.setState({ schoolPrediction: "" });
       }
     });
   }
@@ -82,7 +88,7 @@ export default class TeamsPage extends React.Component {
   handleSchoolCompletion(e) {
     const { schoolPrediction } = this.state;
     if (e.keyCode === 40) {
-      this.setState({ school: schoolPrediction })
+      this.setState({ school: schoolPrediction });
     }
   }
 
@@ -105,21 +111,24 @@ export default class TeamsPage extends React.Component {
   createEventTeam(e) {
     const { match } = this.props;
     const { teamName, school, appName, appDescription } = this.state;
-    const eventTeam = new AV.Object('EventTeam');
+    const eventTeam = new AV.Object("EventTeam");
     eventTeam
-      .set('event', AV.Object.createWithoutData('Event', match.params.id))
-      .set('name', teamName)
-      .set('school', school)
-      .set('appName', appName)
-      .set('appDescription', appDescription)
+      .set("event", AV.Object.createWithoutData("Event", match.params.id))
+      .set("name", teamName)
+      .set("school", school)
+      .set("appName", appName)
+      .set("appDescription", appDescription)
       .save()
       .then(() => {
-        alert('Team successfully added.')
-        this.setState({ teamName: '', school: '', appName: '', appDescription: '' }, this.fetchEventTeams);
+        alert("Team successfully added.");
+        this.setState(
+          { teamName: "", school: "", appName: "", appDescription: "" },
+          this.fetchEventTeams
+        );
       })
       .catch(error => {
         if (error.code === 137) {
-          alert('Team already exists.');
+          alert("Team already exists.");
         } else {
           alert(error);
         }
@@ -144,16 +153,24 @@ export default class TeamsPage extends React.Component {
   importFromCsv(e) {
     const { match } = this.props;
     const { csvToBeImported } = this.state;
-    AV.Object
-      .saveAll(Papa.parse(csvToBeImported.trim()).data.map(row => new AV.Object('EventTeam').set('event', AV.Object.createWithoutData('Event', match.params.id)).set('name', row[0]).set('school', row[1]).set('appName', row[2]).set('appDescription', row[3])))
+    AV.Object.saveAll(
+      Papa.parse(csvToBeImported.trim()).data.map(row =>
+        new AV.Object("EventTeam")
+          .set("event", AV.Object.createWithoutData("Event", match.params.id))
+          .set("name", row[0])
+          .set("school", row[1])
+          .set("appName", row[2])
+          .set("appDescription", row[3])
+      )
+    )
       .then(() => {
-        alert('Teams successfully imported.');
-        this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+        alert("Teams successfully imported.");
+        this.setState({ csvToBeImported: "" }, this.fetchEventTeams);
       })
       .catch(error => {
         if (error.code === 137) {
-          alert('Teams successfully imported with duplicate teams skipped.');
-          this.setState({ csvToBeImported: '' }, this.fetchEventTeams);
+          alert("Teams successfully imported with duplicate teams skipped.");
+          this.setState({ csvToBeImported: "" }, this.fetchEventTeams);
         } else {
           alert(error);
         }
@@ -162,7 +179,16 @@ export default class TeamsPage extends React.Component {
   }
 
   render() {
-    const { eventTeams, teamName, school, schoolPrediction, appName, appDescription, teamsSearch, csvToBeImported } = this.state;
+    const {
+      eventTeams,
+      teamName,
+      school,
+      schoolPrediction,
+      appName,
+      appDescription,
+      teamsSearch,
+      csvToBeImported
+    } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -174,33 +200,70 @@ export default class TeamsPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Team Name</span>
-                      <input type="text" value={teamName} onChange={this.handleTeamNameChange} required />
+                      <input
+                        type="text"
+                        value={teamName}
+                        onChange={this.handleTeamNameChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field field--half field--with--dropdown">
                     <label>
                       <span>School</span>
-                      <input type="text" value={school} onChange={this.handleSchoolChange} onKeyDown={this.handleSchoolCompletion} required />
-                      <div className="dropdown" style={{ display: schoolPrediction && school !== schoolPrediction ? null : 'none' }}>
-                        <span style={{ float: 'left' }}>{schoolPrediction}</span>
-                        <span style={{ float: 'right' }}><kbd style={{ fontSize: '6pt' }}><FontAwesomeIcon icon={faArrowDown} /></kbd></span>
+                      <input
+                        type="text"
+                        value={school}
+                        onChange={this.handleSchoolChange}
+                        onKeyDown={this.handleSchoolCompletion}
+                        required
+                      />
+                      <div
+                        className="dropdown"
+                        style={{
+                          display:
+                            schoolPrediction && school !== schoolPrediction
+                              ? null
+                              : "none"
+                        }}
+                      >
+                        <span style={{ float: "left" }}>
+                          {schoolPrediction}
+                        </span>
+                        <span style={{ float: "right" }}>
+                          <kbd style={{ fontSize: "6pt" }}>
+                            <FontAwesomeIcon icon={faArrowDown} />
+                          </kbd>
+                        </span>
                       </div>
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>App Name</span>
-                      <input type="text" value={appName} onChange={this.handleAppNameChange} required />
+                      <input
+                        type="text"
+                        value={appName}
+                        onChange={this.handleAppNameChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>App Description</span>
-                      <input type="text" value={appDescription} onChange={this.handleAppDescriptionChange} required />
+                      <input
+                        type="text"
+                        value={appDescription}
+                        onChange={this.handleAppDescriptionChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field">
-                    <button type="submit" className="primary">Create</button>
+                    <button type="submit" className="primary">
+                      Create
+                    </button>
                   </div>
                 </form>
               </section>
@@ -211,7 +274,11 @@ export default class TeamsPage extends React.Component {
                 <div className="field field--half">
                   <label>
                     <span>Search</span>
-                    <input type="text" value={teamsSearch} onChange={this.handleTeamsSearchChange} />
+                    <input
+                      type="text"
+                      value={teamsSearch}
+                      onChange={this.handleTeamsSearchChange}
+                    />
                   </label>
                 </div>
                 <div className="field">
@@ -228,17 +295,46 @@ export default class TeamsPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {eventTeams.filter(eventTeam => teamsSearch ? eventTeam.get('name').toLowerCase().includes(teamsSearch.toLowerCase()) || eventTeam.get('appName').toLowerCase().includes(teamsSearch.toLowerCase()) : true).map((eventTeam, index) =>
-                        <tr key={eventTeam.id}>
-                          <td>{index + 1}</td>
-                          <td>{eventTeam.get('name')}</td>
-                          <td>{eventTeam.get('school')}</td>
-                          <td>{eventTeam.get('appName')}</td>
-                          <td>{eventTeam.get('appDescription')}</td>
-                          <td><button onClick={() => { this.editEventTeam(eventTeam) }}>Edit</button></td>
-                          <td><button onClick={() => { this.deleteEventTeam(eventTeam) }}>Delete</button></td>
-                        </tr>
-                      )}
+                      {eventTeams
+                        .filter(eventTeam =>
+                          teamsSearch
+                            ? eventTeam
+                                .get("name")
+                                .toLowerCase()
+                                .includes(teamsSearch.toLowerCase()) ||
+                              eventTeam
+                                .get("appName")
+                                .toLowerCase()
+                                .includes(teamsSearch.toLowerCase())
+                            : true
+                        )
+                        .map((eventTeam, index) => (
+                          <tr key={eventTeam.id}>
+                            <td>{index + 1}</td>
+                            <td>{eventTeam.get("name")}</td>
+                            <td>{eventTeam.get("school")}</td>
+                            <td>{eventTeam.get("appName")}</td>
+                            <td>{eventTeam.get("appDescription")}</td>
+                            <td>
+                              <button
+                                onClick={() => {
+                                  this.editEventTeam(eventTeam);
+                                }}
+                              >
+                                Edit
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                onClick={() => {
+                                  this.deleteEventTeam(eventTeam);
+                                }}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -251,11 +347,18 @@ export default class TeamsPage extends React.Component {
                   <div className="field">
                     <label>
                       <span>Paste CSV or TSV Here</span>
-                      <textarea rows="20" placeholder="The Dream Team,UCI,The Dream App,This is the coolest app in the world!" value={csvToBeImported} onChange={this.handleCsvToBeImportedChange}></textarea>
+                      <textarea
+                        rows="20"
+                        placeholder="The Dream Team,UCI,The Dream App,This is the coolest app in the world!"
+                        value={csvToBeImported}
+                        onChange={this.handleCsvToBeImportedChange}
+                      ></textarea>
                     </label>
                   </div>
                   <div className="field">
-                    <button type="submit" className="primary">Import</button>
+                    <button type="submit" className="primary">
+                      Import
+                    </button>
                   </div>
                 </form>
               </section>

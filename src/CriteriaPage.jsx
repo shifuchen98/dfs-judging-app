@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class CriteriaPage extends React.Component {
   constructor(props) {
     super(props);
     const { match } = this.props;
     this.state = {
-      event: AV.Object.createWithoutData('Event', match.params.id),
-      name: '',
-      max: ''
+      event: AV.Object.createWithoutData("Event", match.params.id),
+      name: "",
+      max: ""
     };
     this.fetchEvent = this.fetchEvent.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -23,7 +23,7 @@ export default class CriteriaPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEvent();
     }
@@ -52,19 +52,22 @@ export default class CriteriaPage extends React.Component {
   addCriterion(e) {
     const { event, name, max } = this.state;
     let existing = false;
-    event.get('criteria').forEach(criterion => {
+    event.get("criteria").forEach(criterion => {
       if (name === criterion.name) {
         existing = true;
       }
     });
     if (existing) {
-      alert('The criterion already exists.');
+      alert("The criterion already exists.");
     } else {
       event
-        .set('criteria', [...event.get('criteria'), { name, max: parseInt(max) }])
+        .set("criteria", [
+          ...event.get("criteria"),
+          { name, max: parseInt(max) }
+        ])
         .save()
         .then(event => {
-          this.setState({ event, name: '', max: '' });
+          this.setState({ event, name: "", max: "" });
         })
         .catch(error => {
           alert(error);
@@ -76,7 +79,10 @@ export default class CriteriaPage extends React.Component {
   deleteCriterion(index) {
     const { event } = this.state;
     event
-      .set('criteria', [...event.get('criteria').slice(0, index), ...event.get('criteria').slice(index + 1)])
+      .set("criteria", [
+        ...event.get("criteria").slice(0, index),
+        ...event.get("criteria").slice(index + 1)
+      ])
       .save()
       .then(event => {
         this.setState({ event });
@@ -99,17 +105,31 @@ export default class CriteriaPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Name</span>
-                      <input type="text" value={name} onChange={this.handleNameChange} required />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={this.handleNameChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>Max Score</span>
-                      <input type="number" value={max} min="1" step="1" onChange={this.handleMaxChange} required />
+                      <input
+                        type="number"
+                        value={max}
+                        min="1"
+                        step="1"
+                        onChange={this.handleMaxChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field">
-                    <button type="submit" className="primary">Add</button>
+                    <button type="submit" className="primary">
+                      Add
+                    </button>
                   </div>
                 </form>
               </section>
@@ -127,13 +147,21 @@ export default class CriteriaPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {(event.get('criteria') || []).map((criterion, index) =>
+                      {(event.get("criteria") || []).map((criterion, index) => (
                         <tr key={index}>
                           <td>{criterion.name}</td>
                           <td>{criterion.max}</td>
-                          <td><button onClick={() => { this.deleteCriterion(index) }}>Delete</button></td>
+                          <td>
+                            <button
+                              onClick={() => {
+                                this.deleteCriterion(index);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </td>
                         </tr>
-                      )}
+                      ))}
                     </tbody>
                   </table>
                 </div>

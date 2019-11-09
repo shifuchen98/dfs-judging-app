@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class PresentationPage extends React.Component {
   constructor(props) {
@@ -10,17 +10,19 @@ export default class PresentationPage extends React.Component {
     this.state = {
       eventTeams: [],
       presentationScores: [],
-      currentEventTeam: '',
+      currentEventTeam: ""
     };
-    this.fetchEventTeams = this.fetchEventTeams.bind(this)
-    this.fetchPresentationScores = this.fetchPresentationScores.bind(this)
-    this.handleCurrentEventTeamChange = this.handleCurrentEventTeamChange.bind(this)
+    this.fetchEventTeams = this.fetchEventTeams.bind(this);
+    this.fetchPresentationScores = this.fetchPresentationScores.bind(this);
+    this.handleCurrentEventTeamChange = this.handleCurrentEventTeamChange.bind(
+      this
+    );
   }
 
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEventTeams();
     }
@@ -28,9 +30,9 @@ export default class PresentationPage extends React.Component {
 
   fetchEventTeams() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
+    const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -43,14 +45,16 @@ export default class PresentationPage extends React.Component {
 
   fetchPresentationScores() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id));
-    const presentationScoresQuery = new AV.Query('PresentationScore');
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery.equalTo(
+      "event",
+      AV.Object.createWithoutData("Event", match.params.id)
+    );
+    const presentationScoresQuery = new AV.Query("PresentationScore");
     presentationScoresQuery
-      .matchesQuery('eventTeam', eventTeamsQuery)
-      .include('eventJudge')
-      .include('eventJudge.user')
+      .matchesQuery("eventTeam", eventTeamsQuery)
+      .include("eventJudge")
+      .include("eventJudge.user")
       .limit(1000)
       .find()
       .then(presentationScores => {
@@ -62,7 +66,7 @@ export default class PresentationPage extends React.Component {
   }
 
   handleCurrentEventTeamChange(e) {
-    this.setState({ currentEventTeam: e.target.value })
+    this.setState({ currentEventTeam: e.target.value });
   }
 
   render() {
@@ -75,13 +79,20 @@ export default class PresentationPage extends React.Component {
               <section className="fields">
                 <h1>Presentation Scores</h1>
                 <div className="field field--half">
-                  <select value={currentEventTeam} onChange={this.handleCurrentEventTeamChange}>
+                  <select
+                    value={currentEventTeam}
+                    onChange={this.handleCurrentEventTeamChange}
+                  >
                     <option value="">All Teams</option>
-                    {eventTeams.map(eventTeam => <option key={eventTeam.id} value={eventTeam.id}>{eventTeam.get("name")}</option>)}
+                    {eventTeams.map(eventTeam => (
+                      <option key={eventTeam.id} value={eventTeam.id}>
+                        {eventTeam.get("name")}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="field">
-                  {currentEventTeam ?
+                  {currentEventTeam ? (
                     <table>
                       <thead>
                         <tr>
@@ -90,15 +101,26 @@ export default class PresentationPage extends React.Component {
                         </tr>
                       </thead>
                       <tbody>
-                        {presentationScores.filter(presentationScore => presentationScore.get('eventTeam').id === currentEventTeam).map(presentationScore =>
-                          <tr key={presentationScore.id}>
-                            <td>{presentationScore.get('eventJudge').get('user').get('name')}</td>
-                            <td>{presentationScore.get('score')}</td>
-                          </tr>
-                        )}
+                        {presentationScores
+                          .filter(
+                            presentationScore =>
+                              presentationScore.get("eventTeam").id ===
+                              currentEventTeam
+                          )
+                          .map(presentationScore => (
+                            <tr key={presentationScore.id}>
+                              <td>
+                                {presentationScore
+                                  .get("eventJudge")
+                                  .get("user")
+                                  .get("name")}
+                              </td>
+                              <td>{presentationScore.get("score")}</td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
-                    :
+                  ) : (
                     <table>
                       <thead>
                         <tr>
@@ -112,20 +134,29 @@ export default class PresentationPage extends React.Component {
                           .map(eventTeam => ({
                             eventTeam,
                             score: presentationScores
-                              .filter(presentationScore => presentationScore.get('eventTeam').id === eventTeam.id)
-                              .reduce((accumulator, presentationScore) => accumulator + presentationScore.get('score') || 0, 0)
+                              .filter(
+                                presentationScore =>
+                                  presentationScore.get("eventTeam").id ===
+                                  eventTeam.id
+                              )
+                              .reduce(
+                                (accumulator, presentationScore) =>
+                                  accumulator +
+                                    presentationScore.get("score") || 0,
+                                0
+                              )
                           }))
                           .sort((a, b) => b.score - a.score)
-                          .map((place, index) =>
+                          .map((place, index) => (
                             <tr key={place.eventTeam.id}>
                               <td>{index + 1}</td>
-                              <td>{place.eventTeam.get('name')}</td>
+                              <td>{place.eventTeam.get("name")}</td>
                               <td>{place.score}</td>
                             </tr>
-                          )}
+                          ))}
                       </tbody>
                     </table>
-                  }
+                  )}
                 </div>
               </section>
             </div>

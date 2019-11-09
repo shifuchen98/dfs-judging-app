@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class PscoringPage extends React.Component {
   constructor(props) {
@@ -18,7 +18,7 @@ export default class PscoringPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchPresentationScores();
     }
@@ -26,19 +26,22 @@ export default class PscoringPage extends React.Component {
 
   fetchPresentationScores() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery.equalTo('event', AV.Object.createWithoutData('Event', match.params.id));
-    const presentationScoresQuery = new AV.Query('PresentationScore');
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery.equalTo(
+      "event",
+      AV.Object.createWithoutData("Event", match.params.id)
+    );
+    const presentationScoresQuery = new AV.Query("PresentationScore");
     presentationScoresQuery
-      .matchesQuery('eventTeam', eventTeamsQuery)
-      .include('eventTeam')
+      .matchesQuery("eventTeam", eventTeamsQuery)
+      .include("eventTeam")
       .limit(1000)
       .find()
       .then(presentationScores => {
         this.setState({
           scores: presentationScores.map(presentationScore => ({
             presentationScore,
-            value: presentationScore.get('score') || ''
+            value: presentationScore.get("score") || ""
           }))
         });
       })
@@ -52,18 +55,21 @@ export default class PscoringPage extends React.Component {
     this.setState({
       scores: scores.map(score => ({
         presentationScore: score.presentationScore,
-        value: score.presentationScore.id === presentationScore.id ? e.target.value : score.value
+        value:
+          score.presentationScore.id === presentationScore.id
+            ? e.target.value
+            : score.value
       }))
     });
   }
 
   submitScore(e, score) {
     score.presentationScore
-      .set('score', parseInt(score.value))
+      .set("score", parseInt(score.value))
       .save()
       .then(() => {
         const { scores } = this.state;
-        alert('Score submitted.');
+        alert("Score submitted.");
         this.setState({ scores });
       })
       .catch(error => {
@@ -79,23 +85,43 @@ export default class PscoringPage extends React.Component {
         <div className="columns">
           <div className="column">
             <div className="card">
-              {scores.map(score =>
+              {scores.map(score => (
                 <section className="fields" key={score.presentationScore.id}>
-                  <h1>{score.presentationScore.get('eventTeam').get('name')}</h1>
-                  <form onSubmit={e => { this.submitScore(e, score); }}>
+                  <h1>
+                    {score.presentationScore.get("eventTeam").get("name")}
+                  </h1>
+                  <form
+                    onSubmit={e => {
+                      this.submitScore(e, score);
+                    }}
+                  >
                     <div className="field">
                       <label>
                         <span>Presentation Score</span>
-                        <input type="number" min="0" max="10" step="1" value={score.value} onChange={e => { this.handleScoreChange(e, score.presentationScore); }} required disabled={score.presentationScore.get('score')}></input>
+                        <input
+                          type="number"
+                          min="0"
+                          max="10"
+                          step="1"
+                          value={score.value}
+                          onChange={e => {
+                            this.handleScoreChange(e, score.presentationScore);
+                          }}
+                          required
+                          disabled={score.presentationScore.get("score")}
+                        ></input>
                       </label>
                     </div>
-                    {score.presentationScore.get('score') ? null :
+                    {score.presentationScore.get("score") ? null : (
                       <div className="field">
-                        <button type="submit" className="primary">Submit</button>
-                      </div>}
+                        <button type="submit" className="primary">
+                          Submit
+                        </button>
+                      </div>
+                    )}
                   </form>
                 </section>
-              )}
+              ))}
             </div>
           </div>
         </div>

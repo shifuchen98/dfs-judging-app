@@ -1,11 +1,11 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckSquare } from '@fortawesome/free-solid-svg-icons';
-import { faSquare } from '@fortawesome/free-regular-svg-icons';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faSquare } from "@fortawesome/free-regular-svg-icons";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class AssignPage extends React.Component {
   constructor(props) {
@@ -14,12 +14,14 @@ export default class AssignPage extends React.Component {
       eventJudges: [],
       eventTeams: [],
       judgeTeamPairs: [],
-      timesEachTeamGetsJudged: ''
+      timesEachTeamGetsJudged: ""
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.fetchJudgeTeamPairs = this.fetchJudgeTeamPairs.bind(this);
-    this.handleTimesEachTeamGetsJudgedChange = this.handleTimesEachTeamGetsJudgedChange.bind(this);
+    this.handleTimesEachTeamGetsJudgedChange = this.handleTimesEachTeamGetsJudgedChange.bind(
+      this
+    );
     this.assign = this.assign.bind(this);
     this.unassign = this.unassign.bind(this);
     this.clear = this.clear.bind(this);
@@ -30,7 +32,7 @@ export default class AssignPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEventJudges();
     }
@@ -38,10 +40,10 @@ export default class AssignPage extends React.Component {
 
   fetchEventJudges() {
     const { match } = this.props;
-    const eventJudgesQuery = new AV.Query('EventJudge');
+    const eventJudgesQuery = new AV.Query("EventJudge");
     eventJudgesQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
-      .include('user')
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .include("user")
       .limit(1000)
       .find()
       .then(eventJudges => {
@@ -54,9 +56,9 @@ export default class AssignPage extends React.Component {
 
   fetchEventTeams() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
+    const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -69,12 +71,14 @@ export default class AssignPage extends React.Component {
 
   fetchJudgeTeamPairs() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery
-      .equalTo('event', AV.Object.createWithoutData('Event', match.params.id))
-    const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery.equalTo(
+      "event",
+      AV.Object.createWithoutData("Event", match.params.id)
+    );
+    const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
     judgeTeamPairsQuery
-      .matchesQuery('eventTeam', eventTeamsQuery)
+      .matchesQuery("eventTeam", eventTeamsQuery)
       .limit(1000)
       .find()
       .then(judgeTeamPairs => {
@@ -91,14 +95,14 @@ export default class AssignPage extends React.Component {
 
   assign(eventJudge, eventTeam) {
     const judgeTeamPairACL = new AV.ACL();
-    judgeTeamPairACL.setReadAccess(eventJudge.get('user'), true);
-    judgeTeamPairACL.setWriteAccess(eventJudge.get('user'), true)
-    judgeTeamPairACL.setRoleReadAccess(new AV.Role('Admin'), true);
-    judgeTeamPairACL.setRoleWriteAccess(new AV.Role('Admin'), true);
-    const judgeTeamPair = new AV.Object('JudgeTeamPair');
+    judgeTeamPairACL.setReadAccess(eventJudge.get("user"), true);
+    judgeTeamPairACL.setWriteAccess(eventJudge.get("user"), true);
+    judgeTeamPairACL.setRoleReadAccess(new AV.Role("Admin"), true);
+    judgeTeamPairACL.setRoleWriteAccess(new AV.Role("Admin"), true);
+    const judgeTeamPair = new AV.Object("JudgeTeamPair");
     judgeTeamPair
-      .set('eventJudge', eventJudge)
-      .set('eventTeam', eventTeam)
+      .set("eventJudge", eventJudge)
+      .set("eventTeam", eventTeam)
       .setACL(judgeTeamPairACL)
       .save()
       .then(this.fetchJudgeTeamPairs)
@@ -118,8 +122,7 @@ export default class AssignPage extends React.Component {
 
   clear() {
     const { judgeTeamPairs } = this.state;
-    AV.Object
-      .destroyAll(judgeTeamPairs)
+    AV.Object.destroyAll(judgeTeamPairs)
       .then(this.fetchJudgeTeamPairs)
       .catch(error => {
         alert(error);
@@ -128,7 +131,9 @@ export default class AssignPage extends React.Component {
 
   shuffle(array) {
     const result = array.map(array => array);
-    let m = result.length, t, i;
+    let m = result.length,
+      t,
+      i;
     while (m) {
       i = Math.floor(Math.random() * m--);
       t = result[m];
@@ -139,16 +144,36 @@ export default class AssignPage extends React.Component {
   }
 
   autoAssign(e) {
-    const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
-    const result = eventJudges.map(eventJudge => ({ eventJudge, eventTeams: [] }));
-    const pendingTeams = this.shuffle(eventTeams.map(eventTeam => Array(parseInt(timesEachTeamGetsJudged)).fill(eventTeam)).flat());
+    const {
+      eventJudges,
+      eventTeams,
+      judgeTeamPairs,
+      timesEachTeamGetsJudged
+    } = this.state;
+    const result = eventJudges.map(eventJudge => ({
+      eventJudge,
+      eventTeams: []
+    }));
+    const pendingTeams = this.shuffle(
+      eventTeams
+        .map(eventTeam =>
+          Array(parseInt(timesEachTeamGetsJudged)).fill(eventTeam)
+        )
+        .flat()
+    );
     pendingTeams.forEach(pendingTeam => {
-      const resultShadow = this.shuffle(result).filter(({ eventTeams }) => eventTeams.reduce((accumulator, eventTeam) => accumulator && eventTeam.id !== pendingTeam.id, true));
+      const resultShadow = this.shuffle(result).filter(({ eventTeams }) =>
+        eventTeams.reduce(
+          (accumulator, eventTeam) =>
+            accumulator && eventTeam.id !== pendingTeam.id,
+          true
+        )
+      );
       resultShadow.sort((a, b) => a.eventTeams.length - b.eventTeams.length);
       for (let i = 0; i < resultShadow.length; i++) {
         let hasSchoolConflict = false;
         resultShadow[i].eventTeams.forEach(eventTeam => {
-          if (eventTeam.get('school') === pendingTeam.get('school')) {
+          if (eventTeam.get("school") === pendingTeam.get("school")) {
             hasSchoolConflict = true;
           }
         });
@@ -159,25 +184,25 @@ export default class AssignPage extends React.Component {
       }
       resultShadow[0].eventTeams.push(pendingTeam);
     });
-    AV.Object
-      .destroyAll(judgeTeamPairs)
+    AV.Object.destroyAll(judgeTeamPairs)
       .then(() => {
-        AV.Object
-          .saveAll(result.reduce((accumulator, { eventJudge, eventTeams }) => {
+        AV.Object.saveAll(
+          result.reduce((accumulator, { eventJudge, eventTeams }) => {
             const judgeTeamPairs = eventTeams.map(eventTeam => {
               const judgeTeamPairACL = new AV.ACL();
-              judgeTeamPairACL.setReadAccess(eventJudge.get('user'), true);
-              judgeTeamPairACL.setWriteAccess(eventJudge.get('user'), true)
-              judgeTeamPairACL.setRoleReadAccess(new AV.Role('Admin'), true);
-              judgeTeamPairACL.setRoleWriteAccess(new AV.Role('Admin'), true);
-              const judgeTeamPair = new AV.Object('JudgeTeamPair');
+              judgeTeamPairACL.setReadAccess(eventJudge.get("user"), true);
+              judgeTeamPairACL.setWriteAccess(eventJudge.get("user"), true);
+              judgeTeamPairACL.setRoleReadAccess(new AV.Role("Admin"), true);
+              judgeTeamPairACL.setRoleWriteAccess(new AV.Role("Admin"), true);
+              const judgeTeamPair = new AV.Object("JudgeTeamPair");
               return judgeTeamPair
-                .set('eventJudge', eventJudge)
-                .set('eventTeam', eventTeam)
-                .setACL(judgeTeamPairACL)
-            })
+                .set("eventJudge", eventJudge)
+                .set("eventTeam", eventTeam)
+                .setACL(judgeTeamPairACL);
+            });
             return [...accumulator, ...judgeTeamPairs];
-          }, []))
+          }, [])
+        )
           .then(this.fetchJudgeTeamPairs)
           .catch(error => {
             alert(error);
@@ -190,7 +215,12 @@ export default class AssignPage extends React.Component {
   }
 
   render() {
-    const { eventJudges, eventTeams, judgeTeamPairs, timesEachTeamGetsJudged } = this.state;
+    const {
+      eventJudges,
+      eventTeams,
+      judgeTeamPairs,
+      timesEachTeamGetsJudged
+    } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -202,15 +232,73 @@ export default class AssignPage extends React.Component {
                   <table className="condensed">
                     <thead>
                       <tr>
-                        <th><span>Judge</span></th>
-                        {eventTeams.map(eventTeam => <th key={eventTeam.id}><span>{eventTeam.get('name')}</span></th>)}
+                        <th>
+                          <span>Judge</span>
+                        </th>
+                        {eventTeams.map(eventTeam => (
+                          <th key={eventTeam.id}>
+                            <span>{eventTeam.get("name")}</span>
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
-                      {eventJudges.map(eventJudge => <tr key={eventJudge.id}>
-                        <td>{eventJudge.get('user').get('name')}</td>
-                        {eventTeams.map(eventTeam => <td key={eventTeam.id}>{judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).length ? <button style={{ width: '36px' }} aria-label={`${eventJudge.get('user').get('name')} is assigned to ${eventTeam.get('name')}. Click to unassign.`} onClick={() => { this.unassign(judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id)[0]) }}><FontAwesomeIcon icon={faCheckSquare} /></button> : <button style={{ width: '36px' }} aria-label={`${eventJudge.get('user').get('name')} is not assigned to ${eventTeam.get('name')}. Click to assign.`} onClick={() => { this.assign(eventJudge, eventTeam) }}><FontAwesomeIcon icon={faSquare} /></button>}</td>)}
-                      </tr>)}
+                      {eventJudges.map(eventJudge => (
+                        <tr key={eventJudge.id}>
+                          <td>{eventJudge.get("user").get("name")}</td>
+                          {eventTeams.map(eventTeam => (
+                            <td key={eventTeam.id}>
+                              {judgeTeamPairs.filter(
+                                judgeTeamPair =>
+                                  judgeTeamPair.get("eventJudge").id ===
+                                    eventJudge.id &&
+                                  judgeTeamPair.get("eventTeam").id ===
+                                    eventTeam.id
+                              ).length ? (
+                                <button
+                                  style={{ width: "36px" }}
+                                  aria-label={`${eventJudge
+                                    .get("user")
+                                    .get(
+                                      "name"
+                                    )} is assigned to ${eventTeam.get(
+                                    "name"
+                                  )}. Click to unassign.`}
+                                  onClick={() => {
+                                    this.unassign(
+                                      judgeTeamPairs.filter(
+                                        judgeTeamPair =>
+                                          judgeTeamPair.get("eventJudge").id ===
+                                            eventJudge.id &&
+                                          judgeTeamPair.get("eventTeam").id ===
+                                            eventTeam.id
+                                      )[0]
+                                    );
+                                  }}
+                                >
+                                  <FontAwesomeIcon icon={faCheckSquare} />
+                                </button>
+                              ) : (
+                                <button
+                                  style={{ width: "36px" }}
+                                  aria-label={`${eventJudge
+                                    .get("user")
+                                    .get(
+                                      "name"
+                                    )} is not assigned to ${eventTeam.get(
+                                    "name"
+                                  )}. Click to assign.`}
+                                  onClick={() => {
+                                    this.assign(eventJudge, eventTeam);
+                                  }}
+                                >
+                                  <FontAwesomeIcon icon={faSquare} />
+                                </button>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -224,11 +312,21 @@ export default class AssignPage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Times Each Team Gets Judged</span>
-                      <input type="number" value={timesEachTeamGetsJudged} min="0" max={eventJudges.length} step="1" onChange={this.handleTimesEachTeamGetsJudgedChange} required />
+                      <input
+                        type="number"
+                        value={timesEachTeamGetsJudged}
+                        min="0"
+                        max={eventJudges.length}
+                        step="1"
+                        onChange={this.handleTimesEachTeamGetsJudgedChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field">
-                    <button type="submit" className="primary">Perform Assignment</button>
+                    <button type="submit" className="primary">
+                      Perform Assignment
+                    </button>
                   </div>
                 </form>
               </section>

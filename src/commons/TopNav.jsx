@@ -1,19 +1,17 @@
-import React from 'react';
-import {
-  NavLink as RouteLink,
-} from 'react-router-dom';
+import React from "react";
+import { NavLink as RouteLink } from "react-router-dom";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import '../style.css';
+import "../style.css";
 
 export default class SideNav extends React.Component {
   constructor(props) {
     super(props);
     const { match } = this.props;
     this.state = {
-      event: AV.Object.createWithoutData('Event', match.params.id),
-      judgingTimeLeft: ''
+      event: AV.Object.createWithoutData("Event", match.params.id),
+      judgingTimeLeft: ""
     };
     this.fetchEvent = this.fetchEvent.bind(this);
     this.updateJudgingTimeLeft = this.updateJudgingTimeLeft.bind(this);
@@ -23,7 +21,7 @@ export default class SideNav extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
       this.fetchEvent();
@@ -48,13 +46,23 @@ export default class SideNav extends React.Component {
 
   updateJudgingTimeLeft() {
     const { event } = this.state;
-    this.setState({ judgingTimeLeft: event.get('judgingDuesAt') > new Date() ? `${Math.floor((event.get('judgingDuesAt') - new Date()) / 60000)}:${`0${Math.floor((event.get('judgingDuesAt') - new Date()) % 86400000 % 60000 / 1000)}`.slice(-2)}` : '' });
+    this.setState({
+      judgingTimeLeft:
+        event.get("judgingDuesAt") > new Date()
+          ? `${Math.floor(
+              (event.get("judgingDuesAt") - new Date()) / 60000
+            )}:${`0${Math.floor(
+              (((event.get("judgingDuesAt") - new Date()) % 86400000) % 60000) /
+                1000
+            )}`.slice(-2)}`
+          : ""
+    });
   }
 
   logOut() {
     const { history } = this.props;
     AV.User.logOut().then(() => {
-      history.push('/');
+      history.push("/");
     });
   }
 
@@ -71,18 +79,34 @@ export default class SideNav extends React.Component {
           </li>
           <li>
             <RouteLink to="/events">
-              <span>All Events<span className="top-nav__extra"> ({judgingTimeLeft ? `${event.get('name')}, ${judgingTimeLeft}` : event.get('name')})</span></span>
+              <span>
+                All Events
+                <span className="top-nav__extra">
+                  {" "}
+                  (
+                  {judgingTimeLeft
+                    ? `${event.get("name")}, ${judgingTimeLeft}`
+                    : event.get("name")}
+                  )
+                </span>
+              </span>
             </RouteLink>
           </li>
         </ul>
         <ul id="top-nav__right">
-          {AV.User.current() ?
+          {AV.User.current() ? (
             <li>
               <button onClick={this.logOut}>
-                <span>Log out<span className="top-nav__extra"> ({AV.User.current().get('name')})</span></span>
+                <span>
+                  Log out
+                  <span className="top-nav__extra">
+                    {" "}
+                    ({AV.User.current().get("name")})
+                  </span>
+                </span>
               </button>
-            </li> : null
-          }
+            </li>
+          ) : null}
         </ul>
       </nav>
     );

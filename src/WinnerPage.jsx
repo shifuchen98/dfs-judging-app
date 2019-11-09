@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class WinnerPage extends React.Component {
   constructor(props) {
     super(props);
     const { match } = this.props;
     this.state = {
-      event: AV.Object.createWithoutData('Event', match.params.id),
+      event: AV.Object.createWithoutData("Event", match.params.id),
       eventJudges: [],
       eventTeams: [],
       judgeTeamPairs: []
@@ -25,7 +25,7 @@ export default class WinnerPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEvent();
     }
@@ -45,10 +45,10 @@ export default class WinnerPage extends React.Component {
 
   fetchEventJudges() {
     const { event } = this.state;
-    const eventJudgesQuery = new AV.Query('EventJudge');
+    const eventJudgesQuery = new AV.Query("EventJudge");
     eventJudgesQuery
-      .equalTo('event', event)
-      .include('user')
+      .equalTo("event", event)
+      .include("user")
       .limit(1000)
       .find()
       .then(eventJudges => {
@@ -61,9 +61,9 @@ export default class WinnerPage extends React.Component {
 
   fetchEventTeams() {
     const { event } = this.state;
-    const eventTeamsQuery = new AV.Query('EventTeam');
+    const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
-      .equalTo('event', event)
+      .equalTo("event", event)
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -76,12 +76,11 @@ export default class WinnerPage extends React.Component {
 
   fetchJudgeTeamPairs() {
     const { event } = this.state;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery
-      .equalTo('event', event)
-    const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery.equalTo("event", event);
+    const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
     judgeTeamPairsQuery
-      .matchesQuery('eventTeam', eventTeamsQuery)
+      .matchesQuery("eventTeam", eventTeamsQuery)
       .limit(1000)
       .find()
       .then(judgeTeamPairs => {
@@ -94,19 +93,171 @@ export default class WinnerPage extends React.Component {
 
   normalizedScores(eventJudge) {
     const { event, eventTeams, judgeTeamPairs } = this.state;
-    const judgeTeamPairsOfEventJudge = judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id);
+    const judgeTeamPairsOfEventJudge = judgeTeamPairs.filter(
+      judgeTeamPair => judgeTeamPair.get("eventJudge").id === eventJudge.id
+    );
     let max = 0;
     let min = 0;
     if (judgeTeamPairsOfEventJudge.length) {
-      max = event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPairsOfEventJudge.sort((a, b) => event.get('criteria').reduce((accumulator, criterion) => accumulator + b.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0) - event.get('criteria').reduce((accumulator, criterion) => accumulator + a.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0))[0].get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0);
-      min = event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPairsOfEventJudge.sort((a, b) => event.get('criteria').reduce((accumulator, criterion) => accumulator + a.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0) - event.get('criteria').reduce((accumulator, criterion) => accumulator + b.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0))[0].get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0);
+      max = event.get("criteria").reduce(
+        (accumulator, criterion) =>
+          accumulator +
+          judgeTeamPairsOfEventJudge
+            .sort(
+              (a, b) =>
+                event
+                  .get("criteria")
+                  .reduce(
+                    (accumulator, criterion) =>
+                      accumulator +
+                      b
+                        .get("scores")
+                        .reduce(
+                          (accumulator, score) =>
+                            score.name === criterion.name
+                              ? accumulator + score.value
+                              : accumulator,
+                          0
+                        ),
+                    0
+                  ) -
+                event
+                  .get("criteria")
+                  .reduce(
+                    (accumulator, criterion) =>
+                      accumulator +
+                      a
+                        .get("scores")
+                        .reduce(
+                          (accumulator, score) =>
+                            score.name === criterion.name
+                              ? accumulator + score.value
+                              : accumulator,
+                          0
+                        ),
+                    0
+                  )
+            )[0]
+            .get("scores")
+            .reduce(
+              (accumulator, score) =>
+                score.name === criterion.name
+                  ? accumulator + score.value
+                  : accumulator,
+              0
+            ),
+        0
+      );
+      min = event.get("criteria").reduce(
+        (accumulator, criterion) =>
+          accumulator +
+          judgeTeamPairsOfEventJudge
+            .sort(
+              (a, b) =>
+                event
+                  .get("criteria")
+                  .reduce(
+                    (accumulator, criterion) =>
+                      accumulator +
+                      a
+                        .get("scores")
+                        .reduce(
+                          (accumulator, score) =>
+                            score.name === criterion.name
+                              ? accumulator + score.value
+                              : accumulator,
+                          0
+                        ),
+                    0
+                  ) -
+                event
+                  .get("criteria")
+                  .reduce(
+                    (accumulator, criterion) =>
+                      accumulator +
+                      b
+                        .get("scores")
+                        .reduce(
+                          (accumulator, score) =>
+                            score.name === criterion.name
+                              ? accumulator + score.value
+                              : accumulator,
+                          0
+                        ),
+                    0
+                  )
+            )[0]
+            .get("scores")
+            .reduce(
+              (accumulator, score) =>
+                score.name === criterion.name
+                  ? accumulator + score.value
+                  : accumulator,
+              0
+            ),
+        0
+      );
     }
-    return eventTeams.map(eventTeam => ({ eventTeam, value: (judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === eventTeam.id).reduce((accumulator, judgeTeamPair) => accumulator + event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0), 0) - min) / (max - min) * event.get('criteria').reduce((accumulator, criterion) => accumulator + criterion.max, 0) || 0 }));
+    return eventTeams.map(eventTeam => ({
+      eventTeam,
+      value:
+        ((judgeTeamPairs
+          .filter(
+            judgeTeamPair =>
+              judgeTeamPair.get("eventJudge").id === eventJudge.id &&
+              judgeTeamPair.get("eventTeam").id === eventTeam.id
+          )
+          .reduce(
+            (accumulator, judgeTeamPair) =>
+              accumulator +
+              event
+                .get("criteria")
+                .reduce(
+                  (accumulator, criterion) =>
+                    accumulator +
+                    judgeTeamPair
+                      .get("scores")
+                      .reduce(
+                        (accumulator, score) =>
+                          score.name === criterion.name
+                            ? accumulator + score.value
+                            : accumulator,
+                        0
+                      ),
+                  0
+                ),
+            0
+          ) -
+          min) /
+          (max - min)) *
+          event
+            .get("criteria")
+            .reduce(
+              (accumulator, criterion) => accumulator + criterion.max,
+              0
+            ) || 0
+    }));
   }
 
   totalScore(eventTeam) {
     const { eventJudges, judgeTeamPairs } = this.state;
-    return eventJudges.map(eventJudge => this.normalizedScores(eventJudge).filter(score => score.eventTeam.id === eventTeam.id).map(score => judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventJudge').id === eventJudge.id && judgeTeamPair.get('eventTeam').id === score.eventTeam.id).length ? score.value : 0).reduce((accumulator, value) => accumulator + value, 0)).reduce((accumulator, value) => accumulator + value, 0).toFixed(2);
+    return eventJudges
+      .map(eventJudge =>
+        this.normalizedScores(eventJudge)
+          .filter(score => score.eventTeam.id === eventTeam.id)
+          .map(score =>
+            judgeTeamPairs.filter(
+              judgeTeamPair =>
+                judgeTeamPair.get("eventJudge").id === eventJudge.id &&
+                judgeTeamPair.get("eventTeam").id === score.eventTeam.id
+            ).length
+              ? score.value
+              : 0
+          )
+          .reduce((accumulator, value) => accumulator + value, 0)
+      )
+      .reduce((accumulator, value) => accumulator + value, 0)
+      .toFixed(2);
   }
 
   render() {
@@ -130,15 +281,21 @@ export default class WinnerPage extends React.Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {eventTeams.map(eventTeam => ({ eventTeam, value: this.totalScore(eventTeam) })).sort((a, b) => b.value - a.value).map((score, index) =>
-                        <tr key={score.eventTeam.id}>
-                          <td>{index + 1}</td>
-                          <td>{score.eventTeam.get('name')}</td>
-                          <td>{score.eventTeam.get('school')}</td>
-                          <td>{score.eventTeam.get('appName')}</td>
-                          <td>{score.value}</td>
-                        </tr>
-                      )}
+                      {eventTeams
+                        .map(eventTeam => ({
+                          eventTeam,
+                          value: this.totalScore(eventTeam)
+                        }))
+                        .sort((a, b) => b.value - a.value)
+                        .map((score, index) => (
+                          <tr key={score.eventTeam.id}>
+                            <td>{index + 1}</td>
+                            <td>{score.eventTeam.get("name")}</td>
+                            <td>{score.eventTeam.get("school")}</td>
+                            <td>{score.eventTeam.get("appName")}</td>
+                            <td>{score.value}</td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>

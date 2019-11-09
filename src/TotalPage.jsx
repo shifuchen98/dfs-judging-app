@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class TotalPage extends React.Component {
   constructor(props) {
     super(props);
     const { match } = this.props;
     this.state = {
-      event: AV.Object.createWithoutData('Event', match.params.id),
+      event: AV.Object.createWithoutData("Event", match.params.id),
       eventTeams: [],
       judgeTeamPairs: []
     };
@@ -21,7 +21,7 @@ export default class TotalPage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchEvent();
     }
@@ -41,9 +41,9 @@ export default class TotalPage extends React.Component {
 
   fetchEventTeams() {
     const { event } = this.state;
-    const eventTeamsQuery = new AV.Query('EventTeam');
+    const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
-      .equalTo('event', event)
+      .equalTo("event", event)
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -56,14 +56,13 @@ export default class TotalPage extends React.Component {
 
   fetchJudgeTeamPairs() {
     const { event } = this.state;
-    const eventTeamsQuery = new AV.Query('EventTeam');
-    eventTeamsQuery
-      .equalTo('event', event);
-    const judgeTeamPairsQuery = new AV.Query('JudgeTeamPair');
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery.equalTo("event", event);
+    const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
     judgeTeamPairsQuery
-      .matchesQuery('eventTeam', eventTeamsQuery)
-      .include('eventJudge')
-      .include('eventJudge.user')
+      .matchesQuery("eventTeam", eventTeamsQuery)
+      .include("eventJudge")
+      .include("eventJudge.user")
       .limit(1000)
       .find()
       .then(judgeTeamPairs => {
@@ -80,37 +79,82 @@ export default class TotalPage extends React.Component {
       <div id="page">
         <div className="columns">
           <div className="column">
-            {eventTeams.map(eventTeam =>
+            {eventTeams.map(eventTeam => (
               <div className="card" key={eventTeam.id}>
                 <section className="fields">
-                  <h1>{eventTeam.get('name')}</h1>
+                  <h1>{eventTeam.get("name")}</h1>
                   <div className="field">
                     <table className="condensed">
                       <thead>
                         <tr>
-                          <th><span>Judge</span></th>
-                          {event.get('criteria').map(criterion =>
-                            <th key={criterion.name}><span>{criterion.name} ({criterion.max})</span></th>
-                          )}
-                          <th><span>Total</span></th>
+                          <th>
+                            <span>Judge</span>
+                          </th>
+                          {event.get("criteria").map(criterion => (
+                            <th key={criterion.name}>
+                              <span>
+                                {criterion.name} ({criterion.max})
+                              </span>
+                            </th>
+                          ))}
+                          <th>
+                            <span>Total</span>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {judgeTeamPairs.filter(judgeTeamPair => judgeTeamPair.get('eventTeam').id === eventTeam.id).map(judgeTeamPair =>
-                          <tr key={judgeTeamPair.id}>
-                            <td>{judgeTeamPair.get('eventJudge').get('user').get('name')}</td>
-                            {event.get('criteria').map(criterion =>
-                              <td key={criterion.name}>{judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, null)}</td>
-                            )}
-                            <td>{event.get('criteria').reduce((accumulator, criterion) => accumulator + judgeTeamPair.get('scores').reduce((accumulator, score) => score.name === criterion.name ? accumulator + score.value : accumulator, 0), 0)}</td>
-                          </tr>
-                        )}
+                        {judgeTeamPairs
+                          .filter(
+                            judgeTeamPair =>
+                              judgeTeamPair.get("eventTeam").id === eventTeam.id
+                          )
+                          .map(judgeTeamPair => (
+                            <tr key={judgeTeamPair.id}>
+                              <td>
+                                {judgeTeamPair
+                                  .get("eventJudge")
+                                  .get("user")
+                                  .get("name")}
+                              </td>
+                              {event.get("criteria").map(criterion => (
+                                <td key={criterion.name}>
+                                  {judgeTeamPair
+                                    .get("scores")
+                                    .reduce(
+                                      (accumulator, score) =>
+                                        score.name === criterion.name
+                                          ? accumulator + score.value
+                                          : accumulator,
+                                      null
+                                    )}
+                                </td>
+                              ))}
+                              <td>
+                                {event
+                                  .get("criteria")
+                                  .reduce(
+                                    (accumulator, criterion) =>
+                                      accumulator +
+                                      judgeTeamPair
+                                        .get("scores")
+                                        .reduce(
+                                          (accumulator, score) =>
+                                            score.name === criterion.name
+                                              ? accumulator + score.value
+                                              : accumulator,
+                                          0
+                                        ),
+                                    0
+                                  )}
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
                 </section>
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>

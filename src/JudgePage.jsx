@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 
-import AV from 'leancloud-storage/live-query';
+import AV from "leancloud-storage/live-query";
 
-import './style.css';
+import "./style.css";
 
 export default class JudgePage extends React.Component {
   constructor(props) {
     super(props);
     const { match } = this.props;
     this.state = {
-      user: AV.Object.createWithoutData('_User', match.params.uid),
-      email: '',
-      name: ''
+      user: AV.Object.createWithoutData("_User", match.params.uid),
+      email: "",
+      name: ""
     };
     this.fetchUser = this.fetchUser.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
@@ -22,7 +22,7 @@ export default class JudgePage extends React.Component {
   componentDidMount() {
     const { history } = this.props;
     if (!AV.User.current()) {
-      history.push('/');
+      history.push("/");
     } else {
       this.fetchUser();
     }
@@ -33,7 +33,11 @@ export default class JudgePage extends React.Component {
     user
       .fetch()
       .then(user => {
-        this.setState({ user, name: user.get('name'), email: user.get('email') });
+        this.setState({
+          user,
+          name: user.get("name"),
+          email: user.get("email")
+        });
       })
       .catch(error => {
         alert(error);
@@ -51,9 +55,9 @@ export default class JudgePage extends React.Component {
   updateUser(e) {
     const { history, match } = this.props;
     const { user, name, email } = this.state;
-    AV.Cloud.rpc('updateUser', { user, name, email })
+    AV.Cloud.rpc("updateUser", { user, name, email })
       .then(() => {
-        alert('Judge information updated.');
+        alert("Judge information updated.");
         history.push(`/event/${match.params.id}/judges`);
       })
       .catch(error => {
@@ -75,17 +79,29 @@ export default class JudgePage extends React.Component {
                   <div className="field field--half">
                     <label>
                       <span>Email</span>
-                      <input type="text" value={email} onChange={this.handleEmailChange} required />
+                      <input
+                        type="text"
+                        value={email}
+                        onChange={this.handleEmailChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field field--half">
                     <label>
                       <span>Name</span>
-                      <input type="text" value={name} onChange={this.handleNameChange} required />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={this.handleNameChange}
+                        required
+                      />
                     </label>
                   </div>
                   <div className="field">
-                    <button type="submit" className="primary">Save</button>
+                    <button type="submit" className="primary">
+                      Save
+                    </button>
                   </div>
                 </form>
               </section>
