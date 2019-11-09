@@ -56,6 +56,10 @@ export default class SideNav extends React.Component {
           path: "criteria",
         },
         {
+          name: "Due for Judging",
+          path: "due",
+        },
+        {
           name: "Total Score",
           path: "total",
         },

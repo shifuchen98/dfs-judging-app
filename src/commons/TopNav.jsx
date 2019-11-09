@@ -13,8 +13,10 @@ export default class SideNav extends React.Component {
     const { match } = this.props;
     this.state = {
       event: AV.Object.createWithoutData('Event', match.params.id),
+      judgingTimeLeft: ''
     };
     this.fetchEvent = this.fetchEvent.bind(this);
+    this.updateJudgingTimeLeft = this.updateJudgingTimeLeft.bind(this);
     this.logOut = this.logOut.bind(this);
   }
 
@@ -23,8 +25,13 @@ export default class SideNav extends React.Component {
     if (!AV.User.current()) {
       history.push('/');
     } else {
+      this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
       this.fetchEvent();
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   fetchEvent() {
@@ -39,6 +46,11 @@ export default class SideNav extends React.Component {
       });
   }
 
+  updateJudgingTimeLeft() {
+    const { event } = this.state;
+    this.setState({ judgingTimeLeft: event.get('judgingDuesAt') > new Date() ? `${Math.floor((event.get('judgingDuesAt') - new Date()) / 60000)}:${`0${Math.floor((event.get('judgingDuesAt') - new Date()) % 86400000 % 60000 / 1000)}`.slice(-2)}` : '' });
+  }
+
   logOut() {
     const { history } = this.props;
     AV.User.logOut().then(() => {
@@ -48,7 +60,7 @@ export default class SideNav extends React.Component {
 
   render() {
     const { sideNavOn, openSideNav, closeSideNav } = this.props;
-    const { event } = this.state;
+    const { event, judgingTimeLeft } = this.state;
     return (
       <nav className="top-nav">
         <ul id="top-nav__left">
@@ -59,7 +71,7 @@ export default class SideNav extends React.Component {
           </li>
           <li>
             <RouteLink to="/events">
-              <span>All Events<span className="top-nav__extra"> ({event.get('name')})</span></span>
+              <span>All Events<span className="top-nav__extra"> ({judgingTimeLeft ? `${event.get('name')}, ${judgingTimeLeft}` : event.get('name')})</span></span>
             </RouteLink>
           </li>
         </ul>
