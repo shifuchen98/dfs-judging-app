@@ -186,8 +186,8 @@ export default class JudgesPage extends React.Component {
   importFromCsv(e) {
     const { match } = this.props;
     const { csvToBeImported } = this.state;
-    Promise.all(
-      Papa.parse(csvToBeImported.trim()).data.map(async row => {
+    const addEventJudge = async row => {
+      try {
         const usersQuery = new AV.Query("_User");
         usersQuery.equalTo("email", row[0]);
         const user = await usersQuery.first();
@@ -225,8 +225,15 @@ export default class JudgesPage extends React.Component {
               AV.Object.createWithoutData("Event", match.params.id)
             );
         }
-      })
-    )
+      } catch (error) {
+        if (error.code === 429) {
+          return await addEventJudge(row);
+        } else {
+          throw error;
+        }
+      }
+    };
+    Promise.all(Papa.parse(csvToBeImported.trim()).data.map(addEventJudge))
       .then(eventJudges => {
         AV.Object.saveAll(eventJudges)
           .then(() => {
