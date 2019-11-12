@@ -142,12 +142,14 @@ export default class TeamsPage extends React.Component {
   }
 
   deleteEventTeam(eventTeam) {
-    eventTeam
-      .destroy()
-      .then(this.fetchEventTeams)
-      .catch(error => {
-        alert(error);
-      });
+    if (window.confirm(`Are you sure to delete ${eventTeam.get("name")}?`)) {
+      eventTeam
+        .destroy()
+        .then(this.fetchEventTeams)
+        .catch(error => {
+          alert(error);
+        });
+    }
   }
 
   importFromCsv(e) {

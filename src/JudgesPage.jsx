@@ -175,12 +175,20 @@ export default class JudgesPage extends React.Component {
   }
 
   deleteEventJudge(eventJudge) {
-    eventJudge
-      .destroy()
-      .then(this.fetchEventJudges)
-      .catch(error => {
-        alert(error);
-      });
+    if (
+      window.confirm(
+        `Are you sure to delete ${eventJudge
+          .get("user")
+          .get("name")} (${eventJudge.get("user").get("email")})?`
+      )
+    ) {
+      eventJudge
+        .destroy()
+        .then(this.fetchEventJudges)
+        .catch(error => {
+          alert(error);
+        });
+    }
   }
 
   importFromCsv(e) {

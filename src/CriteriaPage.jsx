@@ -78,18 +78,24 @@ export default class CriteriaPage extends React.Component {
 
   deleteCriterion(index) {
     const { event } = this.state;
-    event
-      .set("criteria", [
-        ...event.get("criteria").slice(0, index),
-        ...event.get("criteria").slice(index + 1)
-      ])
-      .save()
-      .then(event => {
-        this.setState({ event });
-      })
-      .catch(error => {
-        alert(error);
-      });
+    if (
+      window.confirm(
+        `Are you sure to delete ${event.get("criteria")[index].name}?`
+      )
+    ) {
+      event
+        .set("criteria", [
+          ...event.get("criteria").slice(0, index),
+          ...event.get("criteria").slice(index + 1)
+        ])
+        .save()
+        .then(event => {
+          this.setState({ event });
+        })
+        .catch(error => {
+          alert(error);
+        });
+    }
   }
 
   render() {

@@ -123,12 +123,14 @@ export default class EventsPage extends React.Component {
   }
 
   deleteEvent(event) {
-    event
-      .destroy()
-      .then(this.fetchEvents)
-      .catch(error => {
-        alert(error);
-      });
+    if (window.confirm(`Are you sure to delete ${event.get("name")}?`)) {
+      event
+        .destroy()
+        .then(this.fetchEvents)
+        .catch(error => {
+          alert(error);
+        });
+    }
   }
 
   logOut() {
