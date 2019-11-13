@@ -4,7 +4,7 @@ import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 import AV from "leancloud-storage/live-query";
 import Papa from "papaparse";
-
+import xlsxParser from "xlsx-parse-json";
 import "./style.css";
 
 export default class JudgesPage extends React.Component {
@@ -15,7 +15,10 @@ export default class JudgesPage extends React.Component {
       judgesSearch: "",
       judgeEmail: "",
       judgeEmailPrediction: "",
-      csvToBeImported: ""
+      csvToBeImported: "",
+      myfile: {},
+      myfiletype: "",
+      myfiledata: []
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
@@ -29,6 +32,7 @@ export default class JudgesPage extends React.Component {
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
     this.importFromCsv = this.importFromCsv.bind(this);
+    this.updateData = this.updateData.bind(this);
   }
 
   componentDidMount() {
@@ -191,6 +195,49 @@ export default class JudgesPage extends React.Component {
     }
   }
 
+  handleFileUploadChange = e => {
+    this.setState({
+      myfile: e.target.files[0],
+      myfiletype: e.target.files[0].type
+    });
+  };
+
+  importFromFile = () => {
+    const { myfile, myfiletype } = this.state;
+    if (
+      myfiletype ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      xlsxParser.onFileSelection(myfile).then(data => {
+        var parsedData = data;
+        this.setState({ myfiledata: parsedData.Sheet1 });
+      });
+    }
+    Papa.parse(myfile, {
+      complete: this.updateData,
+      header: true
+    });
+  };
+
+  updateData(result) {
+    const { myfiletype, myfiledata } = this.state;
+    var data_string = "";
+    if (myfiletype === "text/csv") {
+      var data = result.data;
+    } else if (
+      myfiletype ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      var data = myfiledata;
+    }
+    data.forEach(function(element) {
+      data_string =
+        data_string + [element.email, element.name].join(",") + "\n";
+    });
+    this.setState({ csvToBeImported: data_string });
+    this.importFromCsv();
+  }
+
   importFromCsv(e) {
     const { match } = this.props;
     const { csvToBeImported } = this.state;
@@ -262,7 +309,9 @@ export default class JudgesPage extends React.Component {
       .catch(error => {
         alert(error);
       });
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
   }
 
   render() {
@@ -419,6 +468,28 @@ export default class JudgesPage extends React.Component {
                   </div>
                 </form>
               </section>
+              <div className="fields">
+                <h1>Import CSV or XLSX file:</h1>
+                <div className="field">
+                  <input
+                    className="csv-input"
+                    type="file"
+                    ref={input => {
+                      this.filesInput = input;
+                    }}
+                    name="file"
+                    placeholder={null}
+                    onChange={this.handleFileUploadChange}
+                  />
+                  <p />
+                  <div className="field">
+                    <button onClick={this.importFromFile} className="primary">
+                      {" "}
+                      Upload
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

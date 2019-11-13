@@ -24,6 +24,7 @@ import WinnerPage from "./WinnerPage";
 import PresentationPage from "./PresentationPage";
 import ScoringPage from "./ScoringPage";
 import PscoringPage from "./PscoringPage";
+// import FileReader from "./FileReader";
 
 import AV from "leancloud-storage/live-query";
 
@@ -91,6 +92,11 @@ export default class App extends React.Component {
           <Route path="/event/:id">
             <div className="basic-wrapper">
               <Switch>
+                {/* <Route
+                  exact
+                  path="/event/:id/filereader"
+                  component={FileReader}
+                /> */}
                 <Route exact path="/event/:id/info" component={InfoPage} />
                 <Route exact path="/event/:id/judges" component={JudgesPage} />
                 <Route
