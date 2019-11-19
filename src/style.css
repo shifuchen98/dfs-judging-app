@@ -121,7 +121,8 @@ select:disabled {
   border: 1px solid #00000009;
   background-color: transparent;
 }
-input[type="date"] {
+input[type="date"],
+input[type="time"] {
   height: 36px;
 }
 label > input,
