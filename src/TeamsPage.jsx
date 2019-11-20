@@ -37,7 +37,12 @@ export default class TeamsPage extends React.Component {
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
+    this.handleFileUploadChange = this.handleFileUploadChange.bind(this);
+    this.importFromFile = this.importFromFile.bind(this);
+    this.importCsvFile = this.importCsvFile.bind(this);
+    this.importXlsxFile = this.importXlsxFile.bind(this);
     this.importFromText = this.importFromText.bind(this);
+    this.importFromJson = this.importFromJson.bind(this);
   }
 
   componentDidMount() {
@@ -154,13 +159,13 @@ export default class TeamsPage extends React.Component {
     }
   }
 
-  handleFileUploadChange = e => {
+  handleFileUploadChange(e) {
     if (e.target.files[0]) {
       this.setState({ fileToBeImported: e.target.files[0] });
     }
-  };
+  }
 
-  importFromFile = () => {
+  importFromFile(e) {
     const { fileToBeImported } = this.state;
     if (fileToBeImported.type === "text/csv") {
       this.importCsvFile();
@@ -172,9 +177,10 @@ export default class TeamsPage extends React.Component {
     } else {
       alert("File must be of type .xlsx or .csv!");
     }
-  };
+    e.preventDefault();
+  }
 
-  importCsvFile = () => {
+  importCsvFile() {
     const { fileToBeImported } = this.state;
     Papa.parse(fileToBeImported, {
       complete: results => {
@@ -182,14 +188,14 @@ export default class TeamsPage extends React.Component {
       },
       header: true
     });
-  };
+  }
 
-  importXlsxFile = () => {
+  importXlsxFile() {
     const { fileToBeImported } = this.state;
     xlsxParser.onFileSelection(fileToBeImported).then(data => {
       this.importFromJson(data.Sheet1);
     });
-  };
+  }
 
   importFromText(e) {
     const { textToBeImported } = this.state;
@@ -412,30 +418,22 @@ export default class TeamsPage extends React.Component {
                     </button>
                   </div>
                 </form>
-                <div style={{ padding: "10px 0px" }}>
-                  <label>
-                    <span>Upload XLSX or CSV file Here</span>
-                  </label>
-                </div>
-                <div className="field">
-                  <input
-                    className="csv-input"
-                    type="file"
-                    ref={input => {
-                      this.filesInput = input;
-                    }}
-                    name="file"
-                    placeholder={null}
-                    onChange={this.handleFileUploadChange}
-                  />
-                  <p />
-                  <div className="field" style={{ padding: "10px 0px" }}>
-                    <button onClick={this.importFromFile} className="primary">
-                      {" "}
+                <form onSubmit={this.importFromFile}>
+                  <div className="field">
+                    <label>
+                      <span>Upload XLSX or CSV file Here</span>
+                      <input
+                        type="file"
+                        onChange={this.handleFileUploadChange}
+                      />
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">
                       Upload
                     </button>
                   </div>
-                </div>
+                </form>
               </section>
             </div>
           </div>
