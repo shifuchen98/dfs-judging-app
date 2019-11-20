@@ -231,7 +231,6 @@ export default class JudgesPage extends React.Component {
 
   importXlsxFile() {
     const { fileToBeImported } = this.state;
-    console.log(fileToBeImported);
     xlsxParser.onFileSelection(fileToBeImported).then(data => {
       Object.keys(data).map(sheet => {
         this.importFromJson(data[sheet]);
