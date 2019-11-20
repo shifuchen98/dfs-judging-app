@@ -15,10 +15,8 @@ export default class JudgesPage extends React.Component {
       judgesSearch: "",
       judgeEmail: "",
       judgeEmailPrediction: "",
-      csvToBeImported: "",
-      myfile: {},
-      myfiletype: "",
-      myfiledata: []
+      csvTextInput: "",
+      myfile: {}
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
@@ -26,13 +24,10 @@ export default class JudgesPage extends React.Component {
     this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(
       this
     );
-    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(
-      this
-    );
+    this.handleCsvTextInputChange = this.handleCsvTextInputChange.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
-    this.importFromCsv = this.importFromCsv.bind(this);
-    this.updateData = this.updateData.bind(this);
+    this.importTextInput = this.importTextInput.bind(this);
   }
 
   componentDidMount() {
@@ -92,8 +87,8 @@ export default class JudgesPage extends React.Component {
     }
   }
 
-  handleCsvToBeImportedChange(e) {
-    this.setState({ csvToBeImported: e.target.value });
+  handleCsvTextInputChange(e) {
+    this.setState({ csvTextInput: e.target.value });
   }
 
   addEventJudge(e) {
@@ -196,55 +191,57 @@ export default class JudgesPage extends React.Component {
   }
 
   handleFileUploadChange = e => {
-    this.setState({
-      myfile: e.target.files[0],
-      myfiletype: e.target.files[0].type
-    });
+    if (e.target.files[0]) {
+      this.setState({ myfile: e.target.files[0] });
+    }
   };
 
   importFromFile = () => {
-    const { myfile, myfiletype } = this.state;
-    if (
-      myfiletype ===
+    const { myfile } = this.state;
+    if (myfile.type === "text/csv") {
+      this.importCsvFile();
+    } else if (
+      myfile.type ===
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
-      xlsxParser.onFileSelection(myfile).then(data => {
-        var parsedData = data;
-        this.setState({ myfiledata: parsedData.Sheet1 });
-      });
+      this.importXlsxFile();
     }
+  };
+
+  importCsvFile = () => {
+    const { myfile } = this.state;
     Papa.parse(myfile, {
-      complete: this.updateData,
+      complete: results => {
+        this.importFromJson(results.data);
+      },
       header: true
     });
   };
 
-  updateData(result) {
-    const { myfiletype, myfiledata } = this.state;
-    var data_string = "";
-    if (myfiletype === "text/csv") {
-      var data = result.data;
-    } else if (
-      myfiletype ===
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    ) {
-      var data = myfiledata;
-    }
-    data.forEach(function(element) {
-      data_string =
-        data_string + [element.email, element.name].join(",") + "\n";
+  importXlsxFile = () => {
+    const { myfile } = this.state;
+    xlsxParser.onFileSelection(myfile).then(data => {
+      this.importFromJson(data.Sheet1);
     });
-    this.setState({ csvToBeImported: data_string });
-    this.importFromCsv();
+  };
+
+  importTextInput(e) {
+    const { csvTextInput } = this.state;
+    Papa.parse(csvTextInput.trim(), {
+      complete: results => {
+        this.importFromJson(results.data);
+      },
+      header: true
+    });
+    e.preventDefault();
   }
 
-  importFromCsv(e) {
+  importFromJson(jsonToBeImported) {
     const { match } = this.props;
-    const { csvToBeImported } = this.state;
     const addEventJudge = async row => {
       try {
         const usersQuery = new AV.Query("_User");
-        usersQuery.equalTo("email", row[0]);
+        usersQuery.equalTo("email", row.email);
         const user = await usersQuery.first();
         if (user) {
           const roles = await user.getRoles();
@@ -267,9 +264,9 @@ export default class JudgesPage extends React.Component {
           judgePassword.set("password", password);
           const user = new AV.Object("_User");
           user
-            .set("email", row[0])
-            .set("username", row[0])
-            .set("name", row[1])
+            .set("email", row.email)
+            .set("username", row.email)
+            .set("name", row.name)
             .set("password", password)
             .set("judgePassword", judgePassword);
           const eventJudge = new AV.Object("EventJudge");
@@ -288,19 +285,19 @@ export default class JudgesPage extends React.Component {
         }
       }
     };
-    Promise.all(Papa.parse(csvToBeImported.trim()).data.map(addEventJudge))
+    Promise.all(jsonToBeImported.map(addEventJudge))
       .then(eventJudges => {
         AV.Object.saveAll(eventJudges)
           .then(() => {
             alert("Judges successfully imported.");
-            this.setState({ csvToBeImported: "" }, this.fetchEventJudges);
+            this.setState({ csvTextInput: "" }, this.fetchEventJudges);
           })
           .catch(error => {
             if (error.code === 137) {
               alert(
                 "Judges successfully imported with existing judges skipped."
               );
-              this.setState({ csvToBeImported: "" }, this.fetchEventJudges);
+              this.setState({ csvTextInput: "" }, this.fetchEventJudges);
             } else {
               alert(error);
             }
@@ -309,9 +306,6 @@ export default class JudgesPage extends React.Component {
       .catch(error => {
         alert(error);
       });
-    if (e) {
-      e.preventDefault();
-    }
   }
 
   render() {
@@ -320,7 +314,7 @@ export default class JudgesPage extends React.Component {
       judgesSearch,
       judgeEmail,
       judgeEmailPrediction,
-      csvToBeImported
+      csvTextInput
     } = this.state;
     return (
       <div id="page">
@@ -449,15 +443,15 @@ export default class JudgesPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Judges</h1>
-                <form onSubmit={this.importFromCsv}>
+                <form onSubmit={this.importTextInput}>
                   <div className="field">
                     <label>
-                      <span>Paste CSV or TSV Here</span>
+                      <span>Paste XLSX, CSV, or TSV Here</span>
                       <textarea
                         rows="20"
                         placeholder="thornton@uci.edu,Alex Thornton"
-                        value={csvToBeImported}
-                        onChange={this.handleCsvToBeImportedChange}
+                        value={csvTextInput}
+                        onChange={this.handleCsvTextInputChange}
                       ></textarea>
                     </label>
                   </div>
@@ -467,9 +461,9 @@ export default class JudgesPage extends React.Component {
                     </button>
                   </div>
                 </form>
-              </section>
-              <div className="fields">
-                <h1>Import CSV or XLSX file:</h1>
+                <label>
+                  <span>Upload XLSX or CSV file Here</span>
+                </label>
                 <div className="field">
                   <input
                     className="csv-input"
@@ -489,7 +483,7 @@ export default class JudgesPage extends React.Component {
                     </button>
                   </div>
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </div>
