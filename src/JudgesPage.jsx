@@ -15,8 +15,8 @@ export default class JudgesPage extends React.Component {
       judgesSearch: "",
       judgeEmail: "",
       judgeEmailPrediction: "",
-      textInputImport: "",
-      myfile: {}
+      textToBeImported: "",
+      fileToBeImported: {}
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
@@ -24,10 +24,12 @@ export default class JudgesPage extends React.Component {
     this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(
       this
     );
-    this.handleTextInputChange = this.handleTextInputChange.bind(this);
+    this.handleTextToBeImportedChange = this.handleTextToBeImportedChange.bind(
+      this
+    );
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
-    this.importTextInput = this.importTextInput.bind(this);
+    this.importFromText = this.importFromText.bind(this);
   }
 
   componentDidMount() {
@@ -87,8 +89,8 @@ export default class JudgesPage extends React.Component {
     }
   }
 
-  handleTextInputChange(e) {
-    this.setState({ textInputImport: e.target.value });
+  handleTextToBeImportedChange(e) {
+    this.setState({ textToBeImported: e.target.value });
   }
 
   addEventJudge(e) {
@@ -192,16 +194,16 @@ export default class JudgesPage extends React.Component {
 
   handleFileUploadChange = e => {
     if (e.target.files[0]) {
-      this.setState({ myfile: e.target.files[0] });
+      this.setState({ fileToBeImported: e.target.files[0] });
     }
   };
 
   importFromFile = () => {
-    const { myfile } = this.state;
-    if (myfile.type === "text/csv") {
+    const { fileToBeImported } = this.state;
+    if (fileToBeImported.type === "text/csv") {
       this.importCsvFile();
     } else if (
-      myfile.type ===
+      fileToBeImported.type ===
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
       this.importXlsxFile();
@@ -209,8 +211,8 @@ export default class JudgesPage extends React.Component {
   };
 
   importCsvFile = () => {
-    const { myfile } = this.state;
-    Papa.parse(myfile, {
+    const { fileToBeImported } = this.state;
+    Papa.parse(fileToBeImported, {
       complete: results => {
         this.importFromJson(results.data);
       },
@@ -219,15 +221,15 @@ export default class JudgesPage extends React.Component {
   };
 
   importXlsxFile = () => {
-    const { myfile } = this.state;
-    xlsxParser.onFileSelection(myfile).then(data => {
+    const { fileToBeImported } = this.state;
+    xlsxParser.onFileSelection(fileToBeImported).then(data => {
       this.importFromJson(data.Sheet1);
     });
   };
 
-  importTextInput(e) {
-    const { textInputImport } = this.state;
-    Papa.parse(textInputImport.trim(), {
+  importFromText(e) {
+    const { textToBeImported } = this.state;
+    Papa.parse(textToBeImported.trim(), {
       complete: results => {
         this.importFromJson(results.data);
       },
@@ -290,7 +292,7 @@ export default class JudgesPage extends React.Component {
         AV.Object.saveAll(eventJudges)
           .then(() => {
             alert("Judges successfully imported.");
-            this.setState({ textInputImport: "" }, this.fetchEventJudges);
+            this.setState({ textToBeImported: "" }, this.fetchEventJudges);
           })
           .catch(error => {
             if (error.code === 137) {
@@ -314,7 +316,7 @@ export default class JudgesPage extends React.Component {
       judgesSearch,
       judgeEmail,
       judgeEmailPrediction,
-      textInputImport
+      textToBeImported
     } = this.state;
     return (
       <div id="page">
@@ -443,15 +445,15 @@ export default class JudgesPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Judges</h1>
-                <form onSubmit={this.importTextInput}>
+                <form onSubmit={this.importFromText}>
                   <div className="field">
                     <label>
                       <span>Paste XLSX, CSV, or TSV Here</span>
                       <textarea
                         rows="20"
                         placeholder="thornton@uci.edu,Alex Thornton"
-                        value={textInputImport}
-                        onChange={this.handleTextInputChange}
+                        value={textToBeImported}
+                        onChange={this.handleTextToBeImportedChange}
                       ></textarea>
                     </label>
                   </div>
