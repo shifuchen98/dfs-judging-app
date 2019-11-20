@@ -15,7 +15,7 @@ export default class JudgesPage extends React.Component {
       judgesSearch: "",
       judgeEmail: "",
       judgeEmailPrediction: "",
-      csvTextInput: "",
+      textInputImport: "",
       myfile: {}
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
@@ -24,7 +24,7 @@ export default class JudgesPage extends React.Component {
     this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(
       this
     );
-    this.handleCsvTextInputChange = this.handleCsvTextInputChange.bind(this);
+    this.handleTextInputChange = this.handleTextInputChange.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
     this.importTextInput = this.importTextInput.bind(this);
@@ -87,8 +87,8 @@ export default class JudgesPage extends React.Component {
     }
   }
 
-  handleCsvTextInputChange(e) {
-    this.setState({ csvTextInput: e.target.value });
+  handleTextInputChange(e) {
+    this.setState({ textInputImport: e.target.value });
   }
 
   addEventJudge(e) {
@@ -226,8 +226,8 @@ export default class JudgesPage extends React.Component {
   };
 
   importTextInput(e) {
-    const { csvTextInput } = this.state;
-    Papa.parse(csvTextInput.trim(), {
+    const { textInputImport } = this.state;
+    Papa.parse(textInputImport.trim(), {
       complete: results => {
         this.importFromJson(results.data);
       },
@@ -290,14 +290,14 @@ export default class JudgesPage extends React.Component {
         AV.Object.saveAll(eventJudges)
           .then(() => {
             alert("Judges successfully imported.");
-            this.setState({ csvTextInput: "" }, this.fetchEventJudges);
+            this.setState({ textInputImport: "" }, this.fetchEventJudges);
           })
           .catch(error => {
             if (error.code === 137) {
               alert(
                 "Judges successfully imported with existing judges skipped."
               );
-              this.setState({ csvTextInput: "" }, this.fetchEventJudges);
+              this.setState({ textImportImport: "" }, this.fetchEventJudges);
             } else {
               alert(error);
             }
@@ -314,7 +314,7 @@ export default class JudgesPage extends React.Component {
       judgesSearch,
       judgeEmail,
       judgeEmailPrediction,
-      csvTextInput
+      textInputImport
     } = this.state;
     return (
       <div id="page">
@@ -450,8 +450,8 @@ export default class JudgesPage extends React.Component {
                       <textarea
                         rows="20"
                         placeholder="thornton@uci.edu,Alex Thornton"
-                        value={csvTextInput}
-                        onChange={this.handleCsvTextInputChange}
+                        value={textInputImport}
+                        onChange={this.handleTextInputChange}
                       ></textarea>
                     </label>
                   </div>
