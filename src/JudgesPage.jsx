@@ -4,7 +4,7 @@ import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 import AV from "leancloud-storage/live-query";
 import Papa from "papaparse";
-
+import xlsxParser from "xlsx-parse-json";
 import "./style.css";
 
 export default class JudgesPage extends React.Component {
@@ -15,7 +15,8 @@ export default class JudgesPage extends React.Component {
       judgesSearch: "",
       judgeEmail: "",
       judgeEmailPrediction: "",
-      csvToBeImported: ""
+      textToBeImported: "",
+      fileToBeImported: {}
     };
     this.fetchEventJudges = this.fetchEventJudges.bind(this);
     this.handleJudgesSearchChange = this.handleJudgesSearchChange.bind(this);
@@ -23,12 +24,18 @@ export default class JudgesPage extends React.Component {
     this.handleJudgeEmailCompletion = this.handleJudgeEmailCompletion.bind(
       this
     );
-    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(
+    this.handleTextToBeImportedChange = this.handleTextToBeImportedChange.bind(
       this
     );
     this.addEventJudge = this.addEventJudge.bind(this);
+    this.editEventJudge = this.editEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
-    this.importFromCsv = this.importFromCsv.bind(this);
+    this.handleFileUploadChange = this.handleFileUploadChange.bind(this);
+    this.importFromFile = this.importFromFile.bind(this);
+    this.importCsvFile = this.importCsvFile.bind(this);
+    this.importXlsxFile = this.importXlsxFile.bind(this);
+    this.importFromText = this.importFromText.bind(this);
+    this.importFromJson = this.importFromJson.bind(this);
   }
 
   componentDidMount() {
@@ -88,8 +95,8 @@ export default class JudgesPage extends React.Component {
     }
   }
 
-  handleCsvToBeImportedChange(e) {
-    this.setState({ csvToBeImported: e.target.value });
+  handleTextToBeImportedChange(e) {
+    this.setState({ textToBeImported: e.target.value });
   }
 
   addEventJudge(e) {
@@ -191,13 +198,61 @@ export default class JudgesPage extends React.Component {
     }
   }
 
-  importFromCsv(e) {
+  handleFileUploadChange(e) {
+    if (e.target.files[0]) {
+      this.setState({ fileToBeImported: e.target.files[0] });
+    }
+  }
+
+  importFromFile(e) {
+    const { fileToBeImported } = this.state;
+    if (fileToBeImported.type === "text/csv") {
+      this.importCsvFile();
+    } else if (
+      fileToBeImported.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      this.importXlsxFile();
+    } else {
+      alert("File must be of type .xlsx or .csv!");
+    }
+    e.preventDefault();
+  }
+
+  importCsvFile() {
+    const { fileToBeImported } = this.state;
+    Papa.parse(fileToBeImported, {
+      complete: results => {
+        this.importFromJson(results.data);
+      },
+      header: true
+    });
+  }
+
+  importXlsxFile() {
+    const { fileToBeImported } = this.state;
+    xlsxParser.onFileSelection(fileToBeImported).then(data => {
+      this.importFromJson(data.Sheet1);
+    });
+  }
+
+  importFromText(e) {
+    const { textToBeImported } = this.state;
+    Papa.parse(textToBeImported.trim(), {
+      complete: results => {
+        this.importFromJson(results.data);
+      },
+      header: true
+    });
+    e.preventDefault();
+  }
+
+  importFromJson(jsonToBeImported) {
     const { match } = this.props;
-    const { csvToBeImported } = this.state;
     const addEventJudge = async row => {
       try {
         const usersQuery = new AV.Query("_User");
-        usersQuery.equalTo("email", row[0]);
+        usersQuery.equalTo("email", row.email);
         const user = await usersQuery.first();
         if (user) {
           const roles = await user.getRoles();
@@ -220,9 +275,9 @@ export default class JudgesPage extends React.Component {
           judgePassword.set("password", password);
           const user = new AV.Object("_User");
           user
-            .set("email", row[0])
-            .set("username", row[0])
-            .set("name", row[1])
+            .set("email", row.email)
+            .set("username", row.email)
+            .set("name", row.name)
             .set("password", password)
             .set("judgePassword", judgePassword);
           const eventJudge = new AV.Object("EventJudge");
@@ -241,19 +296,19 @@ export default class JudgesPage extends React.Component {
         }
       }
     };
-    Promise.all(Papa.parse(csvToBeImported.trim()).data.map(addEventJudge))
+    Promise.all(jsonToBeImported.map(addEventJudge))
       .then(eventJudges => {
         AV.Object.saveAll(eventJudges)
           .then(() => {
             alert("Judges successfully imported.");
-            this.setState({ csvToBeImported: "" }, this.fetchEventJudges);
+            this.setState({ textToBeImported: "" }, this.fetchEventJudges);
           })
           .catch(error => {
             if (error.code === 137) {
               alert(
                 "Judges successfully imported with existing judges skipped."
               );
-              this.setState({ csvToBeImported: "" }, this.fetchEventJudges);
+              this.setState({ textImportImport: "" }, this.fetchEventJudges);
             } else {
               alert(error);
             }
@@ -262,7 +317,6 @@ export default class JudgesPage extends React.Component {
       .catch(error => {
         alert(error);
       });
-    e.preventDefault();
   }
 
   render() {
@@ -271,7 +325,7 @@ export default class JudgesPage extends React.Component {
       judgesSearch,
       judgeEmail,
       judgeEmailPrediction,
-      csvToBeImported
+      textToBeImported
     } = this.state;
     return (
       <div id="page">
@@ -400,21 +454,42 @@ export default class JudgesPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Judges</h1>
-                <form onSubmit={this.importFromCsv}>
+                <form onSubmit={this.importFromText}>
                   <div className="field">
                     <label>
                       <span>Paste CSV or TSV Here</span>
                       <textarea
                         rows="20"
-                        placeholder="thornton@uci.edu,Alex Thornton"
-                        value={csvToBeImported}
-                        onChange={this.handleCsvToBeImportedChange}
+                        placeholder={
+                          "email,name\nthornton@uci.edu,Alex Thornton\npattis@uci.edu,Richard Pattis\n…"
+                        }
+                        value={textToBeImported}
+                        onChange={this.handleTextToBeImportedChange}
+                        required
                       ></textarea>
                     </label>
                   </div>
                   <div className="field">
                     <button type="submit" className="primary">
                       Import
+                    </button>
+                  </div>
+                </form>
+                <form onSubmit={this.importFromFile}>
+                  <div className="field">
+                    <label>
+                      <span>Upload XLSX or CSV file Here</span>
+                      <input
+                        type="file"
+                        accept=".xlsx,.csv"
+                        onChange={this.handleFileUploadChange}
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">
+                      Upload
                     </button>
                   </div>
                 </form>

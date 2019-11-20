@@ -4,6 +4,7 @@ import { faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 import AV from "leancloud-storage/live-query";
 import Papa from "papaparse";
+import xlsxParser from "xlsx-parse-json";
 
 import "./style.css";
 
@@ -18,7 +19,8 @@ export default class TeamsPage extends React.Component {
       appName: "",
       appDescription: "",
       teamsSearch: "",
-      csvToBeImported: ""
+      textToBeImported: "",
+      fileToBeImported: {}
     };
     this.fetchEventTeams = this.fetchEventTeams.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
@@ -29,13 +31,18 @@ export default class TeamsPage extends React.Component {
       this
     );
     this.handleTeamsSearchChange = this.handleTeamsSearchChange.bind(this);
-    this.handleCsvToBeImportedChange = this.handleCsvToBeImportedChange.bind(
+    this.handleTextToBeImportedChange = this.handleTextToBeImportedChange.bind(
       this
     );
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
-    this.importFromCsv = this.importFromCsv.bind(this);
+    this.handleFileUploadChange = this.handleFileUploadChange.bind(this);
+    this.importFromFile = this.importFromFile.bind(this);
+    this.importCsvFile = this.importCsvFile.bind(this);
+    this.importXlsxFile = this.importXlsxFile.bind(this);
+    this.importFromText = this.importFromText.bind(this);
+    this.importFromJson = this.importFromJson.bind(this);
   }
 
   componentDidMount() {
@@ -104,8 +111,8 @@ export default class TeamsPage extends React.Component {
     this.setState({ teamsSearch: e.target.value });
   }
 
-  handleCsvToBeImportedChange(e) {
-    this.setState({ csvToBeImported: e.target.value });
+  handleTextToBeImportedChange(e) {
+    this.setState({ textToBeImported: e.target.value });
   }
 
   createEventTeam(e) {
@@ -152,32 +159,80 @@ export default class TeamsPage extends React.Component {
     }
   }
 
-  importFromCsv(e) {
+  handleFileUploadChange(e) {
+    if (e.target.files[0]) {
+      this.setState({ fileToBeImported: e.target.files[0] });
+    }
+  }
+
+  importFromFile(e) {
+    const { fileToBeImported } = this.state;
+    if (fileToBeImported.type === "text/csv") {
+      this.importCsvFile();
+    } else if (
+      fileToBeImported.type ===
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
+      this.importXlsxFile();
+    } else {
+      alert("File must be of type .xlsx or .csv!");
+    }
+    e.preventDefault();
+  }
+
+  importCsvFile() {
+    const { fileToBeImported } = this.state;
+    Papa.parse(fileToBeImported, {
+      complete: results => {
+        this.importFromJson(results.data);
+      },
+      header: true
+    });
+  }
+
+  importXlsxFile() {
+    const { fileToBeImported } = this.state;
+    xlsxParser.onFileSelection(fileToBeImported).then(data => {
+      this.importFromJson(data.Sheet1);
+    });
+  }
+
+  importFromText(e) {
+    const { textToBeImported } = this.state;
+    Papa.parse(textToBeImported.trim(), {
+      complete: results => {
+        this.importFromJson(results.data);
+      },
+      header: true
+    });
+    e.preventDefault();
+  }
+
+  importFromJson(jsonToBeImported) {
     const { match } = this.props;
-    const { csvToBeImported } = this.state;
+
     AV.Object.saveAll(
-      Papa.parse(csvToBeImported.trim()).data.map(row =>
+      jsonToBeImported.map(row =>
         new AV.Object("EventTeam")
           .set("event", AV.Object.createWithoutData("Event", match.params.id))
-          .set("name", row[0])
-          .set("school", row[1])
-          .set("appName", row[2])
-          .set("appDescription", row[3])
+          .set("name", row.name)
+          .set("school", row.school)
+          .set("appName", row.appName)
+          .set("appDescription", row.appDescription)
       )
     )
       .then(() => {
         alert("Teams successfully imported.");
-        this.setState({ csvToBeImported: "" }, this.fetchEventTeams);
+        this.setState({ textToBeImported: "" }, this.fetchEventTeams);
       })
       .catch(error => {
         if (error.code === 137) {
           alert("Teams successfully imported with duplicate teams skipped.");
-          this.setState({ csvToBeImported: "" }, this.fetchEventTeams);
+          this.setState({ textToBeImported: "" }, this.fetchEventTeams);
         } else {
           alert(error);
         }
       });
-    e.preventDefault();
   }
 
   render() {
@@ -189,7 +244,7 @@ export default class TeamsPage extends React.Component {
       appName,
       appDescription,
       teamsSearch,
-      csvToBeImported
+      textToBeImported
     } = this.state;
     return (
       <div id="page">
@@ -345,21 +400,42 @@ export default class TeamsPage extends React.Component {
             <div className="card">
               <section className="fields">
                 <h1>Import Teams</h1>
-                <form onSubmit={this.importFromCsv}>
+                <form onSubmit={this.importFromText}>
                   <div className="field">
                     <label>
                       <span>Paste CSV or TSV Here</span>
                       <textarea
                         rows="20"
-                        placeholder="The Dream Team,UCI,The Dream App,This is the coolest app in the world!"
-                        value={csvToBeImported}
-                        onChange={this.handleCsvToBeImportedChange}
+                        placeholder={
+                          "name,school,appName,appDescription\nThe Dream Team,UCI,The Dream App,This is the coolest app in the world!\nThe Daydream Team,UCLA,The Daydream App,This is the hottest app in the world!\n…"
+                        }
+                        value={textToBeImported}
+                        onChange={this.handleTextToBeImportedChange}
+                        required
                       ></textarea>
                     </label>
                   </div>
                   <div className="field">
                     <button type="submit" className="primary">
                       Import
+                    </button>
+                  </div>
+                </form>
+                <form onSubmit={this.importFromFile}>
+                  <div className="field">
+                    <label>
+                      <span>Upload XLSX or CSV file Here</span>
+                      <input
+                        type="file"
+                        accept=".xlsx,.csv"
+                        onChange={this.handleFileUploadChange}
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className="field">
+                    <button type="submit" className="primary">
+                      Upload
                     </button>
                   </div>
                 </form>
