@@ -427,6 +427,7 @@ export default class TeamsPage extends React.Component {
                       <span>Upload XLSX or CSV file Here</span>
                       <input
                         type="file"
+                        accept=".xlsx,.csv"
                         onChange={this.handleFileUploadChange}
                         required
                       />
