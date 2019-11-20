@@ -406,7 +406,9 @@ export default class TeamsPage extends React.Component {
                       <span>Paste CSV or TSV Here</span>
                       <textarea
                         rows="20"
-                        placeholder="The Dream Team,UCI,The Dream App,This is the coolest app in the world!"
+                        placeholder={
+                          "name,school,appName,appDescription\nThe Dream Team,UCI,The Dream App,This is the coolest app in the world!\nThe Daydream Team,UCLA,The Daydream App,This is the hottest app in the world!\n…"
+                        }
                         value={textToBeImported}
                         onChange={this.handleTextToBeImportedChange}
                       ></textarea>

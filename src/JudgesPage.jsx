@@ -460,7 +460,9 @@ export default class JudgesPage extends React.Component {
                       <span>Paste CSV or TSV Here</span>
                       <textarea
                         rows="20"
-                        placeholder="thornton@uci.edu,Alex Thornton"
+                        placeholder={
+                          "email,name\nthornton@uci.edu,Alex Thornton\npattis@uci.edu,Richard Pattis\n…"
+                        }
                         value={textToBeImported}
                         onChange={this.handleTextToBeImportedChange}
                       ></textarea>
