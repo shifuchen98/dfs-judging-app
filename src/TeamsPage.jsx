@@ -411,6 +411,7 @@ export default class TeamsPage extends React.Component {
                         }
                         value={textToBeImported}
                         onChange={this.handleTextToBeImportedChange}
+                        required
                       ></textarea>
                     </label>
                   </div>
@@ -427,6 +428,7 @@ export default class TeamsPage extends React.Component {
                       <input
                         type="file"
                         onChange={this.handleFileUploadChange}
+                        required
                       />
                     </label>
                   </div>
