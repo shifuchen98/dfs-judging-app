@@ -169,6 +169,8 @@ export default class TeamsPage extends React.Component {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     ) {
       this.importXlsxFile();
+    } else {
+      alert("File must be of type .xlsx or .csv!");
     }
   };
 
