@@ -461,9 +461,11 @@ export default class JudgesPage extends React.Component {
                     </button>
                   </div>
                 </form>
-                <label>
-                  <span>Upload XLSX or CSV file Here</span>
-                </label>
+                <div style={{ padding: "10px 0px" }}>
+                  <label>
+                    <span>Upload XLSX or CSV file Here</span>
+                  </label>
+                </div>
                 <div className="field">
                   <input
                     className="csv-input"
@@ -476,7 +478,7 @@ export default class JudgesPage extends React.Component {
                     onChange={this.handleFileUploadChange}
                   />
                   <p />
-                  <div className="field">
+                  <div className="field" style={{ padding: "10px 0px" }}>
                     <button onClick={this.importFromFile} className="primary">
                       {" "}
                       Upload
