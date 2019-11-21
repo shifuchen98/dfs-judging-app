@@ -232,7 +232,7 @@ export default class JudgesPage extends React.Component {
   importXlsxFile() {
     const { fileToBeImported } = this.state;
     xlsxParser.onFileSelection(fileToBeImported).then(data => {
-      this.importFromJson(data.Sheet1);
+      Object.keys(data).map(sheet => this.importFromJson(data[sheet]));
     });
   }
 
