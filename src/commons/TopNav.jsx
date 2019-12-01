@@ -10,6 +10,7 @@ export default class SideNav extends React.Component {
     super(props);
     const { match } = this.props;
     this.state = {
+      roles: [],
       event: AV.Object.createWithoutData("Event", match.params.id),
       judgingTimeLeft: ""
     };
@@ -23,8 +24,14 @@ export default class SideNav extends React.Component {
     if (!AV.User.current()) {
       history.push("/");
     } else {
-      this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
-      this.fetchEvent();
+      AV.User.current()
+        .getRoles()
+        .then(roles => {
+          this.setState({ roles }, () => {
+            this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
+            this.fetchEvent();
+          });
+        });
     }
   }
 
@@ -68,13 +75,17 @@ export default class SideNav extends React.Component {
 
   render() {
     const { sideNavOn, openSideNav, closeSideNav } = this.props;
-    const { event, judgingTimeLeft } = this.state;
+    const { roles, event, judgingTimeLeft } = this.state;
     return (
       <nav className="top-nav">
         <ul id="top-nav__left">
           <li id="top-nav__menu">
             <button onClick={sideNavOn ? closeSideNav : openSideNav}>
-              <span>Menu</span>
+              <span>
+                {roles.filter(role => role.get("name") === "Admin").length
+                  ? "Menu"
+                  : "Teams"}
+              </span>
             </button>
           </li>
           <li>
