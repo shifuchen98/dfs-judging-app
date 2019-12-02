@@ -14,6 +14,39 @@ AV.Cloud.define("updateUser", async request => {
     throw new AV.Cloud.Error("You are not logged in.");
   }
 });
+AV.Cloud.define("correctPresentationScores", request => {
+  const eventJudgesQuery = new AV.Query("EventJudge");
+  eventJudgesQuery
+    .equalTo("event", request.params.event)
+    .limit(1000)
+    .find()
+    .then(eventJudges => {
+      const eventTeamsQuery = new AV.Query("EventTeam");
+      eventTeamsQuery
+        .equalTo("event", request.params.event)
+        .limit(1000)
+        .find()
+        .then(eventTeams => {
+          const presentationScores = [];
+          eventJudges.forEach(eventJudge => {
+            const presentationScoreACL = new AV.ACL();
+            presentationScoreACL.setReadAccess(eventJudge.get("user"), true);
+            presentationScoreACL.setWriteAccess(eventJudge.get("user"), true);
+            presentationScoreACL.setRoleReadAccess(new AV.Role("Admin"), true);
+            presentationScoreACL.setRoleWriteAccess(new AV.Role("Admin"), true);
+            eventTeams.forEach(eventTeam => {
+              const presentationScore = new AV.Object("PresentationScore");
+              presentationScore
+                .set("eventTeam", eventTeam)
+                .set("eventJudge", eventJudge)
+                .setACL(presentationScoreACL);
+              presentationScores.push(presentationScore);
+            });
+          });
+          AV.Object.saveAll(presentationScores);
+        });
+    });
+});
 AV.Cloud.beforeDelete("Event", request => {
   const eventJudgesQuery = new AV.Query("EventJudge");
   eventJudgesQuery

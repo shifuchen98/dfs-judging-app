@@ -18,6 +18,7 @@ export default class PresentationPage extends React.Component {
       this
     );
     this.inputPresentationScore = this.inputPresentationScore.bind(this);
+    this.correctData = this.correctData.bind(this);
   }
 
   componentDidMount() {
@@ -97,6 +98,19 @@ export default class PresentationPage extends React.Component {
         alert("Invalid value.");
       }
     }
+  }
+
+  correctData() {
+    const { match } = this.props;
+    AV.Cloud.rpc("correctPresentationScores", {
+      event: AV.Object.createWithoutData("Event", match.params.id)
+    })
+      .then(() => {
+        alert("Data correction request initiated.");
+      })
+      .catch(error => {
+        alert(error);
+      });
   }
 
   render() {
@@ -210,6 +224,19 @@ export default class PresentationPage extends React.Component {
                       </tbody>
                     </table>
                   )}
+                </div>
+              </section>
+            </div>
+            <div className="card">
+              <section className="fields">
+                <h1>Data Correction</h1>
+                <p>
+                  If a judge reports that they cannot find one or more teams
+                  when giving presentation scores, click on the button below to
+                  fix the issue.
+                </p>
+                <div className="field field--half">
+                  <button onClick={this.correctData}>Perform Correction</button>
                 </div>
               </section>
             </div>
