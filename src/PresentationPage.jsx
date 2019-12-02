@@ -171,31 +171,39 @@ export default class PresentationPage extends React.Component {
                           <th>Place</th>
                           <th>Team Name</th>
                           <th>Total Score</th>
+                          <th>Average Score</th>
                         </tr>
                       </thead>
                       <tbody>
                         {eventTeams
-                          .map(eventTeam => ({
-                            eventTeam,
-                            score: presentationScores
-                              .filter(
-                                presentationScore =>
-                                  presentationScore.get("eventTeam").id ===
-                                  eventTeam.id
-                              )
-                              .reduce(
-                                (accumulator, presentationScore) =>
-                                  accumulator +
-                                    presentationScore.get("score") || 0,
-                                0
-                              )
-                          }))
-                          .sort((a, b) => b.score - a.score)
+                          .map(eventTeam => {
+                            const presentationScoresWithScores = presentationScores.filter(
+                              presentationScore =>
+                                presentationScore.get("eventTeam").id ===
+                                  eventTeam.id &&
+                                presentationScore.get("score") !== undefined
+                            );
+                            const totalScore = presentationScoresWithScores.reduce(
+                              (accumulator, presentationScore) =>
+                                accumulator + presentationScore.get("score"),
+                              0
+                            );
+                            const averageScore = presentationScoresWithScores.length
+                              ? totalScore / presentationScoresWithScores.length
+                              : 0;
+                            return {
+                              eventTeam,
+                              totalScore,
+                              averageScore
+                            };
+                          })
+                          .sort((a, b) => b.averageScore - a.averageScore)
                           .map((place, index) => (
                             <tr key={place.eventTeam.id}>
                               <td>{index + 1}</td>
                               <td>{place.eventTeam.get("name")}</td>
-                              <td>{place.score}</td>
+                              <td>{place.totalScore}</td>
+                              <td>{place.averageScore.toFixed(2)}</td>
                             </tr>
                           ))}
                       </tbody>
