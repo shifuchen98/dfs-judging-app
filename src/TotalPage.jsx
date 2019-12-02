@@ -84,22 +84,16 @@ export default class TotalPage extends React.Component {
                 <section className="fields">
                   <h1>{eventTeam.get("name")}</h1>
                   <div className="field">
-                    <table className="condensed">
+                    <table>
                       <thead>
                         <tr>
-                          <th>
-                            <span>Judge</span>
-                          </th>
-                          {event.get("criteria").map(criterion => (
-                            <th key={criterion.name}>
-                              <span>
-                                {criterion.name} ({criterion.max})
-                              </span>
-                            </th>
-                          ))}
-                          <th>
-                            <span>Total</span>
-                          </th>
+                          <th>Judge</th>
+                          {["Design", "Functionality", "Theme"].map(
+                            category => (
+                              <th key={category}>{category}</th>
+                            )
+                          )}
+                          <th>Total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -116,19 +110,32 @@ export default class TotalPage extends React.Component {
                                   .get("user")
                                   .get("name")}
                               </td>
-                              {event.get("criteria").map(criterion => (
-                                <td key={criterion.name}>
-                                  {judgeTeamPair
-                                    .get("scores")
-                                    .reduce(
-                                      (accumulator, score) =>
-                                        score.name === criterion.name
-                                          ? accumulator + score.value
-                                          : accumulator,
-                                      null
-                                    )}
-                                </td>
-                              ))}
+                              {["Design", "Functionality", "Theme"].map(
+                                category => (
+                                  <td key={category}>
+                                    {event
+                                      .get("criteria")
+                                      .filter(
+                                        criterion =>
+                                          criterion.category === category
+                                      )
+                                      .reduce(
+                                        (accumulator, criterion) =>
+                                          accumulator +
+                                          judgeTeamPair
+                                            .get("scores")
+                                            .reduce(
+                                              (accumulator, score) =>
+                                                score.name === criterion.name
+                                                  ? accumulator + score.value
+                                                  : accumulator,
+                                              0
+                                            ),
+                                        0
+                                      )}
+                                  </td>
+                                )
+                              )}
                               <td>
                                 {event
                                   .get("criteria")

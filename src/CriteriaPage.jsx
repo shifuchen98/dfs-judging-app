@@ -11,10 +11,12 @@ export default class CriteriaPage extends React.Component {
     this.state = {
       event: AV.Object.createWithoutData("Event", match.params.id),
       name: "",
+      category: "Design",
       max: ""
     };
     this.fetchEvent = this.fetchEvent.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleCategoryChange = this.handleCategoryChange.bind(this);
     this.handleMaxChange = this.handleMaxChange.bind(this);
     this.addCriterion = this.addCriterion.bind(this);
     this.deleteCriterion = this.deleteCriterion.bind(this);
@@ -45,12 +47,16 @@ export default class CriteriaPage extends React.Component {
     this.setState({ name: e.target.value });
   }
 
+  handleCategoryChange(e) {
+    this.setState({ category: e.target.value });
+  }
+
   handleMaxChange(e) {
     this.setState({ max: e.target.value });
   }
 
   addCriterion(e) {
-    const { event, name, max } = this.state;
+    const { event, name, category, max } = this.state;
     let existing = false;
     event.get("criteria").forEach(criterion => {
       if (name === criterion.name) {
@@ -63,7 +69,7 @@ export default class CriteriaPage extends React.Component {
       event
         .set("criteria", [
           ...event.get("criteria"),
-          { name, max: parseInt(max) }
+          { name, category, max: parseInt(max) }
         ])
         .save()
         .then(event => {
@@ -99,7 +105,7 @@ export default class CriteriaPage extends React.Component {
   }
 
   render() {
-    const { event, name, max } = this.state;
+    const { event, name, category, max } = this.state;
     return (
       <div id="page">
         <div className="columns">
@@ -117,6 +123,22 @@ export default class CriteriaPage extends React.Component {
                         onChange={this.handleNameChange}
                         required
                       />
+                    </label>
+                  </div>
+                  <div className="field field--half">
+                    <label>
+                      <span>Category</span>
+                      <select
+                        value={category}
+                        onChange={this.handleCategoryChange}
+                        required
+                      >
+                        {["Design", "Functionality", "Theme"].map(category => (
+                          <option value={category} key={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
                     </label>
                   </div>
                   <div className="field field--half">
@@ -148,6 +170,7 @@ export default class CriteriaPage extends React.Component {
                     <thead>
                       <tr>
                         <th>Name</th>
+                        <th>Category</th>
                         <th>Max Score</th>
                         <th>Delete</th>
                       </tr>
@@ -156,6 +179,7 @@ export default class CriteriaPage extends React.Component {
                       {(event.get("criteria") || []).map((criterion, index) => (
                         <tr key={index}>
                           <td>{criterion.name}</td>
+                          <td>{criterion.category}</td>
                           <td>{criterion.max}</td>
                           <td>
                             <button
