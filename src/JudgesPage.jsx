@@ -376,7 +376,7 @@ export default class JudgesPage extends React.Component {
             </div>
             <div className="card">
               <section className="fields">
-                <h1>Existing Judge Accounts</h1>
+                <h1>Existing Judges ({eventJudges.length})</h1>
                 <div className="field field--half">
                   <label>
                     <span>Search</span>
@@ -391,7 +391,6 @@ export default class JudgesPage extends React.Component {
                   <table>
                     <thead>
                       <tr>
-                        <th>#</th>
                         <th>Email</th>
                         <th>Name</th>
                         <th>Password</th>
@@ -415,9 +414,8 @@ export default class JudgesPage extends React.Component {
                                 .includes(judgesSearch.toLowerCase())
                             : true
                         )
-                        .map((eventJudge, index) => (
+                        .map(eventJudge => (
                           <tr key={eventJudge.id}>
-                            <td>{index + 1}</td>
                             <td>{eventJudge.get("user").get("email")}</td>
                             <td>{eventJudge.get("user").get("name")}</td>
                             <td>

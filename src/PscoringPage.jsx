@@ -39,13 +39,19 @@ export default class PscoringPage extends React.Component {
       .find()
       .then(presentationScores => {
         this.setState({
-          scores: presentationScores.map(presentationScore => ({
-            presentationScore,
-            value:
-              presentationScore.get("score") === undefined
-                ? ""
-                : presentationScore.get("score")
-          }))
+          scores: presentationScores
+            .map(presentationScore => ({
+              presentationScore,
+              value:
+                presentationScore.get("score") === undefined
+                  ? ""
+                  : presentationScore.get("score")
+            }))
+            .sort(
+              (a, b) =>
+                a.presentationScore.get("eventTeam").get("place") -
+                b.presentationScore.get("eventTeam").get("place")
+            )
         });
       })
       .catch(error => {

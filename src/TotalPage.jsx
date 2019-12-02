@@ -44,6 +44,7 @@ export default class TotalPage extends React.Component {
     const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
       .equalTo("event", event)
+      .ascending("place")
       .limit(1000)
       .find()
       .then(eventTeams => {

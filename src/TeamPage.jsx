@@ -16,7 +16,8 @@ export default class TeamPage extends React.Component {
       school: "",
       schoolPrediction: "",
       appName: "",
-      appDescription: ""
+      appDescription: "",
+      place: ""
     };
     this.fetchEventTeam = this.fetchEventTeam.bind(this);
     this.handleTeamNameChange = this.handleTeamNameChange.bind(this);
@@ -26,6 +27,7 @@ export default class TeamPage extends React.Component {
     this.handleAppDescriptionChange = this.handleAppDescriptionChange.bind(
       this
     );
+    this.handlePlaceChange = this.handlePlaceChange.bind(this);
     this.updateEventTeam = this.updateEventTeam.bind(this);
   }
 
@@ -48,7 +50,8 @@ export default class TeamPage extends React.Component {
           teamName: eventTeam.get("name"),
           school: eventTeam.get("school"),
           appName: eventTeam.get("appName"),
-          appDescription: eventTeam.get("appDescription")
+          appDescription: eventTeam.get("appDescription"),
+          place: eventTeam.get("place")
         });
       })
       .catch(error => {
@@ -94,14 +97,26 @@ export default class TeamPage extends React.Component {
     this.setState({ appDescription: e.target.value });
   }
 
+  handlePlaceChange(e) {
+    this.setState({ place: e.target.value });
+  }
+
   updateEventTeam(e) {
     const { history, match } = this.props;
-    const { eventTeam, teamName, school, appName, appDescription } = this.state;
+    const {
+      eventTeam,
+      teamName,
+      school,
+      appName,
+      appDescription,
+      place
+    } = this.state;
     eventTeam
       .set("name", teamName)
       .set("school", school)
       .set("appName", appName)
       .set("appDescription", appDescription)
+      .set("place", parseInt(place))
       .save()
       .then(() => {
         alert("Team information updated.");
@@ -123,7 +138,8 @@ export default class TeamPage extends React.Component {
       school,
       schoolPrediction,
       appName,
-      appDescription
+      appDescription,
+      place
     } = this.state;
     return (
       <div id="page">
@@ -192,6 +208,19 @@ export default class TeamPage extends React.Component {
                         type="text"
                         value={appDescription}
                         onChange={this.handleAppDescriptionChange}
+                        required
+                      />
+                    </label>
+                  </div>
+                  <div className="field field--half">
+                    <label>
+                      <span>Place</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={place}
+                        onChange={this.handlePlaceChange}
                         required
                       />
                     </label>

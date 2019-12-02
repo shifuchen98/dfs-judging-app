@@ -59,6 +59,7 @@ export default class AssignPage extends React.Component {
     const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
       .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .ascending("place")
       .limit(1000)
       .find()
       .then(eventTeams => {

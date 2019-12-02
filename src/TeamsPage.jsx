@@ -59,6 +59,7 @@ export default class TeamsPage extends React.Component {
     const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
       .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .ascending("place")
       .limit(1000)
       .find()
       .then(eventTeams => {
@@ -326,7 +327,7 @@ export default class TeamsPage extends React.Component {
             </div>
             <div className="card">
               <section className="fields">
-                <h1>Existing Teams</h1>
+                <h1>Existing Teams ({eventTeams.length})</h1>
                 <div className="field field--half">
                   <label>
                     <span>Search</span>
@@ -341,11 +342,11 @@ export default class TeamsPage extends React.Component {
                   <table>
                     <thead>
                       <tr>
-                        <th>#</th>
                         <th>Team Name</th>
                         <th>School</th>
                         <th>App Name</th>
                         <th>App Description</th>
+                        <th>Place</th>
                         <th>Edit</th>
                         <th>Delete</th>
                       </tr>
@@ -364,13 +365,13 @@ export default class TeamsPage extends React.Component {
                                 .includes(teamsSearch.toLowerCase())
                             : true
                         )
-                        .map((eventTeam, index) => (
+                        .map(eventTeam => (
                           <tr key={eventTeam.id}>
-                            <td>{index + 1}</td>
                             <td>{eventTeam.get("name")}</td>
                             <td>{eventTeam.get("school")}</td>
                             <td>{eventTeam.get("appName")}</td>
                             <td>{eventTeam.get("appDescription")}</td>
+                            <td>{eventTeam.get("place")}</td>
                             <td>
                               <button
                                 onClick={() => {
