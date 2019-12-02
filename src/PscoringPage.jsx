@@ -41,7 +41,10 @@ export default class PscoringPage extends React.Component {
         this.setState({
           scores: presentationScores.map(presentationScore => ({
             presentationScore,
-            value: presentationScore.get("score") || ""
+            value:
+              presentationScore.get("score") === undefined
+                ? ""
+                : presentationScore.get("score")
           }))
         });
       })
@@ -108,17 +111,19 @@ export default class PscoringPage extends React.Component {
                             this.handleScoreChange(e, score.presentationScore);
                           }}
                           required
-                          disabled={score.presentationScore.get("score")}
+                          disabled={
+                            score.presentationScore.get("score") !== undefined
+                          }
                         ></input>
                       </label>
                     </div>
-                    {score.presentationScore.get("score") ? null : (
+                    {score.presentationScore.get("score") === undefined ? (
                       <div className="field">
                         <button type="submit" className="primary">
                           Submit
                         </button>
                       </div>
-                    )}
+                    ) : null}
                   </form>
                 </section>
               ))}

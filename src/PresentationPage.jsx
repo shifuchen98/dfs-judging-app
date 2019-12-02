@@ -17,6 +17,7 @@ export default class PresentationPage extends React.Component {
     this.handleCurrentEventTeamChange = this.handleCurrentEventTeamChange.bind(
       this
     );
+    this.inputPresentationScore = this.inputPresentationScore.bind(this);
   }
 
   componentDidMount() {
@@ -55,6 +56,7 @@ export default class PresentationPage extends React.Component {
       .matchesQuery("eventTeam", eventTeamsQuery)
       .include("eventJudge")
       .include("eventJudge.user")
+      .include("eventTeam")
       .limit(1000)
       .find()
       .then(presentationScores => {
@@ -67,6 +69,33 @@ export default class PresentationPage extends React.Component {
 
   handleCurrentEventTeamChange(e) {
     this.setState({ currentEventTeam: e.target.value });
+  }
+
+  inputPresentationScore(presentationScore) {
+    const newScore = window.prompt(
+      `Enter the presentation score ${presentationScore
+        .get("eventJudge")
+        .get("user")
+        .get("name")} is giving to ${presentationScore
+        .get("eventTeam")
+        .get("name")}:`
+    );
+    if (newScore !== null) {
+      if (parseInt(newScore) >= 0 && parseInt(newScore) <= 10) {
+        presentationScore
+          .set("score", parseInt(newScore))
+          .save()
+          .then(() => {
+            alert("Presentation score saved.");
+            this.fetchPresentationScores();
+          })
+          .catch(error => {
+            alert(error);
+          });
+      } else {
+        alert("Invalid value.");
+      }
+    }
   }
 
   render() {
@@ -98,6 +127,7 @@ export default class PresentationPage extends React.Component {
                         <tr>
                           <th>Judge</th>
                           <th>Score</th>
+                          <th>Input</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -116,6 +146,20 @@ export default class PresentationPage extends React.Component {
                                   .get("name")}
                               </td>
                               <td>{presentationScore.get("score")}</td>
+                              <td>
+                                {presentationScore.get("score") ===
+                                undefined ? (
+                                  <button
+                                    onClick={() => {
+                                      this.inputPresentationScore(
+                                        presentationScore
+                                      );
+                                    }}
+                                  >
+                                    Input
+                                  </button>
+                                ) : null}
+                              </td>
                             </tr>
                           ))}
                       </tbody>
