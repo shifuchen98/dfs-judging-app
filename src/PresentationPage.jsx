@@ -96,7 +96,9 @@ export default class PresentationPage extends React.Component {
         .get("name")}:`
     );
     if (newScore !== null) {
-      if (parseInt(newScore) >= 0 && parseInt(newScore) <= 10) {
+      if (!(parseInt(newScore) >= 0 && parseInt(newScore) <= 10)) {
+        alert("Invalid value.");
+      } else {
         presentationScore
           .set("score", parseInt(newScore))
           .save()
@@ -107,8 +109,6 @@ export default class PresentationPage extends React.Component {
           .catch(error => {
             alert(error);
           });
-      } else {
-        alert("Invalid value.");
       }
     }
   }

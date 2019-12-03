@@ -73,17 +73,21 @@ export default class PscoringPage extends React.Component {
   }
 
   submitScore(e, score) {
-    score.presentationScore
-      .set("score", parseInt(score.value))
-      .save()
-      .then(() => {
-        const { scores } = this.state;
-        alert("Score submitted.");
-        this.setState({ scores });
-      })
-      .catch(error => {
-        alert(error);
-      });
+    if (!(parseInt(score.value) >= 0 && parseInt(score.value) <= 10)) {
+      alert("Invalid value.");
+    } else {
+      score.presentationScore
+        .set("score", parseInt(score.value))
+        .save()
+        .then(() => {
+          const { scores } = this.state;
+          alert("Score submitted.");
+          this.setState({ scores });
+        })
+        .catch(error => {
+          alert(error);
+        });
+    }
     e.preventDefault();
   }
 
@@ -106,7 +110,10 @@ export default class PscoringPage extends React.Component {
                   >
                     <div className="field">
                       <label>
-                        <span>Presentation Score</span>
+                        <span>
+                          Presentation Score{" "}
+                          <strong style={{ color: "#0099ff" }}>(0-10)</strong>
+                        </span>
                         <input
                           type="number"
                           min="0"

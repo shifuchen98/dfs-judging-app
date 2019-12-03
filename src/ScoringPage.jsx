@@ -91,22 +91,52 @@ export default class ScoringPage extends React.Component {
 
   submitScores(e) {
     const { judgeTeamPair, scores } = this.state;
-    judgeTeamPair
-      .set(
-        "scores",
-        scores.map(score => ({
-          name: score.name,
-          value: parseInt(score.value)
-        }))
-      )
-      .save()
-      .then(() => {
-        alert("Scores submitted.");
-        this.fetchJudgeTeamPair();
-      })
-      .catch(error => {
-        alert(error);
-      });
+    const criteriaWithInvalidScores = [];
+    scores.forEach(score => {
+      judgeTeamPair
+        .get("eventTeam")
+        .get("event")
+        .get("criteria")
+        .forEach(criterion => {
+          if (score.name === criterion.name) {
+            if (
+              !(
+                parseInt(score.value) >= 0 &&
+                parseInt(score.value) <= criterion.max
+              )
+            ) {
+              criteriaWithInvalidScores.push(criterion.name);
+            }
+          }
+        });
+    });
+    if (criteriaWithInvalidScores.length) {
+      alert(
+        `Invalid value for the following ${
+          criteriaWithInvalidScores.length === 1 ? "criterion" : "criteria"
+        }:${criteriaWithInvalidScores.reduce(
+          (accumulator, criterion) => `${accumulator}\n${criterion}`,
+          ""
+        )}`
+      );
+    } else {
+      judgeTeamPair
+        .set(
+          "scores",
+          scores.map(score => ({
+            name: score.name,
+            value: parseInt(score.value)
+          }))
+        )
+        .save()
+        .then(() => {
+          alert("Scores submitted.");
+          this.fetchJudgeTeamPair();
+        })
+        .catch(error => {
+          alert(error);
+        });
+    }
     e.preventDefault();
   }
 
@@ -146,7 +176,12 @@ export default class ScoringPage extends React.Component {
                   ).map((criterion, index) => (
                     <div className="field" key={index}>
                       <label>
-                        <span>{`${criterion.name} (out of ${criterion.max})`}</span>
+                        <span>
+                          {criterion.name}{" "}
+                          <strong
+                            style={{ color: "#0099ff" }}
+                          >{`(0-${criterion.max})`}</strong>
+                        </span>
                         <input
                           type="number"
                           min="0"
