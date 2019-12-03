@@ -34,6 +34,7 @@ table.condensed > thead > tr > th {
 }
 table.condensed > thead > tr > th > span {
   display: inline-block;
+  white-space: nowrap;
   transform: rotate(-90deg) translateX(-12pt);
   transform-origin: 0 0;
 }
