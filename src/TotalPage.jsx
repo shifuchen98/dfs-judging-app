@@ -67,7 +67,20 @@ export default class TotalPage extends React.Component {
       .limit(1000)
       .find()
       .then(judgeTeamPairs => {
-        this.setState({ judgeTeamPairs });
+        this.setState({
+          judgeTeamPairs: judgeTeamPairs.sort((a, b) =>
+            a
+              .get("eventJudge")
+              .get("user")
+              .get("name") <
+            b
+              .get("eventJudge")
+              .get("user")
+              .get("name")
+              ? -1
+              : 1
+          )
+        });
       })
       .catch(error => {
         alert(error);

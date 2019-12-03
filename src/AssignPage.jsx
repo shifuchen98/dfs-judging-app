@@ -47,7 +47,14 @@ export default class AssignPage extends React.Component {
       .limit(1000)
       .find()
       .then(eventJudges => {
-        this.setState({ eventJudges }, this.fetchEventTeams);
+        this.setState(
+          {
+            eventJudges: eventJudges.sort((a, b) =>
+              a.get("user").get("name") < b.get("user").get("name") ? -1 : 1
+            )
+          },
+          this.fetchEventTeams
+        );
       })
       .catch(error => {
         alert(error);

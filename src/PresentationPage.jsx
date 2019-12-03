@@ -62,7 +62,20 @@ export default class PresentationPage extends React.Component {
       .limit(1000)
       .find()
       .then(presentationScores => {
-        this.setState({ presentationScores });
+        this.setState({
+          presentationScores: presentationScores.sort((a, b) =>
+            a
+              .get("eventJudge")
+              .get("user")
+              .get("name") <
+            b
+              .get("eventJudge")
+              .get("user")
+              .get("name")
+              ? -1
+              : 1
+          )
+        });
       })
       .catch(error => {
         alert(error);
