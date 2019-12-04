@@ -36,6 +36,7 @@ export default class SideNav extends React.Component {
   }
 
   updatePages() {
+    const { match } = this.props;
     const { roles, pages } = this.state;
     if (roles.filter(role => role.get("name") === "Admin").length) {
       this.setState({
@@ -80,59 +81,67 @@ export default class SideNav extends React.Component {
         ]
       });
     } else {
-      const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
-      judgeTeamPairsQuery
-        .include("eventTeam")
-        .limit(1000)
-        .find()
-        .then(judgeTeamPairs => {
-          this.setState({
-            pages: [
-              ...pages,
-              ...judgeTeamPairs
-                .map(judgeTeamPair => ({
-                  name: judgeTeamPair.get("eventTeam").get("name"),
-                  path: `scoring/${judgeTeamPair.id}`,
-                  judgeTeamPair
-                }))
-                .sort(
-                  (a, b) =>
-                    a.judgeTeamPair.get("eventTeam").get("place") -
-                    b.judgeTeamPair.get("eventTeam").get("place")
-                ),
-              {
-                name: "Presentation Scores",
-                path: "pscoring"
-              }
-            ]
-          });
-        })
-        .catch(error => {
-          alert(error);
-        });
-      judgeTeamPairsQuery
-        .subscribe()
-        .then(liveQuery => {
-          liveQuery.on("update", judgeTeamPair => {
-            const { pages } = this.state;
-            this.setState({
-              pages: pages.map(page =>
-                page.judgeTeamPair
-                  ? {
-                      name: page.name,
-                      path: page.path,
-                      judgeTeamPair:
-                        judgeTeamPair.id === page.judgeTeamPair.id
-                          ? judgeTeamPair
-                          : page.judgeTeamPair
-                    }
-                  : page
-              )
+      const eventJudgesQuery = new AV.Query("EventJudge");
+      eventJudgesQuery
+        .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+        .equalTo("user", AV.User.current())
+        .first()
+        .then(eventJudge => {
+          const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
+          judgeTeamPairsQuery
+            .equalTo("eventJudge", eventJudge)
+            .include("eventTeam")
+            .limit(1000)
+            .find()
+            .then(judgeTeamPairs => {
+              this.setState({
+                pages: [
+                  ...pages,
+                  ...judgeTeamPairs
+                    .map(judgeTeamPair => ({
+                      name: judgeTeamPair.get("eventTeam").get("name"),
+                      path: `scoring/${judgeTeamPair.id}`,
+                      judgeTeamPair
+                    }))
+                    .sort(
+                      (a, b) =>
+                        a.judgeTeamPair.get("eventTeam").get("place") -
+                        b.judgeTeamPair.get("eventTeam").get("place")
+                    ),
+                  {
+                    name: "Presentation Scores",
+                    path: "pscoring"
+                  }
+                ]
+              });
+            })
+            .catch(error => {
+              alert(error);
             });
-          });
-        })
-        .catch(error => {
-          alert(error);
+          judgeTeamPairsQuery
+            .subscribe()
+            .then(liveQuery => {
+              liveQuery.on("update", judgeTeamPair => {
+                const { pages } = this.state;
+                this.setState({
+                  pages: pages.map(page =>
+                    page.judgeTeamPair
+                      ? {
+                          name: page.name,
+                          path: page.path,
+                          judgeTeamPair:
+                            judgeTeamPair.id === page.judgeTeamPair.id
+                              ? judgeTeamPair
+                              : page.judgeTeamPair
+                        }
+                      : page
+                  )
+                });
+              });
+            })
+            .catch(error => {
+              alert(error);
+            });
         });
     }
   }
