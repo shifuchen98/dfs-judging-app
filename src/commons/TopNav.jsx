@@ -41,10 +41,22 @@ export default class SideNav extends React.Component {
 
   fetchEvent() {
     const { event } = this.state;
-    event
-      .fetch()
+    const eventsQuery = new AV.Query("Event");
+    eventsQuery
+      .equalTo("objectId", event.id)
+      .first()
       .then(event => {
         this.setState({ event });
+      })
+      .catch(error => {
+        alert(error);
+      });
+    eventsQuery
+      .subscribe()
+      .then(liveQuery => {
+        liveQuery.on("update", event => {
+          this.setState({ event });
+        });
       })
       .catch(error => {
         alert(error);
