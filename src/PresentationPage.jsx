@@ -244,9 +244,9 @@ export default class PresentationPage extends React.Component {
               <section className="fields">
                 <h1>Data Correction</h1>
                 <p>
-                  If a judge reports that they cannot find one or more teams
-                  when giving presentation scores, click on the button below to
-                  fix the issue.
+                  If one or more judges report that they cannot find one or more
+                  teams when giving presentation scores, click on the button
+                  below to fix the issue.
                 </p>
                 <div className="field field--half">
                   <button onClick={this.correctData}>Perform Correction</button>
