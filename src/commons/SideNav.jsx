@@ -94,26 +94,76 @@ export default class SideNav extends React.Component {
             .limit(1000)
             .find()
             .then(judgeTeamPairs => {
-              this.setState({
-                pages: [
-                  ...pages,
-                  ...judgeTeamPairs
-                    .map(judgeTeamPair => ({
-                      name: judgeTeamPair.get("eventTeam").get("name"),
-                      path: `scoring/${judgeTeamPair.id}`,
-                      judgeTeamPair
-                    }))
-                    .sort(
-                      (a, b) =>
-                        a.judgeTeamPair.get("eventTeam").get("place") -
-                        b.judgeTeamPair.get("eventTeam").get("place")
-                    ),
-                  {
-                    name: "Presentation Scores",
-                    path: "pscoring"
-                  }
-                ]
-              });
+              const presentationScoresQuery = new AV.Query("PresentationScore");
+              presentationScoresQuery
+                .equalTo("eventJudge", eventJudge)
+                .doesNotExist("score")
+                .count()
+                .then(presentationScoresLeft => {
+                  this.setState({
+                    pages: [
+                      ...pages,
+                      ...judgeTeamPairs
+                        .sort(
+                          (a, b) =>
+                            a.get("eventTeam").get("place") -
+                            b.get("eventTeam").get("place")
+                        )
+                        .map(judgeTeamPair => ({
+                          name: judgeTeamPair.get("eventTeam").get("name"),
+                          path: `scoring/${judgeTeamPair.id}`,
+                          judgingCompleted: judgeTeamPair.get("scores").length
+                            ? true
+                            : false
+                        })),
+                      {
+                        name: "Presentation Scores",
+                        path: "pscoring",
+                        presentationScoresLeft
+                      }
+                    ]
+                  });
+                })
+                .catch(error => {
+                  alert(error);
+                });
+              presentationScoresQuery
+                .subscribe()
+                .then(liveQuery => {
+                  liveQuery.on("enter", () => {
+                    const { pages } = this.state;
+                    this.setState({
+                      pages: pages.map(page =>
+                        page.path === "pscoring"
+                          ? {
+                              name: page.name,
+                              path: page.path,
+                              presentationScoresLeft:
+                                page.presentationScoresLeft + 1
+                            }
+                          : page
+                      )
+                    });
+                  });
+                  liveQuery.on("leave", () => {
+                    const { pages } = this.state;
+                    this.setState({
+                      pages: pages.map(page =>
+                        page.path === "pscoring"
+                          ? {
+                              name: page.name,
+                              path: page.path,
+                              presentationScoresLeft:
+                                page.presentationScoresLeft - 1
+                            }
+                          : page
+                      )
+                    });
+                  });
+                })
+                .catch(error => {
+                  alert(error);
+                });
             })
             .catch(error => {
               alert(error);
@@ -125,14 +175,13 @@ export default class SideNav extends React.Component {
                 const { pages } = this.state;
                 this.setState({
                   pages: pages.map(page =>
-                    page.judgeTeamPair
+                    page.path === `scoring/${judgeTeamPair.id}`
                       ? {
                           name: page.name,
                           path: page.path,
-                          judgeTeamPair:
-                            judgeTeamPair.id === page.judgeTeamPair.id
-                              ? judgeTeamPair
-                              : page.judgeTeamPair
+                          judgingCompleted: judgeTeamPair.get("scores").length
+                            ? true
+                            : false
                         }
                       : page
                   )
@@ -163,16 +212,30 @@ export default class SideNav extends React.Component {
               >
                 <span>
                   <span>{page.name}</span>
-                  {page.judgeTeamPair ? (
+                  {"judgingCompleted" in page ? (
                     <span
                       style={{ float: "right" }}
                       aria-label={
-                        page.judgeTeamPair.get("scores").length
-                          ? "Scored."
-                          : "Not scored."
+                        page.judgingCompleted ? "Scored." : "Not scored."
                       }
                     >
-                      {page.judgeTeamPair.get("scores").length ? (
+                      {page.judgingCompleted ? (
+                        <FontAwesomeIcon icon={faCheckCircle} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCircle} />
+                      )}
+                    </span>
+                  ) : null}
+                  {"presentationScoresLeft" in page ? (
+                    <span
+                      style={{ float: "right" }}
+                      aria-label={
+                        page.presentationScoresLeft === 0
+                          ? "Completed."
+                          : "Not completed."
+                      }
+                    >
+                      {page.presentationScoresLeft === 0 ? (
                         <FontAwesomeIcon icon={faCheckCircle} />
                       ) : (
                         <FontAwesomeIcon icon={faCircle} />

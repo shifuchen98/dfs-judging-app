@@ -26,33 +26,38 @@ export default class PscoringPage extends React.Component {
 
   fetchPresentationScores() {
     const { match } = this.props;
-    const eventTeamsQuery = new AV.Query("EventTeam");
-    eventTeamsQuery.equalTo(
-      "event",
-      AV.Object.createWithoutData("Event", match.params.id)
-    );
-    const presentationScoresQuery = new AV.Query("PresentationScore");
-    presentationScoresQuery
-      .matchesQuery("eventTeam", eventTeamsQuery)
-      .include("eventTeam")
-      .limit(1000)
-      .find()
-      .then(presentationScores => {
-        this.setState({
-          scores: presentationScores
-            .map(presentationScore => ({
-              presentationScore,
-              value:
-                presentationScore.get("score") === undefined
-                  ? ""
-                  : presentationScore.get("score")
-            }))
-            .sort(
-              (a, b) =>
-                a.presentationScore.get("eventTeam").get("place") -
-                b.presentationScore.get("eventTeam").get("place")
-            )
-        });
+    const eventJudgesQuery = new AV.Query("EventJudge");
+    eventJudgesQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .equalTo("user", AV.User.current())
+      .first()
+      .then(eventJudge => {
+        const presentationScoresQuery = new AV.Query("PresentationScore");
+        presentationScoresQuery
+          .equalTo("eventJudge", eventJudge)
+          .include("eventTeam")
+          .limit(1000)
+          .find()
+          .then(presentationScores => {
+            this.setState({
+              scores: presentationScores
+                .sort(
+                  (a, b) =>
+                    a.get("eventTeam").get("place") -
+                    b.get("eventTeam").get("place")
+                )
+                .map(presentationScore => ({
+                  presentationScore,
+                  value:
+                    presentationScore.get("score") === undefined
+                      ? ""
+                      : presentationScore.get("score")
+                }))
+            });
+          })
+          .catch(error => {
+            alert(error);
+          });
       })
       .catch(error => {
         alert(error);
