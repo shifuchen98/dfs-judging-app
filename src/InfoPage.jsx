@@ -31,6 +31,9 @@ export default class InfoPage extends React.Component {
         .getRoles()
         .then(roles => {
           this.setState({ roles }, this.fetchEvent);
+        })
+        .catch(error => {
+          alert(error);
         });
     }
   }

@@ -31,6 +31,9 @@ export default class SideNav extends React.Component {
         .getRoles()
         .then(roles => {
           this.setState({ roles }, this.updatePages);
+        })
+        .catch(error => {
+          alert(error);
         });
     }
   }
@@ -87,22 +90,27 @@ export default class SideNav extends React.Component {
         .equalTo("user", AV.User.current())
         .first()
         .then(eventJudge => {
-          const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
-          judgeTeamPairsQuery
+          const presentationScoresQuery = new AV.Query("PresentationScore");
+          presentationScoresQuery
             .equalTo("eventJudge", eventJudge)
-            .include("eventTeam")
-            .limit(1000)
-            .find()
-            .then(judgeTeamPairs => {
-              const presentationScoresQuery = new AV.Query("PresentationScore");
-              presentationScoresQuery
+            .doesNotExist("score")
+            .count()
+            .then(presentationScoresLeft => {
+              const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
+              judgeTeamPairsQuery
                 .equalTo("eventJudge", eventJudge)
-                .doesNotExist("score")
-                .count()
-                .then(presentationScoresLeft => {
+                .include("eventTeam")
+                .limit(1000)
+                .find()
+                .then(judgeTeamPairs => {
                   this.setState({
                     pages: [
                       ...pages,
+                      {
+                        name: "Presentation Scores",
+                        path: "pscoring",
+                        presentationScoresLeft
+                      },
                       ...judgeTeamPairs
                         .sort(
                           (a, b) =>
@@ -115,46 +123,28 @@ export default class SideNav extends React.Component {
                           judgingCompleted: judgeTeamPair.get("scores").length
                             ? true
                             : false
-                        })),
-                      {
-                        name: "Presentation Scores",
-                        path: "pscoring",
-                        presentationScoresLeft
-                      }
+                        }))
                     ]
                   });
                 })
                 .catch(error => {
                   alert(error);
                 });
-              presentationScoresQuery
+              judgeTeamPairsQuery
                 .subscribe()
                 .then(liveQuery => {
-                  liveQuery.on("enter", () => {
+                  liveQuery.on("update", judgeTeamPair => {
                     const { pages } = this.state;
                     this.setState({
                       pages: pages.map(page =>
-                        page.path === "pscoring"
+                        page.path === `scoring/${judgeTeamPair.id}`
                           ? {
                               name: page.name,
                               path: page.path,
-                              presentationScoresLeft:
-                                page.presentationScoresLeft + 1
-                            }
-                          : page
-                      )
-                    });
-                  });
-                  liveQuery.on("leave", () => {
-                    const { pages } = this.state;
-                    this.setState({
-                      pages: pages.map(page =>
-                        page.path === "pscoring"
-                          ? {
-                              name: page.name,
-                              path: page.path,
-                              presentationScoresLeft:
-                                page.presentationScoresLeft - 1
+                              judgingCompleted: judgeTeamPair.get("scores")
+                                .length
+                                ? true
+                                : false
                             }
                           : page
                       )
@@ -168,20 +158,34 @@ export default class SideNav extends React.Component {
             .catch(error => {
               alert(error);
             });
-          judgeTeamPairsQuery
+          presentationScoresQuery
             .subscribe()
             .then(liveQuery => {
-              liveQuery.on("update", judgeTeamPair => {
+              liveQuery.on("enter", () => {
                 const { pages } = this.state;
                 this.setState({
                   pages: pages.map(page =>
-                    page.path === `scoring/${judgeTeamPair.id}`
+                    page.path === "pscoring"
                       ? {
                           name: page.name,
                           path: page.path,
-                          judgingCompleted: judgeTeamPair.get("scores").length
-                            ? true
-                            : false
+                          presentationScoresLeft:
+                            page.presentationScoresLeft + 1
+                        }
+                      : page
+                  )
+                });
+              });
+              liveQuery.on("leave", () => {
+                const { pages } = this.state;
+                this.setState({
+                  pages: pages.map(page =>
+                    page.path === "pscoring"
+                      ? {
+                          name: page.name,
+                          path: page.path,
+                          presentationScoresLeft:
+                            page.presentationScoresLeft - 1
                         }
                       : page
                   )
@@ -191,6 +195,9 @@ export default class SideNav extends React.Component {
             .catch(error => {
               alert(error);
             });
+        })
+        .catch(error => {
+          alert(error);
         });
     }
   }
@@ -212,20 +219,6 @@ export default class SideNav extends React.Component {
               >
                 <span>
                   <span>{page.name}</span>
-                  {"judgingCompleted" in page ? (
-                    <span
-                      style={{ float: "right" }}
-                      aria-label={
-                        page.judgingCompleted ? "Scored." : "Not scored."
-                      }
-                    >
-                      {page.judgingCompleted ? (
-                        <FontAwesomeIcon icon={faCheckCircle} />
-                      ) : (
-                        <FontAwesomeIcon icon={faCircle} />
-                      )}
-                    </span>
-                  ) : null}
                   {"presentationScoresLeft" in page ? (
                     <span
                       style={{ float: "right" }}
@@ -236,6 +229,20 @@ export default class SideNav extends React.Component {
                       }
                     >
                       {page.presentationScoresLeft === 0 ? (
+                        <FontAwesomeIcon icon={faCheckCircle} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCircle} />
+                      )}
+                    </span>
+                  ) : null}
+                  {"judgingCompleted" in page ? (
+                    <span
+                      style={{ float: "right" }}
+                      aria-label={
+                        page.judgingCompleted ? "Scored." : "Not scored."
+                      }
+                    >
+                      {page.judgingCompleted ? (
                         <FontAwesomeIcon icon={faCheckCircle} />
                       ) : (
                         <FontAwesomeIcon icon={faCircle} />

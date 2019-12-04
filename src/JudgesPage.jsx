@@ -112,31 +112,38 @@ export default class JudgesPage extends React.Component {
       .first()
       .then(user => {
         if (user) {
-          user.getRoles().then(roles => {
-            if (roles.filter(role => role.get("name") === "Admin").length) {
-              alert("An admin cannot be added as a judge.");
-            } else {
-              const eventJudge = new AV.Object("EventJudge");
-              eventJudge
-                .set("user", user)
-                .set(
-                  "event",
-                  AV.Object.createWithoutData("Event", match.params.id)
-                )
-                .save()
-                .then(() => {
-                  alert("Judge successfully added");
-                  this.setState({ judgeEmail: "" }, this.fetchEventJudges);
-                })
-                .catch(error => {
-                  if (error.code === 137) {
-                    alert("This judge is already added to the current event.");
-                  } else {
-                    alert(error);
-                  }
-                });
-            }
-          });
+          user
+            .getRoles()
+            .then(roles => {
+              if (roles.filter(role => role.get("name") === "Admin").length) {
+                alert("An admin cannot be added as a judge.");
+              } else {
+                const eventJudge = new AV.Object("EventJudge");
+                eventJudge
+                  .set("user", user)
+                  .set(
+                    "event",
+                    AV.Object.createWithoutData("Event", match.params.id)
+                  )
+                  .save()
+                  .then(() => {
+                    alert("Judge successfully added");
+                    this.setState({ judgeEmail: "" }, this.fetchEventJudges);
+                  })
+                  .catch(error => {
+                    if (error.code === 137) {
+                      alert(
+                        "This judge is already added to the current event."
+                      );
+                    } else {
+                      alert(error);
+                    }
+                  });
+              }
+            })
+            .catch(error => {
+              alert(error);
+            });
         } else {
           const judgeName = prompt(
             "This is the first time this judge attends DFS. Please provide the name of the judge."

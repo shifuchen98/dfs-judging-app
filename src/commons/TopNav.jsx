@@ -31,6 +31,9 @@ export default class SideNav extends React.Component {
             this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
             this.fetchEvent();
           });
+        })
+        .catch(error => {
+          alert(error);
         });
     }
   }

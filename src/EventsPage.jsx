@@ -36,6 +36,9 @@ export default class EventsPage extends React.Component {
         .getRoles()
         .then(roles => {
           this.setState({ roles }, this.fetchEvents);
+        })
+        .catch(error => {
+          alert(error);
         });
     }
   }
