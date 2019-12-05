@@ -33,28 +33,6 @@ AV.Cloud.beforeDelete("Event", request => {
       });
     });
 });
-AV.Cloud.afterSave("EventJudge", request => {
-  const presentationScoreACL = new AV.ACL();
-  presentationScoreACL.setReadAccess(request.object.get("user"), true);
-  presentationScoreACL.setWriteAccess(request.object.get("user"), true);
-  presentationScoreACL.setRoleReadAccess(new AV.Role("Admin"), true);
-  presentationScoreACL.setRoleWriteAccess(new AV.Role("Admin"), true);
-  const eventTeamsQuery = new AV.Query("EventTeam");
-  eventTeamsQuery
-    .equalTo("event", request.object.get("event"))
-    .limit(1000)
-    .find()
-    .then(eventTeams => {
-      AV.Object.saveAll(
-        eventTeams.map(eventTeam =>
-          new AV.Object("PresentationScore")
-            .set("eventTeam", eventTeam)
-            .set("eventJudge", request.object)
-            .setACL(presentationScoreACL)
-        )
-      );
-    });
-});
 AV.Cloud.beforeDelete("EventJudge", request => {
   const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
   judgeTeamPairsQuery
@@ -70,28 +48,6 @@ AV.Cloud.beforeDelete("EventJudge", request => {
         .then(presentationScores => {
           AV.Object.destroyAll([...judgeTeamPairs, ...presentationScores]);
         });
-    });
-});
-AV.Cloud.afterSave("EventTeam", request => {
-  const eventJudgesQuery = new AV.Query("EventJudge");
-  eventJudgesQuery
-    .equalTo("event", request.object.get("event"))
-    .limit(1000)
-    .find()
-    .then(eventJudges => {
-      AV.Object.saveAll(
-        eventJudges.map(eventJudge => {
-          const presentationScoreACL = new AV.ACL();
-          presentationScoreACL.setReadAccess(eventJudge.get("user"), true);
-          presentationScoreACL.setWriteAccess(eventJudge.get("user"), true);
-          presentationScoreACL.setRoleReadAccess(new AV.Role("Admin"), true);
-          presentationScoreACL.setRoleWriteAccess(new AV.Role("Admin"), true);
-          return new AV.Object("PresentationScore")
-            .set("eventJudge", eventJudge)
-            .set("eventTeam", request.object)
-            .setACL(presentationScoreACL);
-        })
-      );
     });
 });
 AV.Cloud.beforeDelete("EventTeam", request => {

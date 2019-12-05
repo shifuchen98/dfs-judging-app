@@ -34,6 +34,7 @@ export default class TeamsPage extends React.Component {
     this.handleTextToBeImportedChange = this.handleTextToBeImportedChange.bind(
       this
     );
+    this.createPresentationScores = this.createPresentationScores.bind(this);
     this.createEventTeam = this.createEventTeam.bind(this);
     this.editEventTeam = this.editEventTeam.bind(this);
     this.deleteEventTeam = this.deleteEventTeam.bind(this);
@@ -116,6 +117,46 @@ export default class TeamsPage extends React.Component {
     this.setState({ textToBeImported: e.target.value });
   }
 
+  createPresentationScores(eventTeams, callback) {
+    const { match } = this.props;
+    const eventJudgesQuery = new AV.Query("EventJudge");
+    eventJudgesQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .limit(1000)
+      .find()
+      .then(eventJudges => {
+        AV.Object.saveAll(
+          eventTeams.reduce((accumulator, eventTeam) => {
+            const presentationScores = eventJudges.map(eventJudge => {
+              const presentationScoreACL = new AV.ACL();
+              presentationScoreACL.setReadAccess(eventJudge.get("user"), true);
+              presentationScoreACL.setWriteAccess(eventJudge.get("user"), true);
+              presentationScoreACL.setRoleReadAccess(
+                new AV.Role("Admin"),
+                true
+              );
+              presentationScoreACL.setRoleWriteAccess(
+                new AV.Role("Admin"),
+                true
+              );
+              return new AV.Object("PresentationScore")
+                .set("eventJudge", eventJudge)
+                .set("eventTeam", eventTeam)
+                .setACL(presentationScoreACL);
+            });
+            return [...accumulator, ...presentationScores];
+          }, [])
+        )
+          .then(callback)
+          .catch(error => {
+            alert(error);
+          });
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
   createEventTeam(e) {
     const { match } = this.props;
     const { teamName, school, appName, appDescription } = this.state;
@@ -128,11 +169,13 @@ export default class TeamsPage extends React.Component {
       .set("appDescription", appDescription)
       .save()
       .then(() => {
-        alert("Team successfully added.");
-        this.setState(
-          { teamName: "", school: "", appName: "", appDescription: "" },
-          this.fetchEventTeams
-        );
+        this.createPresentationScores([eventTeam], () => {
+          alert("Team successfully added.");
+          this.setState(
+            { teamName: "", school: "", appName: "", appDescription: "" },
+            this.fetchEventTeams
+          );
+        });
       })
       .catch(error => {
         if (error.code === 137) {
@@ -201,7 +244,10 @@ export default class TeamsPage extends React.Component {
   importFromText(e) {
     let { textToBeImported } = this.state;
     textToBeImported = textToBeImported.trim();
-    if (!textToBeImported.startsWith("name,school,appName,appDescription\n")) {
+    if (
+      !textToBeImported.startsWith("name,school,appName,appDescription\n") &&
+      !textToBeImported.startsWith("name\tschool\tappName\tappDescription\n")
+    ) {
       textToBeImported = `name,school,appName,appDescription\n${textToBeImported}`;
     }
     Papa.parse(textToBeImported, {
@@ -215,24 +261,27 @@ export default class TeamsPage extends React.Component {
 
   importFromJson(jsonToBeImported) {
     const { match } = this.props;
-    AV.Object.saveAll(
-      jsonToBeImported.map(row =>
-        new AV.Object("EventTeam")
-          .set("event", AV.Object.createWithoutData("Event", match.params.id))
-          .set("name", row.name.trim())
-          .set("school", row.school.trim())
-          .set("appName", row.appName.trim())
-          .set("appDescription", row.appDescription.trim())
-      )
-    )
+    const eventTeams = jsonToBeImported.map(row =>
+      new AV.Object("EventTeam")
+        .set("event", AV.Object.createWithoutData("Event", match.params.id))
+        .set("name", row.name.trim())
+        .set("school", row.school.trim())
+        .set("appName", row.appName.trim())
+        .set("appDescription", row.appDescription.trim())
+    );
+    AV.Object.saveAll(eventTeams)
       .then(() => {
-        alert("Teams successfully imported.");
-        this.setState({ textToBeImported: "" }, this.fetchEventTeams);
+        this.createPresentationScores(eventTeams, () => {
+          alert("Teams successfully imported.");
+          this.setState({ textToBeImported: "" }, this.fetchEventTeams);
+        });
       })
       .catch(error => {
         if (error.code === 137) {
-          alert("Teams successfully imported with duplicate teams skipped.");
-          this.setState({ textToBeImported: "" }, this.fetchEventTeams);
+          this.createPresentationScores(eventTeams, () => {
+            alert("Teams successfully imported with duplicate teams skipped.");
+            this.setState({ textToBeImported: "" }, this.fetchEventTeams);
+          });
         } else {
           alert(error);
         }

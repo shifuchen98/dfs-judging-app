@@ -27,6 +27,7 @@ export default class JudgesPage extends React.Component {
     this.handleTextToBeImportedChange = this.handleTextToBeImportedChange.bind(
       this
     );
+    this.createPresentationScores = this.createPresentationScores.bind(this);
     this.addEventJudge = this.addEventJudge.bind(this);
     this.editEventJudge = this.editEventJudge.bind(this);
     this.deleteEventJudge = this.deleteEventJudge.bind(this);
@@ -103,6 +104,40 @@ export default class JudgesPage extends React.Component {
     this.setState({ textToBeImported: e.target.value });
   }
 
+  createPresentationScores(eventJudges, callback) {
+    const { match } = this.props;
+    const eventTeamsQuery = new AV.Query("EventTeam");
+    eventTeamsQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .limit(1000)
+      .find()
+      .then(eventTeams => {
+        AV.Object.saveAll(
+          eventJudges.reduce((accumulator, eventJudge) => {
+            const presentationScoreACL = new AV.ACL();
+            presentationScoreACL.setReadAccess(eventJudge.get("user"), true);
+            presentationScoreACL.setWriteAccess(eventJudge.get("user"), true);
+            presentationScoreACL.setRoleReadAccess(new AV.Role("Admin"), true);
+            presentationScoreACL.setRoleWriteAccess(new AV.Role("Admin"), true);
+            const presentationScores = eventTeams.map(eventTeam =>
+              new AV.Object("PresentationScore")
+                .set("eventJudge", eventJudge)
+                .set("eventTeam", eventTeam)
+                .setACL(presentationScoreACL)
+            );
+            return [...accumulator, ...presentationScores];
+          }, [])
+        )
+          .then(callback)
+          .catch(error => {
+            alert(error);
+          });
+      })
+      .catch(error => {
+        alert(error);
+      });
+  }
+
   addEventJudge(e) {
     const { match } = this.props;
     const { judgeEmail } = this.state;
@@ -170,8 +205,10 @@ export default class JudgesPage extends React.Component {
               )
               .save()
               .then(() => {
-                alert("Judge successfully added");
-                this.setState({ judgeEmail: "" }, this.fetchEventJudges);
+                this.createPresentationScores([eventJudge], () => {
+                  alert("Judge successfully added");
+                  this.setState({ judgeEmail: "" }, this.fetchEventJudges);
+                });
               })
               .catch(error => {
                 alert(error);
@@ -250,7 +287,10 @@ export default class JudgesPage extends React.Component {
   importFromText(e) {
     let { textToBeImported } = this.state;
     textToBeImported = textToBeImported.trim();
-    if (!textToBeImported.startsWith("email,name\n")) {
+    if (
+      !textToBeImported.startsWith("email,name\n") &&
+      !textToBeImported.startsWith("email\tname\n")
+    ) {
       textToBeImported = `email,name\n${textToBeImported}`;
     }
     Papa.parse(textToBeImported, {
@@ -315,15 +355,19 @@ export default class JudgesPage extends React.Component {
       .then(eventJudges => {
         AV.Object.saveAll(eventJudges)
           .then(() => {
-            alert("Judges successfully imported.");
-            this.setState({ textToBeImported: "" }, this.fetchEventJudges);
+            this.createPresentationScores(eventJudges, () => {
+              alert("Judges successfully imported.");
+              this.setState({ textToBeImported: "" }, this.fetchEventJudges);
+            });
           })
           .catch(error => {
             if (error.code === 137) {
-              alert(
-                "Judges successfully imported with existing judges skipped."
-              );
-              this.setState({ textImportImport: "" }, this.fetchEventJudges);
+              this.createPresentationScores(eventJudges, () => {
+                alert(
+                  "Judges successfully imported with existing judges skipped."
+                );
+                this.setState({ textToBeImported: "" }, this.fetchEventJudges);
+              });
             } else {
               alert(error);
             }
