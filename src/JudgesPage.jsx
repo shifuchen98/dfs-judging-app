@@ -79,7 +79,7 @@ export default class JudgesPage extends React.Component {
       if (judgeEmail) {
         const usersQuery = new AV.Query("_User");
         usersQuery
-          .startsWith("email", judgeEmail)
+          .startsWith("email", judgeEmail.toLowerCase())
           .exists("judgePassword")
           .first()
           .then(user => {
@@ -143,7 +143,7 @@ export default class JudgesPage extends React.Component {
     const { judgeEmail } = this.state;
     const usersQuery = new AV.Query("_User");
     usersQuery
-      .equalTo("email", judgeEmail)
+      .equalTo("email", judgeEmail.toLowerCase())
       .first()
       .then(user => {
         if (user) {
@@ -191,8 +191,8 @@ export default class JudgesPage extends React.Component {
             judgePassword.set("password", password);
             const user = new AV.Object("_User");
             user
-              .set("email", judgeEmail)
-              .set("username", judgeEmail)
+              .set("email", judgeEmail.toLowerCase())
+              .set("username", judgeEmail.toLowerCase())
               .set("name", judgeName)
               .set("password", password)
               .set("judgePassword", judgePassword);
@@ -307,7 +307,7 @@ export default class JudgesPage extends React.Component {
     const addEventJudge = async row => {
       try {
         const usersQuery = new AV.Query("_User");
-        usersQuery.equalTo("email", row.email.trim());
+        usersQuery.equalTo("email", row.email.trim().toLowerCase());
         const user = await usersQuery.first();
         if (user) {
           const roles = await user.getRoles();
@@ -330,8 +330,8 @@ export default class JudgesPage extends React.Component {
           judgePassword.set("password", password);
           const user = new AV.Object("_User");
           user
-            .set("email", row.email.trim())
-            .set("username", row.email.trim())
+            .set("email", row.email.trim().toLowerCase())
+            .set("username", row.email.trim().toLowerCase())
             .set("name", row.name.trim())
             .set("password", password)
             .set("judgePassword", judgePassword);

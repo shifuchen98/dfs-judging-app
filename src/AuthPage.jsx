@@ -34,7 +34,7 @@ export default class AuthPage extends React.Component {
   go(e) {
     const { email, password } = this.state;
     const { history } = this.props;
-    AV.User.logIn(email, password)
+    AV.User.logIn(email.toLowerCase(), password)
       .then(() => {
         history.push("/events");
       })
