@@ -120,22 +120,30 @@ export default class ScoringPage extends React.Component {
         )}`
       );
     } else {
-      judgeTeamPair
-        .set(
-          "scores",
-          scores.map(score => ({
-            name: score.name,
-            value: parseInt(score.value)
-          }))
+      if (
+        window.confirm(
+          `Are you sure you want to submit scores for ${judgeTeamPair
+            .get("eventTeam")
+            .get("name")}?`
         )
-        .save()
-        .then(() => {
-          alert("Scores submitted.");
-          this.fetchJudgeTeamPair();
-        })
-        .catch(error => {
-          alert(error);
-        });
+      ) {
+        judgeTeamPair
+          .set(
+            "scores",
+            scores.map(score => ({
+              name: score.name,
+              value: parseInt(score.value)
+            }))
+          )
+          .save()
+          .then(() => {
+            alert("Scores submitted.");
+            this.fetchJudgeTeamPair();
+          })
+          .catch(error => {
+            alert(error);
+          });
+      }
     }
     e.preventDefault();
   }
