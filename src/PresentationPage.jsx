@@ -115,14 +115,57 @@ export default class PresentationPage extends React.Component {
 
   correctData() {
     const { match } = this.props;
-    AV.Cloud.rpc("correctPresentationScores", {
-      event: AV.Object.createWithoutData("Event", match.params.id)
-    })
-      .then(() => {
-        alert("Data correction request initiated.");
-      })
-      .catch(error => {
-        alert(error);
+    const eventJudgesQuery = new AV.Query("EventJudge");
+    eventJudgesQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .limit(1000)
+      .find()
+      .then(eventJudges => {
+        const eventTeamsQuery = new AV.Query("EventTeam");
+        eventTeamsQuery
+          .equalTo(
+            "event",
+            AV.Object.createWithoutData("Event", match.params.id)
+          )
+          .limit(1000)
+          .find()
+          .then(eventTeams => {
+            const presentationScores = [];
+            eventJudges.forEach(eventJudge => {
+              const presentationScoreACL = new AV.ACL();
+              presentationScoreACL.setReadAccess(eventJudge.get("user"), true);
+              presentationScoreACL.setWriteAccess(eventJudge.get("user"), true);
+              presentationScoreACL.setRoleReadAccess(
+                new AV.Role("Admin"),
+                true
+              );
+              presentationScoreACL.setRoleWriteAccess(
+                new AV.Role("Admin"),
+                true
+              );
+              eventTeams.forEach(eventTeam => {
+                const presentationScore = new AV.Object("PresentationScore");
+                presentationScore
+                  .set("eventTeam", eventTeam)
+                  .set("eventJudge", eventJudge)
+                  .setACL(presentationScoreACL);
+                presentationScores.push(presentationScore);
+              });
+            });
+            AV.Object.saveAll(presentationScores)
+              .then(() => {
+                alert("Data correction completed.");
+                this.fetchPresentationScores();
+              })
+              .catch(error => {
+                if (error.code === 137) {
+                  alert("Data correction completed.");
+                  this.fetchPresentationScores();
+                } else {
+                  alert(error);
+                }
+              });
+          });
       });
   }
 
@@ -245,14 +288,15 @@ export default class PresentationPage extends React.Component {
                 <h1>Data Correction</h1>
                 <p>
                   If one or more judges report that they cannot find one or more
-                  teams when giving presentation scores, clicking on the button
-                  below may fix the issue. If the issue persists after clicking
-                  on the button, please try manually removing the judges that
-                  have problems and adding them again. Clicking on the button
-                  below <strong>will not</strong> remove any existing scores or
-                  presentation scores stored in the system. However, manually
-                  removing a judge <strong>will</strong> remove all the scores
-                  and presentation scores given by this judge.
+                  teams when giving presentation scores, or if one or more
+                  judges are missing when a team is selected above, clicking on
+                  the button below may fix the issue. If the issue persists
+                  after clicking on the button, please try manually removing the
+                  judges that have problems and adding them again. Clicking on
+                  the button below <strong>will not</strong> remove any existing
+                  scores or presentation scores stored in the system. However,
+                  manually removing a judge <strong>will</strong> remove all the
+                  scores and presentation scores given by this judge.
                 </p>
                 <div className="field field--half">
                   <button onClick={this.correctData}>Perform Correction</button>
