@@ -60,7 +60,9 @@ export default class TeamsPage extends React.Component {
     const eventTeamsQuery = new AV.Query("EventTeam");
     eventTeamsQuery
       .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
-      .ascending("place")
+      .addAscending("place")
+      .addAscending("school")
+      .addAscending("name")
       .limit(1000)
       .find()
       .then(eventTeams => {
