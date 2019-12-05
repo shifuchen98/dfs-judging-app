@@ -5,7 +5,7 @@ AV.Cloud.define("updateUser", async request => {
     if (roles.filter(role => role.get("name") === "Admin").length) {
       return request.params.user
         .set("name", request.params.name)
-        .set("email", request.params.email)
+        .set("email", request.params.email.toLowerCase())
         .save();
     } else {
       throw new AV.Cloud.Error("You are not an admin.");
