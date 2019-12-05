@@ -245,8 +245,14 @@ export default class PresentationPage extends React.Component {
                 <h1>Data Correction</h1>
                 <p>
                   If one or more judges report that they cannot find one or more
-                  teams when giving presentation scores, click on the button
-                  below to fix the issue.
+                  teams when giving presentation scores, clicking on the button
+                  below may fix the issue. If the issue persists after clicking
+                  on the button, please try manually removing the judges that
+                  have problems and adding them again. Clicking on the button
+                  below <strong>will not</strong> remove any existing scores or
+                  presentation scores stored in the system. However, manually
+                  removing a judge <strong>will</strong> remove all the scores
+                  and presentation scores given by this judge.
                 </p>
                 <div className="field field--half">
                   <button onClick={this.correctData}>Perform Correction</button>
