@@ -199,8 +199,12 @@ export default class TeamsPage extends React.Component {
   }
 
   importFromText(e) {
-    const { textToBeImported } = this.state;
-    Papa.parse(textToBeImported.trim(), {
+    let { textToBeImported } = this.state;
+    textToBeImported = textToBeImported.trim();
+    if (!textToBeImported.startsWith("name,school,appName,appDescription\n")) {
+      textToBeImported = `name,school,appName,appDescription\n${textToBeImported}`;
+    }
+    Papa.parse(textToBeImported, {
       complete: results => {
         this.importFromJson(results.data);
       },
@@ -215,10 +219,10 @@ export default class TeamsPage extends React.Component {
       jsonToBeImported.map(row =>
         new AV.Object("EventTeam")
           .set("event", AV.Object.createWithoutData("Event", match.params.id))
-          .set("name", row.name)
-          .set("school", row.school)
-          .set("appName", row.appName)
-          .set("appDescription", row.appDescription)
+          .set("name", row.name.trim())
+          .set("school", row.school.trim())
+          .set("appName", row.appName.trim())
+          .set("appDescription", row.appDescription.trim())
       )
     )
       .then(() => {

@@ -248,8 +248,12 @@ export default class JudgesPage extends React.Component {
   }
 
   importFromText(e) {
-    const { textToBeImported } = this.state;
-    Papa.parse(textToBeImported.trim(), {
+    let { textToBeImported } = this.state;
+    textToBeImported = textToBeImported.trim();
+    if (!textToBeImported.startsWith("email,name\n")) {
+      textToBeImported = `email,name\n${textToBeImported}`;
+    }
+    Papa.parse(textToBeImported, {
       complete: results => {
         this.importFromJson(results.data);
       },
@@ -263,7 +267,7 @@ export default class JudgesPage extends React.Component {
     const addEventJudge = async row => {
       try {
         const usersQuery = new AV.Query("_User");
-        usersQuery.equalTo("email", row.email);
+        usersQuery.equalTo("email", row.email.trim());
         const user = await usersQuery.first();
         if (user) {
           const roles = await user.getRoles();
@@ -286,9 +290,9 @@ export default class JudgesPage extends React.Component {
           judgePassword.set("password", password);
           const user = new AV.Object("_User");
           user
-            .set("email", row.email)
-            .set("username", row.email)
-            .set("name", row.name)
+            .set("email", row.email.trim())
+            .set("username", row.email.trim())
+            .set("name", row.name.trim())
             .set("password", password)
             .set("judgePassword", judgePassword);
           const eventJudge = new AV.Object("EventJudge");
