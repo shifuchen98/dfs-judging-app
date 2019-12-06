@@ -24,11 +24,11 @@ export default class SideNav extends React.Component {
     if (!AV.User.current()) {
       history.push("/");
     } else {
+      this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
       AV.User.current()
         .getRoles()
         .then(roles => {
           this.setState({ roles }, () => {
-            this.interval = setInterval(this.updateJudgingTimeLeft, 1000);
             this.fetchEvent();
           });
         })
@@ -39,7 +39,11 @@ export default class SideNav extends React.Component {
   }
 
   componentWillUnmount() {
+    this.unmounted = true;
     clearInterval(this.interval);
+    if (this.eventsLiveQuery) {
+      this.eventsLiveQuery.unsubscribe();
+    }
   }
 
   fetchEvent() {
@@ -57,9 +61,12 @@ export default class SideNav extends React.Component {
     eventsQuery
       .subscribe()
       .then(liveQuery => {
-        liveQuery.on("update", event => {
-          this.setState({ event });
-        });
+        if (!this.unmounted) {
+          this.eventsLiveQuery = liveQuery;
+          liveQuery.on("update", event => {
+            this.setState({ event });
+          });
+        }
       })
       .catch(error => {
         alert(error);

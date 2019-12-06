@@ -38,6 +38,16 @@ export default class SideNav extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.unmounted = true;
+    if (this.judgeTeamPairsLiveQuery) {
+      this.judgeTeamPairsLiveQuery.unsubscribe();
+    }
+    if (this.presentationScoresLiveQuery) {
+      this.presentationScoresLiveQuery.unsubscribe();
+    }
+  }
+
   updatePages() {
     const { match } = this.props;
     const { roles, pages } = this.state;
@@ -133,23 +143,26 @@ export default class SideNav extends React.Component {
               judgeTeamPairsQuery
                 .subscribe()
                 .then(liveQuery => {
-                  liveQuery.on("update", judgeTeamPair => {
-                    const { pages } = this.state;
-                    this.setState({
-                      pages: pages.map(page =>
-                        page.path === `scoring/${judgeTeamPair.id}`
-                          ? {
-                              name: page.name,
-                              path: page.path,
-                              judgingCompleted: judgeTeamPair.get("scores")
-                                .length
-                                ? true
-                                : false
-                            }
-                          : page
-                      )
+                  if (!this.unmounted) {
+                    this.judgeTeamPairsLiveQuery = liveQuery;
+                    liveQuery.on("update", judgeTeamPair => {
+                      const { pages } = this.state;
+                      this.setState({
+                        pages: pages.map(page =>
+                          page.path === `scoring/${judgeTeamPair.id}`
+                            ? {
+                                name: page.name,
+                                path: page.path,
+                                judgingCompleted: judgeTeamPair.get("scores")
+                                  .length
+                                  ? true
+                                  : false
+                              }
+                            : page
+                        )
+                      });
                     });
-                  });
+                  }
                 })
                 .catch(error => {
                   alert(error);
@@ -161,36 +174,39 @@ export default class SideNav extends React.Component {
           presentationScoresQuery
             .subscribe()
             .then(liveQuery => {
-              liveQuery.on("enter", () => {
-                const { pages } = this.state;
-                this.setState({
-                  pages: pages.map(page =>
-                    page.path === "pscoring"
-                      ? {
-                          name: page.name,
-                          path: page.path,
-                          presentationScoresLeft:
-                            page.presentationScoresLeft + 1
-                        }
-                      : page
-                  )
+              if (!this.unmounted) {
+                this.presentationScoresLiveQuery = liveQuery;
+                liveQuery.on("enter", () => {
+                  const { pages } = this.state;
+                  this.setState({
+                    pages: pages.map(page =>
+                      page.path === "pscoring"
+                        ? {
+                            name: page.name,
+                            path: page.path,
+                            presentationScoresLeft:
+                              page.presentationScoresLeft + 1
+                          }
+                        : page
+                    )
+                  });
                 });
-              });
-              liveQuery.on("leave", () => {
-                const { pages } = this.state;
-                this.setState({
-                  pages: pages.map(page =>
-                    page.path === "pscoring"
-                      ? {
-                          name: page.name,
-                          path: page.path,
-                          presentationScoresLeft:
-                            page.presentationScoresLeft - 1
-                        }
-                      : page
-                  )
+                liveQuery.on("leave", () => {
+                  const { pages } = this.state;
+                  this.setState({
+                    pages: pages.map(page =>
+                      page.path === "pscoring"
+                        ? {
+                            name: page.name,
+                            path: page.path,
+                            presentationScoresLeft:
+                              page.presentationScoresLeft - 1
+                          }
+                        : page
+                    )
+                  });
                 });
-              });
+              }
             })
             .catch(error => {
               alert(error);
