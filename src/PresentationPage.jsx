@@ -51,10 +51,9 @@ export default class PresentationPage extends React.Component {
   fetchPresentationScores() {
     const { match } = this.props;
     const eventTeamsQuery = new AV.Query("EventTeam");
-    eventTeamsQuery.equalTo(
-      "event",
-      AV.Object.createWithoutData("Event", match.params.id)
-    );
+    eventTeamsQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .limit(1000);
     const presentationScoresQuery = new AV.Query("PresentationScore");
     presentationScoresQuery
       .matchesQuery("eventTeam", eventTeamsQuery)

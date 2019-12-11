@@ -82,10 +82,9 @@ export default class AssignPage extends React.Component {
   fetchJudgeTeamPairs() {
     const { match } = this.props;
     const eventTeamsQuery = new AV.Query("EventTeam");
-    eventTeamsQuery.equalTo(
-      "event",
-      AV.Object.createWithoutData("Event", match.params.id)
-    );
+    eventTeamsQuery
+      .equalTo("event", AV.Object.createWithoutData("Event", match.params.id))
+      .limit(1000);
     const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
     judgeTeamPairsQuery
       .matchesQuery("eventTeam", eventTeamsQuery)

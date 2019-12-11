@@ -91,7 +91,7 @@ export default class ExportPage extends React.Component {
   fetchJudgeTeamPairs() {
     const { event } = this.state;
     const eventTeamsQuery = new AV.Query("EventTeam");
-    eventTeamsQuery.equalTo("event", event);
+    eventTeamsQuery.equalTo("event", event).limit(1000);
     const judgeTeamPairsQuery = new AV.Query("JudgeTeamPair");
     judgeTeamPairsQuery
       .matchesQuery("eventTeam", eventTeamsQuery)
