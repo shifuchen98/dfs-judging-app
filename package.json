@@ -2,20 +2,23 @@
   "name": "dfs",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dfs.avosapps.us",
+  "homepage": "https://judge.dreamsforschools.org",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.25",
-    "@fortawesome/free-regular-svg-icons": "^5.11.2",
-    "@fortawesome/free-solid-svg-icons": "^5.11.2",
-    "@fortawesome/react-fontawesome": "^0.1.7",
+    "@fortawesome/fontawesome-svg-core": "^1.2.26",
+    "@fortawesome/free-regular-svg-icons": "^5.12.0",
+    "@fortawesome/free-solid-svg-icons": "^5.12.0",
+    "@fortawesome/react-fontawesome": "^0.1.8",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.3",
+    "@testing-library/user-event": "^7.1.2",
     "eslint-config-airbnb": "^18.0.1",
-    "leancloud-storage": "^3.15.0",
-    "leanengine": "^3.4.0",
+    "leancloud-storage": "^4.1.0",
+    "leanengine": "^3.5.0",
     "papaparse": "^5.1.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
+    "react-scripts": "3.3.0",
     "xlsx-parse-json": "^3.0.5"
   },
   "scripts": {
@@ -55,6 +58,6 @@
     ]
   },
   "engines": {
-    "node": "^13.1.0"
+    "node": "^13.3.0"
   }
 }
