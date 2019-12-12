@@ -202,10 +202,6 @@ td > button.primary:hover {
   width: 100%;
   overflow: auto;
 }
-.column--thin {
-  float: none;
-  max-width: 483px;
-}
 .top-nav {
   position: fixed;
   top: 0;
@@ -329,7 +325,7 @@ td > button.primary:hover {
 #auth__logo {
   width: 100%;
 }
-@media (min-width: 547px) {
+@media (min-width: 544px) {
   .card {
     margin: 0 0 16px 0;
   }
@@ -341,6 +337,10 @@ td > button.primary:hover {
   }
   .field {
     margin: 0 0 16px 0;
+  }
+  .column--thin {
+    float: none;
+    max-width: 480px;
   }
   label > input,
   label > textarea,
@@ -360,7 +360,7 @@ td > button.primary:hover {
     padding: 0 32px 64px 32px;
   }
 }
-@media (min-width: 803px) {
+@media (min-width: 800px) {
   #top-nav__left > #top-nav__menu {
     display: none;
   }
@@ -372,7 +372,7 @@ td > button.primary:hover {
     margin: 48px 0 0 256px;
   }
 }
-@media (min-width: 1081px) {
+@media (min-width: 1296px) {
   .field--half {
     width: calc((100% - 16px) / 2);
   }
@@ -383,8 +383,8 @@ td > button.primary:hover {
     margin: 0 0 16px 0;
   }
 }
-@media (min-width: 1921px) {
+@media (min-width: 1792px) {
   #page {
-    width: 1664px;
+    width: 1536px;
   }
 }
