@@ -190,36 +190,16 @@ export default class AssignPage extends React.Component {
         eventJudge,
         eventTeams: []
       }));
-      const pendingTeams = this.shuffle(
-        eventTeams
-          .map(eventTeam =>
-            Array(parseInt(timesEachTeamGetsJudged)).fill(eventTeam)
-          )
-          .flat()
-      );
-      pendingTeams.forEach(pendingTeam => {
-        const resultShadow = this.shuffle(result).filter(({ eventTeams }) =>
-          eventTeams.reduce(
-            (accumulator, eventTeam) =>
-              accumulator && eventTeam.id !== pendingTeam.id,
-            true
-          )
-        );
-        resultShadow.sort((a, b) => a.eventTeams.length - b.eventTeams.length);
-        for (let i = 0; i < resultShadow.length; i++) {
-          let hasSchoolConflict = false;
-          resultShadow[i].eventTeams.forEach(eventTeam => {
-            if (eventTeam.get("school") === pendingTeam.get("school")) {
-              hasSchoolConflict = true;
-            }
-          });
-          if (!hasSchoolConflict) {
-            resultShadow[i].eventTeams.push(pendingTeam);
-            return;
-          }
-        }
-        resultShadow[0].eventTeams.push(pendingTeam);
-      });
+      this.shuffle(eventTeams)
+        .sort((a, b) => (a.get("school") < b.get("school") ? -1 : 1))
+        .forEach(eventTeam => {
+          this.shuffle(result)
+            .sort((a, b) => a.eventTeams.length - b.eventTeams.length)
+            .slice(0, timesEachTeamGetsJudged)
+            .forEach(({ eventTeams }) => {
+              eventTeams.push(eventTeam);
+            });
+        });
       AV.Object.destroyAll(judgeTeamPairs)
         .then(() => {
           AV.Object.saveAll(

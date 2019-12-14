@@ -21,16 +21,14 @@ AV.Cloud.beforeDelete("Event", request => {
     .limit(1000)
     .find()
     .then(eventJudges => {
-      AV.Object.destroyAll(eventJudges).then(() => {
-        const eventTeamsQuery = new AV.Query("EventTeam");
-        eventTeamsQuery
-          .equalTo("event", request.object)
-          .limit(1000)
-          .find()
-          .then(eventTeams => {
-            AV.Object.destroyAll(eventTeams);
-          });
-      });
+      const eventTeamsQuery = new AV.Query("EventTeam");
+      eventTeamsQuery
+        .equalTo("event", request.object)
+        .limit(1000)
+        .find()
+        .then(eventTeams => {
+          AV.Object.destroyAll([...eventJudges, ...eventTeams]);
+        });
     });
 });
 AV.Cloud.beforeDelete("EventJudge", request => {
