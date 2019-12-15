@@ -190,8 +190,21 @@ export default class AssignPage extends React.Component {
         eventJudge,
         eventTeams: []
       }));
-      this.shuffle(eventTeams)
-        .sort((a, b) => (a.get("school") < b.get("school") ? -1 : 1))
+      this.shuffle(
+        Object.values(
+          this.shuffle(eventTeams).reduce(
+            (accumulator, eventTeam) => ({
+              ...accumulator,
+              [eventTeam.get("school")]: [
+                ...(accumulator[eventTeam.get("school")] || []),
+                eventTeam
+              ]
+            }),
+            {}
+          )
+        )
+      )
+        .flat()
         .forEach(eventTeam => {
           this.shuffle(result)
             .sort((a, b) => a.eventTeams.length - b.eventTeams.length)
@@ -204,12 +217,12 @@ export default class AssignPage extends React.Component {
         .then(() => {
           AV.Object.saveAll(
             result.reduce((accumulator, { eventJudge, eventTeams }) => {
+              const judgeTeamPairACL = new AV.ACL();
+              judgeTeamPairACL.setReadAccess(eventJudge.get("user"), true);
+              judgeTeamPairACL.setWriteAccess(eventJudge.get("user"), true);
+              judgeTeamPairACL.setRoleReadAccess(new AV.Role("Admin"), true);
+              judgeTeamPairACL.setRoleWriteAccess(new AV.Role("Admin"), true);
               const judgeTeamPairs = eventTeams.map(eventTeam => {
-                const judgeTeamPairACL = new AV.ACL();
-                judgeTeamPairACL.setReadAccess(eventJudge.get("user"), true);
-                judgeTeamPairACL.setWriteAccess(eventJudge.get("user"), true);
-                judgeTeamPairACL.setRoleReadAccess(new AV.Role("Admin"), true);
-                judgeTeamPairACL.setRoleWriteAccess(new AV.Role("Admin"), true);
                 const judgeTeamPair = new AV.Object("JudgeTeamPair");
                 return judgeTeamPair
                   .set("eventJudge", eventJudge)

@@ -238,8 +238,8 @@ export default class TeamsPage extends React.Component {
 
   importXlsxFile() {
     const { fileToBeImported } = this.state;
-    xlsxParser.onFileSelection(fileToBeImported).then(data => {
-      Object.keys(data).map(sheet => this.importFromJson(data[sheet]));
+    xlsxParser.onFileSelection(fileToBeImported).then(sheets => {
+      Object.values(sheets).forEach(this.importFromJson);
     });
   }
 
