@@ -12,20 +12,21 @@
     "@testing-library/react": "^9.3.3",
     "@testing-library/user-event": "^7.1.2",
     "eslint-config-airbnb": "^18.0.1",
-    "leancloud-storage": "^4.1.0",
+    "leancloud-storage": "^4.2.0",
     "leanengine": "^3.5.0",
-    "papaparse": "^5.1.0",
+    "papaparse": "^5.1.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
-    "xlsx-parse-json": "^3.0.5"
+    "xlsx-parse-json": "^3.1.0"
   },
   "scripts": {
     "serve": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "start": "node server.js",
     "postinstall": "npm run build"
   },
   "eslintConfig": {
@@ -58,6 +59,6 @@
     ]
   },
   "engines": {
-    "node": "^13.3.0"
+    "node": "*"
   }
 }
